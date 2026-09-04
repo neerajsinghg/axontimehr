@@ -1,0 +1,3533 @@
+Yes. For **AxonTimeHR**, after Phase 5, Phase 6 should focus on **Leave Management + Holiday Management + Attendance Regularization + Approval Workflows**.
+
+The key design principle is that Phase 6 should consume the employee, attendance, shift, and policy foundations from Phases 3–5 rather than creating parallel systems.
+
+# PHASE 6 — LEAVE, HOLIDAY, REGULARIZATION & APPROVAL WORKFLOW DEVELOPMENT
+
+# AXONTIMEHR — PRODUCTION-GRADE LEAVE & ATTENDANCE WORKFLOW ENGINE
+
+---
+
+# 1. PROJECT CONTEXT
+
+You are continuing development of **AxonTimeHR**, a modern, advanced, production-ready, multi-tenant **Attendance + HRMS SaaS platform**.
+
+AxonTimeHR is being developed incrementally in phases.
+
+Previously completed:
+
+```text
+PHASE 1
+Foundation
+```
+
+```text
+PHASE 2
+Authentication + Identity + RBAC
+```
+
+```text
+PHASE 3
+Organization + Employee Management
+```
+
+```text
+PHASE 4
+Attendance + Shift Management
+```
+
+```text
+PHASE 5
+GPS + Geofencing + Verified Attendance
+```
+
+Phase 6 must build on these existing modules.
+
+---
+
+# 2. PHASE 6 OBJECTIVE
+
+The objective of Phase 6 is to implement a complete:
+
+# LEAVE + HOLIDAY + ATTENDANCE REGULARIZATION + APPROVAL WORKFLOW ENGINE
+
+The module must support:
+
+* Leave types
+* Leave policies
+* Leave balances
+* Leave accrual
+* Leave requests
+* Leave cancellation
+* Leave approval
+* Leave rejection
+* Leave withdrawal
+* Half-day leave
+* Partial-day leave where applicable
+* Multiple leave types
+* Holiday calendars
+* Branch-specific holidays
+* Organization holidays
+* Weekly offs
+* Leave validation against attendance
+* Attendance regularization
+* Manager approval
+* HR approval
+* Multi-level approval workflows
+* Delegated approvals
+* Approval history
+* Notifications foundation
+* Audit logs
+* Tenant isolation
+* RBAC
+
+The final system should support both:
+
+```text
+Employee Self Service
+```
+
+and:
+
+```text
+Manager / HR / Admin workflows
+```
+
+---
+
+# 3. CRITICAL DEVELOPMENT RULE
+
+Before writing code:
+
+**INSPECT THE ENTIRE EXISTING AXONTIMEHR REPOSITORY.**
+
+Do not recreate:
+
+* Employee model
+* Organization model
+* Branch model
+* Department model
+* Attendance model
+* Shift model
+* Authentication
+* JWT
+* RBAC
+* Tenant handling
+* Audit logging
+* Existing notification architecture
+* Database connection
+* API architecture
+* Frontend design system
+
+Reuse existing functionality.
+
+If an existing table/model/service already supports part of Phase 6, extend it rather than creating a duplicate.
+
+---
+
+# 4. FIRST STEP — CODEBASE ANALYSIS
+
+Before implementation inspect:
+
+```text
+Backend
+Frontend
+PostgreSQL models
+Migrations
+Employee module
+Attendance module
+Shift module
+Location module
+Attendance policy
+RBAC
+Tenant middleware
+Audit logging
+Notification foundation
+API patterns
+Testing framework
+Docker configuration
+Environment configuration
+```
+
+Then produce an implementation analysis:
+
+```text
+1. Existing architecture
+2. Existing employee relationships
+3. Existing attendance relationships
+4. Existing shift architecture
+5. Existing holiday implementation, if any
+6. Existing RBAC
+7. Existing approval-related code
+8. Existing notification infrastructure
+9. Existing audit infrastructure
+10. Database changes required
+11. API changes required
+12. Frontend changes required
+13. Migration strategy
+14. Testing strategy
+```
+
+Only after this analysis begin implementation.
+
+---
+
+# 5. HIGH-LEVEL PHASE 6 ARCHITECTURE
+
+Use a reusable workflow-oriented architecture:
+
+```text
+                    AxonTimeHR
+                        |
+                Authentication
+                        |
+                   Tenant Context
+                        |
+              Leave / Workflow APIs
+                        |
+                 Service Layer
+                        |
+        +---------------+---------------+
+        |               |               |
+   Leave Engine   Approval Engine   Holiday Engine
+        |               |               |
+        +---------------+---------------+
+                        |
+                 Attendance Engine
+                        |
+                    PostgreSQL
+```
+
+Supporting systems:
+
+```text
+Audit
+Notifications
+Redis/Celery
+Object Storage where required
+```
+
+---
+
+# 6. DOMAIN MODULES
+
+Phase 6 should contain the following logical modules:
+
+```text
+Leave Management
+Holiday Management
+Leave Balance
+Leave Policy
+Leave Accrual
+Leave Request
+Leave Approval
+Leave Cancellation
+Attendance Regularization
+Approval Workflow
+Approval History
+Delegation
+Notifications Foundation
+```
+
+Keep modules loosely coupled.
+
+---
+
+# 7. LEAVE TYPE MANAGEMENT
+
+Create a configurable leave type master.
+
+Examples:
+
+```text
+CASUAL_LEAVE
+SICK_LEAVE
+EARNED_LEAVE
+ANNUAL_LEAVE
+PRIVILEGE_LEAVE
+MATERNITY_LEAVE
+PATERNITY_LEAVE
+UNPAID_LEAVE
+COMP_OFF
+```
+
+Do not hard-code business-specific leave types into application logic.
+
+Each tenant should be able to configure appropriate leave types.
+
+---
+
+# 8. LEAVE TYPE DATA MODEL
+
+Potential fields:
+
+```text
+id
+tenant_id
+code
+name
+description
+color/reference for UI
+paid
+requires_document
+allow_half_day
+allow_partial_day
+allow_backdated
+allow_future
+minimum_notice_days
+maximum_consecutive_days
+status
+created_at
+updated_at
+created_by
+updated_by
+```
+
+Use the existing naming conventions.
+
+Do not add fields without business value.
+
+---
+
+# 9. LEAVE POLICY
+
+Create a configurable leave policy.
+
+Possible configuration:
+
+```text
+leave_type
+annual_entitlement
+accrual_frequency
+accrual_amount
+carry_forward_allowed
+carry_forward_limit
+encashment_allowed
+maximum_balance
+negative_balance_allowed
+probation_allowed
+notice_period
+document_required
+approval_required
+```
+
+The policy must be tenant-specific.
+
+---
+
+# 10. LEAVE POLICY ASSIGNMENT
+
+Allow policies to be assigned based on appropriate organizational rules.
+
+Potential scopes:
+
+```text
+Organization
+Branch
+Department
+Employee
+Employee Group
+Employment Type
+Designation
+```
+
+Define a deterministic precedence rule.
+
+For example:
+
+```text
+Employee-specific policy
+        ↓
+Employee-group policy
+        ↓
+Department policy
+        ↓
+Branch policy
+        ↓
+Organization default
+```
+
+Document and test the precedence.
+
+---
+
+# 11. LEAVE BALANCE
+
+Implement employee leave balances.
+
+Example:
+
+```text
+Employee:
+Neeraj
+
+Casual Leave:
+Allocated = 12
+Used = 4
+Pending = 2
+Available = 6
+```
+
+The balance model should support:
+
+```text
+opening_balance
+accrued
+adjusted
+used
+pending
+expired
+carried_forward
+available
+```
+
+Avoid storing derived values unnecessarily if they can be safely calculated.
+
+If balances are materialized for performance, define the authoritative source clearly.
+
+---
+
+# 12. LEAVE LEDGER
+
+Prefer a ledger-based architecture for balance changes.
+
+Example:
+
+```text
+Leave Ledger
+
+Opening       +12
+Accrual        +1
+Leave Used     -2
+Adjustment     +1
+Expiry         -1
+------------------
+Available      11
+```
+
+This makes the system:
+
+* Auditable
+* Reversible
+* Traceable
+* Easier to reconcile
+
+Do not simply overwrite a balance number without recording why it changed.
+
+---
+
+# 13. LEAVE BALANCE TRANSACTIONS
+
+Possible transaction types:
+
+```text
+OPENING_BALANCE
+ACCRUAL
+LEAVE_DEBIT
+LEAVE_REVERSAL
+MANUAL_ADJUSTMENT
+CARRY_FORWARD
+EXPIRY
+ENCASHMENT
+```
+
+Every balance-changing operation should generate an auditable transaction.
+
+---
+
+# 14. LEAVE ACCRUAL
+
+Support configurable accrual rules.
+
+Examples:
+
+```text
+Monthly:
+1 day/month
+
+Quarterly:
+3 days/quarter
+
+Yearly:
+24 days/year
+```
+
+Future-compatible accrual rules may include:
+
+```text
+joining-date based
+calendar-year based
+financial-year based
+monthly pro-rata
+```
+
+Do not hard-code one accrual model.
+
+---
+
+# 15. PRO-RATA ACCRUAL
+
+Prepare support for employees joining mid-year.
+
+Example:
+
+```text
+Annual entitlement = 24 days
+Joining date = July
+```
+
+The system may calculate a proportional entitlement according to tenant policy.
+
+Make the formula configurable and clearly documented.
+
+---
+
+# 16. LEAVE YEAR
+
+Support configurable leave years.
+
+Examples:
+
+```text
+January → December
+April → March
+```
+
+Do not hard-code January 1 as the beginning of every leave year.
+
+The leave-year calculation must respect tenant configuration.
+
+---
+
+# 17. CARRY FORWARD
+
+Support carry-forward policies.
+
+Example:
+
+```text
+Annual Leave = 20
+Carry Forward Limit = 5
+```
+
+At year end:
+
+```text
+Unused = 8
+Carry Forward = 5
+Expired = 3
+```
+
+Record the operation in the leave ledger.
+
+---
+
+# 18. LEAVE EXPIRY
+
+Support expiration rules.
+
+Examples:
+
+```text
+End of Leave Year
+Specific Date
+Never Expires
+```
+
+When leave expires:
+
+```text
+Leave Balance
+      ↓
+Expiry Transaction
+      ↓
+Audit
+```
+
+Do not silently delete unused balance.
+
+---
+
+# 19. NEGATIVE BALANCE
+
+Support tenant-configurable behavior:
+
+```text
+ALLOW
+DO_NOT_ALLOW
+ALLOW_WITH_APPROVAL
+```
+
+If negative balance is allowed, define the maximum negative amount.
+
+---
+
+# 20. LEAVE REQUEST
+
+Implement employee leave requests.
+
+Example:
+
+```http
+POST /api/v1/leaves/requests
+```
+
+Request:
+
+```json
+{
+  "leave_type_id": "...",
+  "start_date": "2026-09-10",
+  "end_date": "2026-09-12",
+  "duration": "FULL_DAY",
+  "reason": "Personal work"
+}
+```
+
+The server must calculate the final number of leave days.
+
+Do not trust:
+
+```text
+total_days
+```
+
+from the client.
+
+---
+
+# 21. LEAVE DURATION
+
+Support:
+
+```text
+FULL_DAY
+HALF_DAY
+PARTIAL_DAY
+```
+
+Where policy allows.
+
+For half-day leave support:
+
+```text
+FIRST_HALF
+SECOND_HALF
+```
+
+Do not allow half-day leave for leave types that prohibit it.
+
+---
+
+# 22. WORKING-DAY CALCULATION
+
+Leave duration must consider:
+
+```text
+Working days
+Weekly offs
+Holidays
+Employee schedule
+Branch calendar
+```
+
+Example:
+
+```text
+Monday = Working
+Tuesday = Working
+Wednesday = Holiday
+Thursday = Working
+Friday = Working
+Saturday = Off
+Sunday = Off
+```
+
+A leave request across these dates should count only applicable leave days according to policy.
+
+Do not simply calculate:
+
+```text
+end_date - start_date + 1
+```
+
+---
+
+# 23. HOLIDAY INTEGRATION
+
+Leave calculation must integrate with Phase 6 holiday calendars.
+
+Example:
+
+```text
+Leave:
+Monday → Friday
+
+Wednesday:
+Holiday
+
+Result:
+4 leave days
+```
+
+unless tenant policy explicitly counts holidays as leave.
+
+Make this behavior configurable.
+
+---
+
+# 24. WEEKLY OFF INTEGRATION
+
+Do not count scheduled weekly offs as leave by default.
+
+Use employee/tenant work-week rules established in Phase 4.
+
+---
+
+# 25. LEAVE OVERLAP VALIDATION
+
+Prevent invalid overlapping leave.
+
+Example:
+
+Existing:
+
+```text
+10 Sep → 12 Sep
+```
+
+New:
+
+```text
+11 Sep → 15 Sep
+```
+
+must be detected as overlapping.
+
+The server must reject or handle it according to policy.
+
+---
+
+# 26. PENDING LEAVE OVERLAP
+
+Also determine whether pending requests should block new requests.
+
+Configuration may be:
+
+```text
+BLOCK_OVERLAP
+ALLOW_OVERLAP
+```
+
+Recommended default:
+
+```text
+BLOCK_OVERLAP
+```
+
+---
+
+# 27. LEAVE STATUS
+
+Use controlled statuses.
+
+Example:
+
+```text
+DRAFT
+PENDING
+APPROVED
+REJECTED
+CANCEL_REQUESTED
+CANCELLED
+WITHDRAWN
+EXPIRED
+```
+
+Define valid transitions.
+
+---
+
+# 28. LEAVE STATE MACHINE
+
+Implement/document:
+
+```text
+DRAFT
+  |
+  ↓
+PENDING
+  |
+  +----> REJECTED
+  |
+  ↓
+APPROVED
+  |
+  +----> CANCEL_REQUESTED
+  |             |
+  |             ↓
+  |         CANCELLED
+  |
+  ↓
+COMPLETED
+```
+
+Employee withdrawal should only be allowed at appropriate states.
+
+Invalid transitions must be rejected.
+
+---
+
+# 29. APPROVAL WORKFLOW ENGINE
+
+Create a reusable approval workflow rather than hard-coding:
+
+```text
+Employee → Manager
+```
+
+The workflow engine should support:
+
+```text
+Single-level approval
+Multi-level approval
+Manager approval
+HR approval
+Admin approval
+Conditional approval
+```
+
+Future modules should be able to reuse it.
+
+---
+
+# 30. WORKFLOW EXAMPLE
+
+Example:
+
+```text
+Employee
+   |
+   ↓
+Leave Request
+   |
+   ↓
+Reporting Manager
+   |
+   ↓
+HR
+   |
+   ↓
+Approved
+```
+
+Another tenant:
+
+```text
+Employee
+   |
+   ↓
+Manager
+   |
+   ↓
+Approved
+```
+
+Do not force every tenant into the same approval chain.
+
+---
+
+# 31. APPROVAL WORKFLOW MODEL
+
+Possible entities:
+
+```text
+ApprovalWorkflow
+ApprovalWorkflowStep
+ApprovalInstance
+ApprovalInstanceStep
+ApprovalAction
+ApprovalDelegation
+```
+
+Use existing workflow models if already available.
+
+---
+
+# 32. APPROVAL STEP
+
+Potential fields:
+
+```text
+step_order
+approver_type
+approver_reference
+required
+minimum_approvals
+timeout
+auto_approval_rules
+```
+
+Approver types may include:
+
+```text
+REPORTING_MANAGER
+DEPARTMENT_HEAD
+HR
+ROLE
+SPECIFIC_USER
+ADMIN
+```
+
+---
+
+# 33. APPROVAL INSTANCE
+
+When a leave request is submitted:
+
+```text
+Leave Request
+      ↓
+Approval Workflow Resolved
+      ↓
+Approval Instance Created
+      ↓
+Current Step = Manager
+```
+
+Do not dynamically change the approval chain after approval has started unless a controlled workflow rule explicitly allows it.
+
+---
+
+# 34. APPROVAL ACTIONS
+
+Support:
+
+```text
+APPROVE
+REJECT
+RETURN
+CANCEL
+DELEGATE
+```
+
+Require rejection reason where appropriate.
+
+---
+
+# 35. APPROVAL HISTORY
+
+Every approval action must be recorded.
+
+Example:
+
+```text
+Employee submitted
+↓
+Manager approved
+↓
+HR rejected
+```
+
+Record:
+
+```text
+actor
+action
+timestamp
+comments
+step
+previous_status
+new_status
+```
+
+Approval history must be immutable.
+
+---
+
+# 36. MANAGER APPROVAL
+
+Managers should see requests only for employees they are authorized to manage.
+
+Do not expose every tenant leave request to every manager.
+
+Use the reporting hierarchy from Phase 3.
+
+---
+
+# 37. HR APPROVAL
+
+HR permissions should allow appropriate tenant-wide or organizational visibility based on RBAC.
+
+Do not simply grant all HR users unrestricted access without considering branch/organization scope.
+
+---
+
+# 38. ADMIN APPROVAL
+
+Administrators may be able to:
+
+* approve
+* reject
+* cancel
+* modify
+* override
+
+But overrides must always be audited.
+
+---
+
+# 39. APPROVAL DELEGATION
+
+Prepare support for:
+
+```text
+Manager unavailable
+      ↓
+Delegate approval to another authorized user
+```
+
+Delegation should contain:
+
+```text
+delegator
+delegate
+start_date
+end_date
+scope
+status
+```
+
+Do not allow delegation to arbitrary users without authorization.
+
+---
+
+# 40. SELF-APPROVAL PREVENTION
+
+An employee must not approve their own request.
+
+Example:
+
+```text
+Employee = Neeraj
+Approver = Neeraj
+```
+
+must be rejected unless an explicitly authorized emergency workflow permits it.
+
+---
+
+# 41. APPROVER VALIDATION
+
+At approval time verify:
+
+```text
+Approver is authenticated
+Approver belongs to tenant
+Approver has permission
+Approver is authorized for employee/request
+Workflow step is active
+Request is still pending
+```
+
+Do not trust an approver ID from the client.
+
+---
+
+# 42. RACE CONDITION IN APPROVAL
+
+Two approvers may attempt to approve/reject simultaneously.
+
+The system must prevent inconsistent state.
+
+Example:
+
+```text
+Manager A → APPROVE
+Manager B → REJECT
+```
+
+The final state must follow workflow rules and transactional locking/versioning.
+
+---
+
+# 43. LEAVE CANCELLATION
+
+Support cancellation after approval where policy allows.
+
+Example:
+
+```text
+APPROVED
+   ↓
+Cancellation Request
+   ↓
+Manager Approval
+   ↓
+CANCELLED
+```
+
+When cancelled:
+
+```text
+Leave Debit
+     ↓
+Reversal
+     ↓
+Balance Restored
+```
+
+The reversal must be recorded in the leave ledger.
+
+---
+
+# 44. PARTIAL CANCELLATION
+
+Prepare architecture for future partial cancellation.
+
+Example:
+
+```text
+Leave:
+10 Sep → 15 Sep
+
+Employee cancels:
+13 Sep → 15 Sep
+```
+
+If not implemented now, do not design the data model in a way that makes it impossible later.
+
+---
+
+# 45. BACKDATED LEAVE
+
+Support configurable policy:
+
+```text
+ALLOW
+DENY
+REQUIRE_APPROVAL
+```
+
+Example:
+
+Employee requests leave for yesterday.
+
+System evaluates:
+
+```text
+Policy
++
+Attendance
++
+Approval
+```
+
+---
+
+# 46. FUTURE-DATED LEAVE
+
+Allow leave requests for future dates subject to:
+
+* notice period
+* leave balance
+* policy
+* blackout dates if configured
+
+---
+
+# 47. BLACKOUT DATES
+
+Prepare optional architecture for restricted periods.
+
+Example:
+
+```text
+Year-end closing
+Festival season
+Critical project period
+```
+
+Possible rule:
+
+```text
+Leave not allowed
+Leave requires HR approval
+```
+
+Do not hard-code blackout dates.
+
+---
+
+# 48. LEAVE DOCUMENTS
+
+Some leave types may require documentation.
+
+Example:
+
+```text
+Medical Leave
+```
+
+Create secure document metadata architecture.
+
+Do not store arbitrary files directly in PostgreSQL.
+
+Use secure object storage architecture where available.
+
+---
+
+# 49. DOCUMENT VALIDATION
+
+Validate:
+
+```text
+file size
+file type
+extension
+MIME
+storage reference
+```
+
+Do not trust client-provided MIME information.
+
+---
+
+# 50. HOLIDAY MANAGEMENT
+
+Implement complete holiday calendar management.
+
+Support:
+
+```text
+Organization holidays
+Branch holidays
+Optional holidays
+Restricted holidays
+Employee-specific holiday calendars
+```
+
+---
+
+# 51. HOLIDAY MODEL
+
+Potential fields:
+
+```text
+id
+tenant_id
+calendar_id
+holiday_date
+holiday_name
+holiday_type
+branch_id
+optional
+description
+status
+created_at
+updated_at
+```
+
+---
+
+# 52. HOLIDAY CALENDAR
+
+Create holiday calendars.
+
+Example:
+
+```text
+India National Holidays 2026
+Gurugram Office Holidays 2026
+Bangalore Office Holidays 2026
+```
+
+A calendar can be assigned to:
+
+```text
+Organization
+Branch
+Employee group
+Employee
+```
+
+---
+
+# 53. HOLIDAY CONFLICT
+
+Prevent duplicate holidays for the same effective scope.
+
+Example:
+
+```text
+Same branch
+Same date
+Same calendar
+```
+
+must not accidentally create duplicate records.
+
+---
+
+# 54. OPTIONAL HOLIDAY
+
+Support optional/floating holidays.
+
+Example:
+
+```text
+Employee may select:
+Diwali
+or
+Christmas
+```
+
+Create appropriate selection/request architecture.
+
+---
+
+# 55. HOLIDAY WORKED DAY
+
+Integrate with attendance.
+
+If employee works on a holiday:
+
+```text
+Holiday
++
+Attendance
+```
+
+should be preserved for future:
+
+```text
+Overtime
+Comp-off
+Payroll
+```
+
+Do not automatically convert it into overtime in Phase 6 unless business rules explicitly require it.
+
+---
+
+# 56. ATTENDANCE REGULARIZATION
+
+Extend Phase 4 regularization foundation into a complete workflow.
+
+Examples:
+
+```text
+Forgot Check-in
+Forgot Check-out
+Wrong Check-in Time
+Wrong Check-out Time
+Missing Attendance
+Wrong Attendance Status
+```
+
+---
+
+# 57. REGULARIZATION REQUEST
+
+Example:
+
+```http
+POST /api/v1/attendance/regularization
+```
+
+Request:
+
+```json
+{
+  "attendance_date": "2026-09-01",
+  "requested_check_in": "09:05",
+  "requested_check_out": "18:10",
+  "reason": "Forgot to check out"
+}
+```
+
+Server calculates:
+
+```text
+worked_minutes
+late
+early_exit
+attendance_status
+```
+
+Do not trust client-calculated attendance values.
+
+---
+
+# 58. REGULARIZATION APPROVAL
+
+Flow:
+
+```text
+Employee
+   ↓
+Regularization Request
+   ↓
+Manager
+   ↓
+Approved
+   ↓
+Attendance Updated
+```
+
+If rejected:
+
+```text
+Attendance remains unchanged
+```
+
+---
+
+# 59. REGULARIZATION AUDIT
+
+Never silently modify attendance.
+
+Store:
+
+```text
+Original Check-in
+Original Check-out
+
+Requested Check-in
+Requested Check-out
+
+Approved Check-in
+Approved Check-out
+
+Reason
+Approver
+Timestamp
+```
+
+---
+
+# 60. ATTENDANCE IMMUTABILITY
+
+Important attendance records should be treated as historical records.
+
+Corrections must occur through controlled workflows.
+
+Do not allow normal employees to directly update:
+
+```text
+attendance_status
+worked_minutes
+late_minutes
+check_in
+check_out
+```
+
+through arbitrary update APIs.
+
+---
+
+# 61. LEAVE ↔ ATTENDANCE INTEGRATION
+
+When leave is approved:
+
+```text
+Leave Approved
+      ↓
+Attendance Calendar
+      ↓
+ON_LEAVE
+```
+
+Do not create duplicate attendance records unnecessarily.
+
+Use a clear source of truth.
+
+---
+
+# 62. LEAVE AND ATTENDANCE CONFLICT
+
+If employee has:
+
+```text
+Approved Leave
++
+Attendance Check-in
+```
+
+define business behavior.
+
+Possible:
+
+```text
+ALLOW
+FLAG_EXCEPTION
+REQUIRE_ADMIN_REVIEW
+```
+
+Recommended default:
+
+```text
+FLAG_EXCEPTION
+```
+
+rather than silently deleting attendance.
+
+---
+
+# 63. HALF-DAY LEAVE + ATTENDANCE
+
+Example:
+
+```text
+Morning Half-Day Leave
++
+Afternoon Attendance
+```
+
+The system should be able to represent:
+
+```text
+Half-day leave
++
+Half-day work
+```
+
+without corrupting attendance calculations.
+
+---
+
+# 64. LEAVE BALANCE VALIDATION
+
+When submitting a request:
+
+```text
+Available balance
++
+Pending requests
++
+Requested duration
+```
+
+must be evaluated according to policy.
+
+Prevent double-spending of the same leave balance.
+
+---
+
+# 65. TRANSACTIONAL LEAVE APPROVAL
+
+When leave is approved:
+
+```text
+BEGIN
+
+Validate request
+Validate balance
+Update leave status
+Create ledger transaction
+Update attendance/calendar state
+Create audit record
+
+COMMIT
+```
+
+If any critical operation fails:
+
+```text
+ROLLBACK
+```
+
+---
+
+# 66. BALANCE RACE CONDITION
+
+Two leave requests must not consume the same available balance incorrectly.
+
+Example:
+
+```text
+Available = 2
+
+Request A = 2 days
+Request B = 2 days
+```
+
+The database/service layer must prevent both from being approved if policy does not allow negative balance.
+
+---
+
+# 67. LEAVE BALANCE RESERVATION
+
+Consider pending leave as:
+
+```text
+Allocated
+-
+Approved
+-
+Pending
+```
+
+where the policy requires reservation.
+
+This prevents employees from submitting many simultaneous requests against the same balance.
+
+---
+
+# 68. LEAVE CALENDAR
+
+Create employee leave calendar UI.
+
+Display:
+
+```text
+Approved Leave
+Pending Leave
+Rejected Leave
+Holidays
+Week Off
+Attendance
+```
+
+Use different visual states.
+
+---
+
+# 69. EMPLOYEE LEAVE DASHBOARD
+
+Create:
+
+```text
+My Leave
+```
+
+Display:
+
+```text
+Casual Leave
+Available: 6
+Pending: 2
+
+Sick Leave
+Available: 8
+
+Annual Leave
+Available: 14
+```
+
+Actions:
+
+```text
+Apply Leave
+View History
+Cancel Leave
+View Balance
+```
+
+---
+
+# 70. APPLY LEAVE UI
+
+Form:
+
+```text
+Leave Type
+From Date
+To Date
+Duration
+Half Day
+Reason
+Attachment
+```
+
+Show calculated:
+
+```text
+Requested Days: 3
+Working Days: 3
+Holidays: 1
+Weekly Off: 1
+```
+
+The final server calculation remains authoritative.
+
+---
+
+# 71. MANAGER LEAVE DASHBOARD
+
+Manager should see:
+
+```text
+Pending Requests
+Approved
+Rejected
+Upcoming Leave
+Team Calendar
+```
+
+Filters:
+
+```text
+Employee
+Department
+Date
+Leave Type
+Status
+```
+
+---
+
+# 72. HR LEAVE DASHBOARD
+
+HR should see organization/authorized scope statistics:
+
+```text
+Total Leave
+Pending
+Approved
+Rejected
+Employees on Leave Today
+Upcoming Leave
+```
+
+---
+
+# 73. HOLIDAY UI
+
+Create:
+
+```text
+Holiday Calendars
+```
+
+Features:
+
+```text
+Create Calendar
+Add Holiday
+Edit Holiday
+Remove/Deactivate Holiday
+Assign Calendar
+```
+
+---
+
+# 74. ADMIN LEAVE SETTINGS
+
+Create:
+
+```text
+Leave Settings
+```
+
+Configure:
+
+```text
+Leave Types
+Leave Policies
+Accrual
+Carry Forward
+Expiry
+Negative Balance
+Notice Period
+Approval Workflow
+Document Requirements
+```
+
+---
+
+# 75. WORKFLOW CONFIGURATION UI
+
+Provide a reusable workflow editor.
+
+Example:
+
+```text
+Leave Request
+
+Step 1:
+Reporting Manager
+
+Step 2:
+HR
+
+Final:
+Approved
+```
+
+Allow authorized administrators to configure workflow steps.
+
+Do not make the UI unnecessarily complex in the first implementation.
+
+---
+
+# 76. NOTIFICATIONS FOUNDATION
+
+Integrate with existing notification architecture.
+
+Events:
+
+```text
+Leave Submitted
+Leave Approved
+Leave Rejected
+Leave Cancelled
+Regularization Submitted
+Regularization Approved
+Regularization Rejected
+Approval Pending
+```
+
+Possible channels:
+
+```text
+In-App
+Email
+Push
+SMS
+WhatsApp
+```
+
+Only implement channels already supported by the existing system.
+
+Prepare interfaces for future channels.
+
+---
+
+# 77. CELERY / REDIS
+
+If Redis/Celery exists:
+
+Use asynchronous jobs for:
+
+```text
+Leave accrual
+Leave expiry
+Reminder notifications
+Pending approval reminders
+Holiday notifications
+Daily leave calendar generation
+```
+
+Do not make synchronous leave submission depend on a background job.
+
+---
+
+# 78. SCHEDULED JOBS
+
+Prepare jobs such as:
+
+```text
+monthly_leave_accrual
+leave_expiry_processing
+approval_reminders
+upcoming_leave_notifications
+```
+
+Jobs must be:
+
+* idempotent
+* retry-safe
+* tenant-aware
+* auditable
+
+---
+
+# 79. JOB IDEMPOTENCY
+
+A monthly accrual job must not grant leave twice if retried.
+
+Example:
+
+```text
+September accrual
+```
+
+must be uniquely identifiable.
+
+Use ledger transaction uniqueness/idempotency keys.
+
+---
+
+# 80. TENANT ISOLATION
+
+Every Phase 6 entity must belong to the correct tenant.
+
+Tenant A must never access:
+
+```text
+Tenant B leave
+Tenant B balances
+Tenant B holiday calendar
+Tenant B approval workflow
+Tenant B regularization
+```
+
+Test this aggressively.
+
+---
+
+# 81. RBAC
+
+Add permissions such as:
+
+```text
+leave.view
+leave.create
+leave.update
+leave.cancel
+leave.approve
+leave.reject
+
+leave_type.view
+leave_type.create
+leave_type.update
+leave_type.delete
+
+leave_policy.view
+leave_policy.create
+leave_policy.update
+
+leave_balance.view
+leave_balance.adjust
+
+holiday.view
+holiday.create
+holiday.update
+holiday.delete
+
+regularization.view
+regularization.create
+regularization.approve
+regularization.reject
+
+workflow.view
+workflow.create
+workflow.update
+workflow.delete
+```
+
+Use the existing Phase 2 RBAC mechanism.
+
+---
+
+# 82. DATA SCOPE
+
+Do not rely only on role names.
+
+Authorization should consider:
+
+```text
+Tenant
+Role
+Permission
+Employee relationship
+Branch
+Department
+Workflow step
+```
+
+Example:
+
+A manager may approve employees who report to them, but not unrelated employees.
+
+---
+
+# 83. IDOR PROTECTION
+
+Test malicious requests such as:
+
+```text
+GET /api/v1/leaves/OTHER_EMPLOYEE_ID
+```
+
+or:
+
+```json
+{
+  "employee_id": "OTHER_EMPLOYEE"
+}
+```
+
+The backend must validate authorization.
+
+---
+
+# 84. MASS ASSIGNMENT PROTECTION
+
+Clients must not directly set:
+
+```text
+tenant_id
+employee_id
+approved_by
+approval_status
+balance
+created_by
+updated_by
+```
+
+unless explicitly authorized.
+
+---
+
+# 85. DATABASE DESIGN
+
+Potential tables:
+
+```text
+leave_types
+leave_policies
+leave_policy_assignments
+leave_balances
+leave_ledger
+leave_requests
+leave_request_days
+holiday_calendars
+holidays
+holiday_calendar_assignments
+approval_workflows
+approval_workflow_steps
+approval_instances
+approval_instance_steps
+approval_actions
+approval_delegations
+regularization_requests
+```
+
+Do not blindly create all tables.
+
+Reuse existing structures where appropriate.
+
+---
+
+# 86. DATABASE CONSTRAINTS
+
+Use:
+
+```text
+Foreign Keys
+Unique Constraints
+Check Constraints
+Tenant Constraints
+Status Constraints
+Date Constraints
+```
+
+Examples:
+
+```text
+leave_start <= leave_end
+```
+
+and:
+
+```text
+balance transaction belongs to same tenant as employee
+```
+
+---
+
+# 87. DATABASE INDEXES
+
+Important query patterns:
+
+```text
+tenant_id
+employee_id
+leave_type_id
+status
+start_date
+end_date
+holiday_date
+workflow_id
+approval_instance_id
+created_at
+```
+
+Composite indexes where appropriate:
+
+```text
+tenant_id + employee_id + status
+tenant_id + start_date
+tenant_id + holiday_date
+tenant_id + status + created_at
+```
+
+Do not create indexes blindly.
+
+---
+
+# 88. CONCURRENCY
+
+Protect concurrent operations:
+
+```text
+Leave approval
+Leave cancellation
+Balance adjustment
+Leave accrual
+Regularization approval
+```
+
+Use transactions/locking/versioning where required.
+
+---
+
+# 89. AUDIT LOGGING
+
+Audit:
+
+```text
+Leave Type Created
+Leave Policy Changed
+Leave Balance Adjusted
+Leave Submitted
+Leave Approved
+Leave Rejected
+Leave Cancelled
+Holiday Created
+Holiday Updated
+Regularization Submitted
+Regularization Approved
+Regularization Rejected
+Workflow Changed
+Approval Delegated
+```
+
+Record:
+
+```text
+actor
+tenant
+entity
+entity_id
+action
+timestamp
+reason
+before
+after
+```
+
+Never expose sensitive internal data unnecessarily.
+
+---
+
+# 90. LEAVE BALANCE AUDIT
+
+Every manual adjustment must include:
+
+```text
+Previous Balance
+Adjustment
+New Balance
+Reason
+Actor
+Timestamp
+```
+
+No silent balance modifications.
+
+---
+
+# 91. TIMEZONE
+
+Leave and holiday dates are generally date-based, but timestamps for:
+
+```text
+submission
+approval
+cancellation
+audit
+```
+
+must remain timezone-aware.
+
+Use tenant timezone appropriately.
+
+---
+
+# 92. DATE BOUNDARY
+
+Be especially careful with:
+
+```text
+23:59
+00:00
+month-end
+year-end
+leave-year-end
+timezone conversion
+```
+
+Do not accidentally shift leave dates because of UTC conversion.
+
+Date-only business values should use date types where appropriate.
+
+---
+
+# 93. API DESIGN
+
+Potential APIs:
+
+```text
+GET    /api/v1/leave-types
+POST   /api/v1/leave-types
+GET    /api/v1/leave-types/{id}
+PUT    /api/v1/leave-types/{id}
+PATCH  /api/v1/leave-types/{id}
+
+GET    /api/v1/leave-policies
+POST   /api/v1/leave-policies
+PUT    /api/v1/leave-policies/{id}
+
+GET    /api/v1/leaves/balance
+GET    /api/v1/leaves/balance/{employee_id}
+
+GET    /api/v1/leaves/requests
+POST   /api/v1/leaves/requests
+GET    /api/v1/leaves/requests/{id}
+PATCH  /api/v1/leaves/requests/{id}
+POST   /api/v1/leaves/requests/{id}/cancel
+POST   /api/v1/leaves/requests/{id}/withdraw
+
+POST   /api/v1/leaves/requests/{id}/approve
+POST   /api/v1/leaves/requests/{id}/reject
+
+GET    /api/v1/holidays
+POST   /api/v1/holidays
+PUT    /api/v1/holidays/{id}
+DELETE /api/v1/holidays/{id}
+
+GET    /api/v1/leave-calendar
+GET    /api/v1/team-leave-calendar
+
+GET    /api/v1/regularization
+POST   /api/v1/regularization
+GET    /api/v1/regularization/{id}
+POST   /api/v1/regularization/{id}/approve
+POST   /api/v1/regularization/{id}/reject
+
+GET    /api/v1/approvals
+GET    /api/v1/approvals/{id}
+POST   /api/v1/approvals/{id}/approve
+POST   /api/v1/approvals/{id}/reject
+```
+
+Follow existing API conventions.
+
+---
+
+# 94. SERVER-AUTHORITATIVE CALCULATIONS
+
+The backend must calculate:
+
+```text
+leave days
+working days
+holiday exclusions
+weekly-off exclusions
+balance availability
+accrual
+carry-forward
+expiry
+approval eligibility
+attendance impact
+```
+
+Do not trust client calculations.
+
+---
+
+# 95. LEAVE REQUEST VALIDATION PIPELINE
+
+Expected flow:
+
+```text
+Authenticated User
+       ↓
+Tenant Resolver
+       ↓
+Employee Resolver
+       ↓
+Leave Type
+       ↓
+Leave Policy
+       ↓
+Leave Year
+       ↓
+Holiday Calendar
+       ↓
+Work Week
+       ↓
+Requested Dates
+       ↓
+Overlap Validation
+       ↓
+Balance Validation
+       ↓
+Notice Period
+       ↓
+Approval Workflow
+       ↓
+Create Request
+       ↓
+Audit
+       ↓
+Notification
+```
+
+---
+
+# 96. LEAVE APPROVAL PIPELINE
+
+```text
+Pending Request
+       ↓
+Resolve Approval Instance
+       ↓
+Validate Approver
+       ↓
+Validate Current Step
+       ↓
+Lock/Transaction
+       ↓
+Approve/Reject
+       ↓
+Update Workflow
+       ↓
+Update Leave Status
+       ↓
+Update Balance Ledger
+       ↓
+Update Attendance/Calendar
+       ↓
+Audit
+       ↓
+Notification
+```
+
+---
+
+# 97. REGULARIZATION PIPELINE
+
+```text
+Employee
+   ↓
+Regularization Request
+   ↓
+Validate Attendance
+   ↓
+Validate Policy
+   ↓
+Validate Reason
+   ↓
+Approval Workflow
+   ↓
+Manager Approval
+   ↓
+Attendance Recalculation
+   ↓
+Audit
+   ↓
+Notification
+```
+
+---
+
+# 98. FRONTEND STRUCTURE
+
+Use existing frontend architecture.
+
+Create:
+
+```text
+Leave Dashboard
+Leave Balance
+Apply Leave
+Leave History
+Leave Calendar
+Team Leave Calendar
+Leave Approval
+Holiday Calendar
+Leave Settings
+Leave Types
+Leave Policies
+Approval Workflow
+Regularization
+```
+
+---
+
+# 99. EMPLOYEE LEAVE DASHBOARD
+
+Display:
+
+```text
+Available Leave
+Pending Leave
+Upcoming Leave
+Recent Leave
+```
+
+Example:
+
+```text
+Casual Leave
+Available: 8
+
+Sick Leave
+Available: 6
+
+Annual Leave
+Available: 14
+```
+
+---
+
+# 100. LEAVE HISTORY
+
+Columns:
+
+```text
+Leave Type
+From
+To
+Days
+Reason
+Status
+Submitted
+Approved By
+```
+
+Filters:
+
+```text
+Date
+Leave Type
+Status
+```
+
+Use server-side pagination.
+
+---
+
+# 101. LEAVE CALENDAR UI
+
+Display:
+
+```text
+Holiday
+Approved Leave
+Pending Leave
+Week Off
+Attendance
+```
+
+Allow authorized users to filter:
+
+```text
+Employee
+Department
+Branch
+Leave Type
+```
+
+---
+
+# 102. MANAGER APPROVAL UI
+
+Display pending requests:
+
+```text
+Employee
+Leave Type
+Dates
+Days
+Reason
+Available Balance
+Status
+```
+
+Actions:
+
+```text
+Approve
+Reject
+Return
+```
+
+Rejection should require a reason where configured.
+
+---
+
+# 103. HR DASHBOARD
+
+Display:
+
+```text
+Employees on Leave Today
+Pending Approvals
+Leave Utilization
+Upcoming Leave
+Leave by Department
+```
+
+Use database aggregation.
+
+Do not load all employee records into frontend.
+
+---
+
+# 104. HOLIDAY MANAGEMENT UI
+
+Provide:
+
+```text
+Holiday Calendar
+Holiday Name
+Date
+Type
+Branch
+Optional
+Status
+```
+
+Actions:
+
+```text
+Add
+Edit
+Deactivate
+Assign
+```
+
+---
+
+# 105. REGULARIZATION UI
+
+Employee:
+
+```text
+Attendance Date
+Original Check-in
+Original Check-out
+Requested Check-in
+Requested Check-out
+Reason
+```
+
+Manager:
+
+```text
+Approve
+Reject
+Comment
+```
+
+Admin:
+
+```text
+View history
+Override where authorized
+```
+
+---
+
+# 106. APPROVAL INBOX
+
+Create reusable:
+
+```text
+My Approvals
+```
+
+Display:
+
+```text
+Request Type
+Employee
+Submitted
+Current Step
+Waiting Since
+Status
+```
+
+This inbox should eventually support:
+
+```text
+Leave
+Regularization
+Overtime
+Comp-off
+Payroll
+```
+
+Do not build separate unrelated approval systems for every module.
+
+---
+
+# 107. APPROVAL WORKFLOW REUSABILITY
+
+The approval engine must be reusable.
+
+Future:
+
+```text
+Leave
+Regularization
+Overtime
+Comp-Off
+Expense
+Payroll
+```
+
+should be able to use the same workflow engine.
+
+---
+
+# 108. SEARCH & FILTERING
+
+All major lists must support:
+
+```text
+Search
+Pagination
+Sorting
+Filtering
+Date range
+Status
+Department
+Branch
+Employee
+```
+
+Perform filtering server-side.
+
+---
+
+# 109. API PAGINATION
+
+Never return unlimited:
+
+```text
+leave requests
+approval requests
+holiday records
+regularization records
+```
+
+Use the existing pagination standard.
+
+---
+
+# 110. API ERROR HANDLING
+
+Use stable error codes.
+
+Examples:
+
+```text
+LEAVE_BALANCE_INSUFFICIENT
+LEAVE_OVERLAP
+LEAVE_NOT_ALLOWED
+LEAVE_NOTICE_PERIOD_VIOLATION
+LEAVE_TYPE_INACTIVE
+LEAVE_REQUEST_NOT_FOUND
+INVALID_LEAVE_STATE
+APPROVAL_NOT_AUTHORIZED
+APPROVAL_STEP_INVALID
+SELF_APPROVAL_NOT_ALLOWED
+REGULARIZATION_NOT_ALLOWED
+HOLIDAY_CONFLICT
+```
+
+---
+
+# 111. SECURITY
+
+Protect against:
+
+```text
+IDOR
+Cross-tenant access
+Privilege escalation
+Mass assignment
+Self approval
+Balance manipulation
+Employee impersonation
+Approval tampering
+Workflow manipulation
+```
+
+The frontend must never be treated as a security boundary.
+
+---
+
+# 112. FILE SECURITY
+
+If leave documents are supported:
+
+```text
+Validate
+Scan where available
+Store securely
+Authorize downloads
+Use signed URLs
+Log access where appropriate
+```
+
+Do not expose public document URLs.
+
+---
+
+# 113. TESTING STRATEGY
+
+Use pytest and the existing test framework.
+
+Test:
+
+## Leave Type
+
+```text
+create
+update
+activate/deactivate
+duplicate code
+tenant isolation
+```
+
+## Leave Policy
+
+```text
+create
+assignment
+precedence
+validation
+```
+
+## Leave Balance
+
+```text
+opening
+accrual
+debit
+reversal
+adjustment
+carry forward
+expiry
+```
+
+## Leave Request
+
+```text
+create
+validation
+overlap
+balance
+holiday
+weekly off
+half day
+notice period
+backdated
+future dated
+```
+
+---
+
+# 114. APPROVAL TESTS
+
+Test:
+
+```text
+manager approval
+HR approval
+multi-level approval
+wrong approver
+self approval
+rejection
+return
+delegation
+expired delegation
+concurrent approval
+```
+
+---
+
+# 115. REGULARIZATION TESTS
+
+Test:
+
+```text
+forgot check-in
+forgot checkout
+incorrect time
+missing attendance
+approval
+rejection
+attendance recalculation
+audit history
+```
+
+---
+
+# 116. HOLIDAY TESTS
+
+Test:
+
+```text
+organization holiday
+branch holiday
+optional holiday
+duplicate holiday
+holiday assignment
+leave excluding holiday
+```
+
+---
+
+# 117. ATTENDANCE INTEGRATION TESTS
+
+Test:
+
+```text
+Approved leave → ON_LEAVE
+Half-day leave + attendance
+Holiday + attendance
+Weekly off + attendance
+Leave cancellation → balance reversal
+Regularization approval → attendance update
+```
+
+---
+
+# 118. CONCURRENCY TESTS
+
+Important cases:
+
+```text
+Two leave approvals
+Two leave requests consuming same balance
+Leave approval + cancellation
+Accrual job retry
+Approval action retry
+```
+
+---
+
+# 119. TENANT SECURITY TESTS
+
+Explicitly test:
+
+```text
+Tenant A cannot see Tenant B leave.
+Tenant A cannot see Tenant B balance.
+Tenant A cannot modify Tenant B holiday.
+Tenant A cannot approve Tenant B request.
+Tenant A cannot modify Tenant B regularization.
+Tenant A cannot access Tenant B workflow.
+```
+
+---
+
+# 120. DATABASE TESTS
+
+Verify:
+
+```text
+Foreign keys
+Unique constraints
+Date constraints
+Tenant constraints
+Leave ledger integrity
+Approval relationships
+Transaction rollback
+```
+
+---
+
+# 121. PROPERTY / EDGE CASE TESTING
+
+Test:
+
+```text
+Leap year
+Month boundary
+Year boundary
+Leave-year boundary
+Holiday on weekly off
+Multiple holidays
+Half-day
+Zero duration
+Negative duration
+Start date > end date
+Same-day leave
+Backdated leave
+Future leave
+Employee joins mid-year
+Employee leaves mid-year
+Inactive employee
+Terminated employee
+```
+
+---
+
+# 122. PERFORMANCE TESTING
+
+Use realistic datasets:
+
+```text
+10,000 employees
+5+ leave types
+Several years of leave ledger
+Thousands of leave requests
+Thousands of approval actions
+Large holiday calendars
+```
+
+Test:
+
+```text
+Employee balance
+Leave history
+Manager approval inbox
+HR dashboard
+Calendar
+```
+
+Avoid N+1 queries.
+
+---
+
+# 123. LEAVE LEDGER PERFORMANCE
+
+Do not calculate balances by scanning millions of ledger records for every request.
+
+Use appropriate:
+
+```text
+Indexes
+Materialized/current balance
+Aggregations
+Caching where safe
+```
+
+But preserve ledger as the audit source of balance changes.
+
+---
+
+# 124. ACCRUAL JOB PERFORMANCE
+
+Accrual jobs must process tenants/employees efficiently.
+
+Avoid:
+
+```text
+One database query per employee
+```
+
+Use batching/bulk operations where safe.
+
+---
+
+# 125. JOB FAILURE HANDLING
+
+Background jobs must support:
+
+```text
+Retry
+Idempotency
+Logging
+Failure reporting
+Partial failure handling
+```
+
+Do not grant duplicate leave because a job was retried.
+
+---
+
+# 126. OBSERVABILITY
+
+Add metrics/logging for:
+
+```text
+leave.request.created
+leave.request.approved
+leave.request.rejected
+leave.request.cancelled
+leave.balance.adjusted
+leave.accrual.completed
+leave.accrual.failed
+approval.completed
+approval.rejected
+regularization.created
+regularization.approved
+regularization.rejected
+```
+
+Do not log sensitive employee information unnecessarily.
+
+---
+
+# 127. AUDIT RETENTION
+
+Keep important approval and balance history.
+
+Do not physically delete:
+
+```text
+approval actions
+leave ledger transactions
+regularization history
+```
+
+through normal CRUD operations.
+
+---
+
+# 128. DATA PRIVACY
+
+Do not expose:
+
+```text
+medical documents
+private reasons
+attachments
+personal information
+```
+
+to users without authorization.
+
+Managers may need limited information while HR may have broader permissions.
+
+Use least privilege.
+
+---
+
+# 129. API DOCUMENTATION
+
+All endpoints must have:
+
+```text
+Summary
+Description
+Request schema
+Response schema
+Authentication
+Authorization
+Validation errors
+Business errors
+```
+
+Ensure OpenAPI is accurate.
+
+---
+
+# 130. MIGRATIONS
+
+Create proper PostgreSQL migrations.
+
+Test:
+
+```text
+Fresh database
+Existing Phase 1–5 database
+Migration upgrade
+Rollback where supported
+```
+
+Do not manually edit production schema.
+
+---
+
+# 131. SEED DATA
+
+For development, create safe demo data:
+
+```text
+Leave Types
+Leave Policies
+Holiday Calendar
+Holidays
+Approval Workflow
+Sample balances
+```
+
+Never add real employee information.
+
+---
+
+# 132. BACKWARD COMPATIBILITY
+
+Phase 6 must not break:
+
+```text
+Phase 1
+Phase 2
+Phase 3
+Phase 4
+Phase 5
+```
+
+Especially:
+
+```text
+Authentication
+Employee management
+Attendance
+Shift calculation
+GPS attendance
+Geofence
+Verification
+```
+
+---
+
+# 133. FEATURE FLAGS
+
+If feature flags exist, consider:
+
+```text
+LEAVE_MANAGEMENT
+LEAVE_APPROVAL
+HOLIDAY_CALENDAR
+REGULARIZATION
+ADVANCED_APPROVAL_WORKFLOW
+```
+
+Features should be tenant-aware where appropriate.
+
+---
+
+# 134. DEFAULT BEHAVIOR
+
+Existing Phase 4 attendance should continue to work when Phase 6 features are not configured.
+
+Example:
+
+```text
+No leave policy configured
+        ↓
+Attendance still works
+```
+
+Once leave management is configured:
+
+```text
+Leave approved
+        ↓
+Attendance recognizes leave
+```
+
+Do not make new features mandatory for existing tenants without migration/default configuration.
+
+---
+
+# 135. BUSINESS RULE SOURCE OF TRUTH
+
+Clearly define:
+
+```text
+Employee → employee data
+Attendance → attendance facts
+Shift → work schedule
+Holiday → holiday calendar
+Leave → leave entitlement/request
+Leave Ledger → balance changes
+Approval → workflow decisions
+```
+
+Do not duplicate ownership of business facts unnecessarily.
+
+---
+
+# 136. FINAL ARCHITECTURE
+
+The expected relationship should be approximately:
+
+```text
+Tenant
+  |
+  +-- Organization
+  |      |
+  |      +-- Branch
+  |
+  +-- Employees
+  |
+  +-- Leave Types
+  |
+  +-- Leave Policies
+  |
+  +-- Leave Calendars
+  |
+  +-- Holiday Calendars
+  |
+  +-- Approval Workflows
+          |
+          +-- Leave Requests
+          |
+          +-- Regularization Requests
+```
+
+And:
+
+```text
+Employee
+   |
+   +-- Leave Balance
+   |      |
+   |      +-- Leave Ledger
+   |
+   +-- Leave Requests
+   |
+   +-- Attendance
+   |
+   +-- Regularization
+```
+
+---
+
+# 137. DEFINITION OF DONE
+
+Phase 6 is complete only when:
+
+## LEAVE
+
+* Leave types working
+* Leave policies working
+* Leave balances working
+* Leave ledger working
+* Leave accrual working
+* Carry-forward working
+* Expiry working
+* Leave request working
+* Leave validation working
+* Overlap detection working
+* Half-day support working
+* Leave cancellation working
+
+## HOLIDAY
+
+* Holiday calendars working
+* Organization holidays working
+* Branch holidays working
+* Optional holidays foundation working
+* Holiday/leave integration working
+
+## APPROVAL
+
+* Approval workflow engine working
+* Single-level approval working
+* Multi-level approval working
+* Manager scope working
+* HR approval working
+* Approval history working
+* Delegation foundation working
+* Self-approval prevention working
+
+## REGULARIZATION
+
+* Regularization request working
+* Approval workflow working
+* Attendance update after approval
+* Audit trail working
+
+## SECURITY
+
+* Authentication
+* RBAC
+* Tenant isolation
+* IDOR protection
+* Mass assignment protection
+* Secure document handling
+
+## FRONTEND
+
+* Employee leave dashboard
+* Leave balance
+* Apply leave
+* Leave history
+* Leave calendar
+* Manager approval
+* HR dashboard
+* Holiday management
+* Regularization
+* Approval inbox
+* Leave settings
+
+## TESTING
+
+All critical:
+
+```text
+Unit tests
+API tests
+Integration tests
+Database tests
+Security tests
+Tenant tests
+Concurrency tests
+Workflow tests
+Regression tests
+```
+
+must pass.
+
+---
+
+# 138. FINAL VALIDATION
+
+Run:
+
+```text
+1. Formatter
+2. Linter
+3. Type checking
+4. Database migrations
+5. Unit tests
+6. API tests
+7. Integration tests
+8. Security tests
+9. Tenant isolation tests
+10. RBAC tests
+11. Leave calculation tests
+12. Balance tests
+13. Approval workflow tests
+14. Holiday tests
+15. Regularization tests
+16. Concurrency tests
+17. Background job tests
+18. Frontend tests
+19. Production build
+20. Docker build
+21. Docker startup
+22. OpenAPI validation
+23. Full regression suite
+```
+
+No critical failure should remain.
+
+---
+
+# 139. FINAL DEVELOPMENT REPORT
+
+After implementation provide:
+
+## Architecture
+
+Explain:
+
+```text
+Leave engine
+Balance engine
+Holiday engine
+Approval engine
+Regularization engine
+```
+
+## Database
+
+Report:
+
+```text
+New tables
+Modified tables
+Relationships
+Indexes
+Constraints
+Migrations
+```
+
+## Backend APIs
+
+List:
+
+```text
+Leave APIs
+Holiday APIs
+Approval APIs
+Regularization APIs
+```
+
+## Frontend
+
+List:
+
+```text
+Screens
+Pages
+Components
+Forms
+Dashboards
+```
+
+## Business Rules
+
+Explain:
+
+```text
+Leave calculation
+Balance calculation
+Accrual
+Carry forward
+Expiry
+Holiday calculation
+Approval
+Cancellation
+Regularization
+```
+
+## Security
+
+Explain:
+
+```text
+Tenant isolation
+RBAC
+IDOR protection
+Self-approval protection
+Mass assignment
+Document security
+```
+
+## Background Jobs
+
+List:
+
+```text
+Accrual
+Expiry
+Notifications
+Approval reminders
+```
+
+## Testing
+
+Report:
+
+```text
+Total tests:
+Passed:
+Failed:
+Skipped:
+Coverage:
+```
+
+## Performance
+
+Report:
+
+```text
+Important indexes
+Query optimizations
+Batch processing
+Caching
+```
+
+## Known Issues
+
+List all known limitations honestly.
+
+## Next Phase
+
+Recommend Phase 7 based on the completed implementation.
+
+---
+
+# 140. CRITICAL DEVELOPMENT PRINCIPLE
+
+Do not implement Phase 6 as simple CRUD.
+
+The Leave and Approval systems are **business-rule engines**.
+
+The implementation must correctly handle:
+
+```text
+Leave entitlement
+Leave balance
+Leave ledger
+Accrual
+Carry-forward
+Expiry
+Working days
+Holidays
+Weekly offs
+Leave overlap
+Approval hierarchy
+Manager scope
+HR scope
+Delegation
+Cancellation
+Regularization
+Attendance integration
+Concurrency
+Tenant isolation
+Audit
+```
+
+---
+
+# FINAL INSTRUCTION TO THE AI CODING AGENT
+
+Inspect the existing AxonTimeHR repository completely before making changes.
+
+Understand Phase 1 through Phase 5.
+
+Do not rewrite working code.
+
+Do not create duplicate employee, attendance, shift, authentication, RBAC, or tenant models.
+
+Implement Phase 6 incrementally:
+
+```text
+1. Repository analysis
+2. Database/domain design
+3. Leave types
+4. Leave policies
+5. Leave balances
+6. Leave ledger
+7. Leave accrual
+8. Holiday calendars
+9. Leave requests
+10. Leave validation
+11. Approval workflow engine
+12. Leave approval
+13. Leave cancellation
+14. Regularization workflow
+15. Attendance integration
+16. Notifications
+17. Background jobs
+18. Frontend
+19. Security
+20. Audit
+21. Testing
+22. Performance
+23. Regression
+24. Documentation
+```
+
+After every major component:
+
+```text
+Implement
+   ↓
+Run tests
+   ↓
+Fix failures
+   ↓
+Check database integrity
+   ↓
+Check security
+   ↓
+Check regression
+   ↓
+Continue
+```
+
+The final Phase 6 implementation must be:
+
+**production-ready, multi-tenant, secure, auditable, scalable, configurable, workflow-driven, mobile-ready, and reusable by future AxonTimeHR modules such as Overtime, Comp-Off, Payroll, Expenses, and other approval-based HR workflows.**
+
+Do not build separate approval logic for every future module.
+
+Build a reusable workflow foundation now.

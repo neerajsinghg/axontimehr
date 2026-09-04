@@ -1,0 +1,2146 @@
+# PHASE 4 — ATTENDANCE & SHIFT MANAGEMENT DEVELOPMENT
+
+# AXONTIMEHR — PRODUCTION-GRADE ATTENDANCE ENGINE
+
+---
+
+# 1. PROJECT CONTEXT
+
+You are continuing development of **AxonTimeHR**, a modern, production-ready, multi-tenant **Attendance + HRMS SaaS platform**.
+
+The system is being developed in phases.
+
+Previously completed:
+
+## PHASE 1 — FOUNDATION
+
+Established:
+
+* Application architecture
+* PostgreSQL database
+* Backend foundation
+* Frontend foundation
+* Configuration
+* Environment management
+* Database connectivity
+* Migration framework
+* Basic infrastructure
+
+## PHASE 2 — AUTHENTICATION & IDENTITY
+
+Established:
+
+* Authentication
+* JWT/token handling
+* User identity
+* RBAC
+* Permissions
+* Tenant-aware authentication
+* Protected APIs
+* Authentication security
+
+## PHASE 3 — ORGANIZATION & EMPLOYEE MANAGEMENT
+
+Established:
+
+* Tenant/organization structure
+* Organizations
+* Branches
+* Departments
+* Designations
+* Employees
+* Employee lifecycle
+* Reporting hierarchy
+* Employee ↔ User relationship
+* Employee documents architecture
+* Employee search/filtering/pagination
+* Employee RBAC
+* Employee audit logging
+
+---
+
+# 2. CRITICAL RULE
+
+Before implementing Phase 4:
+
+**INSPECT THE EXISTING CODEBASE FIRST.**
+
+Do not rebuild Phase 1, Phase 2, or Phase 3.
+
+Do not create duplicate:
+
+* User models
+* Employee models
+* Organization models
+* Authentication
+* JWT system
+* RBAC
+* Tenant middleware
+* Database session
+* API architecture
+* Logging
+* Error handling
+* Audit system
+* Frontend design system
+
+Reuse the existing implementation.
+
+If something is missing, extend it cleanly.
+
+---
+
+# 3. PHASE 4 OBJECTIVE
+
+Build a production-grade:
+
+# ATTENDANCE + SHIFT MANAGEMENT ENGINE
+
+This phase should establish the foundation for future:
+
+* GPS attendance
+* Geofencing
+* Selfie verification
+* Mobile attendance
+* Leave management
+* Overtime
+* Comp-off
+* Attendance regularization
+* Payroll
+* Reports
+* Analytics
+* Notifications
+
+The system must support multiple attendance policies and work schedules while maintaining strict tenant isolation.
+
+---
+
+# 4. HIGH-LEVEL ARCHITECTURE
+
+Target architecture:
+
+```text
+                    AxonTimeHR
+                        |
+              Authentication / RBAC
+                        |
+                   Tenant Context
+                        |
+              Attendance API Layer
+                        |
+                Attendance Service
+                        |
+             Attendance Rule Engine
+                  /           \
+             Shift Engine    Policy Engine
+                  |              |
+                  +------ + -----+
+                         |
+                    PostgreSQL
+                         |
+                  Audit / Events
+```
+
+Future integrations:
+
+```text
+GPS
+ |
+Geofencing
+ |
+Selfie Verification
+ |
+Mobile App
+ |
+Attendance Engine
+```
+
+Do not tightly couple future functionality into the current implementation.
+
+---
+
+# 5. ATTENDANCE DOMAIN MODEL
+
+Design a robust attendance data model.
+
+At minimum consider:
+
+```text
+Attendance
+AttendanceEvent
+AttendancePolicy
+Shift
+ShiftSchedule
+EmployeeShiftAssignment
+Holiday
+WorkWeek
+AttendanceAdjustment
+AttendanceRegularization
+```
+
+Use the existing project's naming conventions.
+
+Do not blindly create every table if an equivalent already exists.
+
+---
+
+# 6. ATTENDANCE RECORD
+
+Create an attendance record for an employee/day.
+
+Potential fields:
+
+```text
+id
+tenant_id
+employee_id
+attendance_date
+shift_id
+status
+first_check_in
+last_check_out
+total_work_minutes
+total_break_minutes
+overtime_minutes
+late_minutes
+early_exit_minutes
+worked_minutes
+attendance_source
+remarks
+created_at
+updated_at
+```
+
+Use appropriate database types.
+
+Avoid storing calculated values redundantly unless there is a clear performance/business reason.
+
+---
+
+# 7. ATTENDANCE STATUS
+
+Create controlled attendance statuses.
+
+Possible values:
+
+```text
+PRESENT
+ABSENT
+HALF_DAY
+LATE
+EARLY_EXIT
+ON_LEAVE
+HOLIDAY
+WEEK_OFF
+WORK_FROM_HOME
+REGULARIZED
+PARTIAL
+PENDING
+```
+
+The final enum/status architecture should be compatible with future leave and payroll modules.
+
+Do not allow arbitrary status strings.
+
+---
+
+# 8. ATTENDANCE EVENTS
+
+Separate attendance events from the daily attendance summary.
+
+Example:
+
+```text
+Employee
+   |
+   +-- CHECK_IN
+   +-- BREAK_START
+   +-- BREAK_END
+   +-- CHECK_OUT
+```
+
+Attendance event fields may include:
+
+```text
+id
+tenant_id
+employee_id
+attendance_id
+event_type
+event_time
+source
+device_reference
+location_reference
+verification_reference
+remarks
+created_at
+```
+
+This event model should allow future GPS/mobile/selfie integrations without redesigning attendance.
+
+---
+
+# 9. EVENT SOURCES
+
+Support controlled sources such as:
+
+```text
+WEB
+MOBILE
+ADMIN
+API
+BIOMETRIC
+IMPORT
+SYSTEM
+```
+
+Future sources can include:
+
+```text
+GPS
+GEOFENCE
+SELFIE
+FACE_VERIFICATION
+```
+
+Do not implement actual face recognition in Phase 4 unless explicitly required.
+
+Prepare extensible architecture.
+
+---
+
+# 10. CHECK-IN / CHECK-OUT
+
+Implement secure check-in/check-out APIs.
+
+Example:
+
+```http
+POST /api/v1/attendance/check-in
+POST /api/v1/attendance/check-out
+```
+
+The system must:
+
+1. Identify the authenticated user.
+2. Resolve the employee.
+3. Resolve tenant.
+4. Determine the employee's applicable shift.
+5. Validate attendance policy.
+6. Validate whether check-in/out is allowed.
+7. Create attendance event.
+8. Update daily attendance state.
+9. Calculate applicable values.
+10. Create audit/event information.
+
+Never trust:
+
+```text
+tenant_id
+employee_id
+attendance_id
+```
+
+from the client when they can be derived securely from authentication context.
+
+---
+
+# 11. DUPLICATE CHECK-IN PROTECTION
+
+Prevent duplicate check-ins.
+
+Example:
+
+```text
+09:00 CHECK_IN
+09:01 CHECK_IN
+09:02 CHECK_IN
+```
+
+must not create three independent active check-ins.
+
+Implement idempotent or rule-based handling.
+
+Return a meaningful error:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ALREADY_CHECKED_IN",
+    "message": "Employee is already checked in."
+  }
+}
+```
+
+---
+
+# 12. CHECK-OUT VALIDATION
+
+Prevent invalid checkout.
+
+Examples:
+
+* Checkout before check-in
+* Multiple checkout
+* Checkout from another tenant
+* Checkout for another employee
+* Checkout for a non-working day unless policy permits it
+
+Handle overnight shifts correctly.
+
+---
+
+# 13. OVERNIGHT SHIFT SUPPORT
+
+The attendance engine must support shifts such as:
+
+```text
+22:00 → 06:00
+```
+
+The system must not incorrectly assign the checkout to the following day's attendance record.
+
+Design a clear business rule for attendance date.
+
+Example:
+
+```text
+Shift Date = date on which the shift started
+```
+
+Use a consistent approach throughout the system.
+
+---
+
+# 14. SHIFT MANAGEMENT
+
+Implement shift master management.
+
+A shift should support:
+
+```text
+id
+tenant_id
+shift_code
+shift_name
+start_time
+end_time
+grace_period_minutes
+late_threshold_minutes
+early_exit_threshold_minutes
+minimum_work_minutes
+break configuration
+overnight flag
+status
+created_at
+updated_at
+```
+
+Use appropriate PostgreSQL time/date types.
+
+---
+
+# 15. FLEXIBLE SHIFT CONFIGURATION
+
+Prepare support for:
+
+### Fixed shift
+
+```text
+09:00 → 18:00
+```
+
+### Evening shift
+
+```text
+14:00 → 23:00
+```
+
+### Night shift
+
+```text
+22:00 → 06:00
+```
+
+### Flexible shift
+
+Example:
+
+```text
+Required working time = 8 hours
+```
+
+Do not unnecessarily over-engineer flexible scheduling if the current product requirements do not require it.
+
+But design the model so it can be extended.
+
+---
+
+# 16. BREAK MANAGEMENT
+
+Support configurable breaks.
+
+Example:
+
+```text
+Lunch
+12:30 → 13:30
+```
+
+Possible configuration:
+
+```text
+break_name
+break_type
+duration_minutes
+is_paid
+is_required
+maximum_duration
+```
+
+The attendance engine should calculate:
+
+```text
+gross duration
+-
+break duration
+=
+worked duration
+```
+
+Avoid hard-coding one lunch break.
+
+---
+
+# 17. GRACE PERIOD
+
+Implement configurable grace periods.
+
+Example:
+
+```text
+Shift start = 09:00
+Grace = 10 minutes
+```
+
+Check-in at:
+
+```text
+09:07 → On time
+09:15 → Late
+```
+
+The rule must be configurable per tenant/shift/policy where appropriate.
+
+---
+
+# 18. LATE ARRIVAL
+
+Calculate:
+
+```text
+late_minutes
+```
+
+based on:
+
+* shift start
+* grace period
+* attendance policy
+
+Example:
+
+```text
+Shift = 09:00
+Grace = 10 min
+Check-in = 09:25
+
+Late = 15 minutes
+```
+
+Do not calculate late time incorrectly for overnight shifts.
+
+---
+
+# 19. EARLY EXIT
+
+Calculate:
+
+```text
+early_exit_minutes
+```
+
+based on:
+
+* shift end
+* applicable grace
+* actual checkout
+
+Do not mark early exit when an employee has valid overtime.
+
+---
+
+# 20. WORKING HOURS CALCULATION
+
+Calculate:
+
+```text
+worked_minutes
+```
+
+using attendance events.
+
+Example:
+
+```text
+09:05 CHECK_IN
+13:00 BREAK_START
+14:00 BREAK_END
+18:15 CHECK_OUT
+```
+
+The system should calculate the correct net working duration.
+
+Do not depend exclusively on client-calculated values.
+
+The server must calculate authoritative attendance values.
+
+---
+
+# 21. ATTENDANCE POLICY
+
+Create an attendance policy architecture.
+
+Policies may eventually include:
+
+```text
+required_work_minutes
+grace_period
+late_threshold
+early_exit_threshold
+half_day_threshold
+absent_threshold
+overtime_enabled
+break_rules
+weekend_rules
+holiday_rules
+```
+
+Policies should be tenant-specific.
+
+Allow policies to be assigned to employees/groups where appropriate.
+
+---
+
+# 22. EMPLOYEE SHIFT ASSIGNMENT
+
+Implement employee-to-shift assignment.
+
+Example:
+
+```text
+Employee
+   ↓
+Shift Assignment
+   ↓
+Monday-Friday
+   ↓
+09:00-18:00
+```
+
+Support:
+
+* effective_from
+* effective_to
+* shift_id
+* employee_id
+* tenant_id
+* status
+
+Historical assignments must remain available.
+
+Do not overwrite historical assignments without preserving history.
+
+---
+
+# 23. SHIFT ROSTER / SCHEDULE
+
+Prepare architecture for future roster management.
+
+Example:
+
+```text
+Monday     → Morning
+Tuesday    → Morning
+Wednesday  → Evening
+Thursday   → Evening
+Friday     → Evening
+Saturday   → Off
+Sunday     → Off
+```
+
+The data model must be extensible for future roster functionality.
+
+---
+
+# 24. WORK WEEK
+
+Create configurable work-week rules.
+
+Example:
+
+```text
+Monday     WORKING
+Tuesday    WORKING
+Wednesday  WORKING
+Thursday   WORKING
+Friday     WORKING
+Saturday   WEEK_OFF
+Sunday     WEEK_OFF
+```
+
+Do not hard-code Saturday/Sunday as weekends.
+
+Different tenants may have different work weeks.
+
+---
+
+# 25. HOLIDAY FOUNDATION
+
+Create holiday management required by attendance.
+
+Holiday fields may include:
+
+```text
+id
+tenant_id
+holiday_name
+holiday_date
+holiday_type
+branch_id
+description
+status
+```
+
+Support:
+
+* organization-wide holidays
+* branch-specific holidays
+
+Do not implement the complete leave system yet.
+
+---
+
+# 26. WEEK-OFF HANDLING
+
+Attendance must understand scheduled weekly offs.
+
+Example:
+
+```text
+Sunday = WEEK_OFF
+```
+
+If an employee checks in on a weekly off:
+
+```text
+WORKED_ON_WEEK_OFF
+```
+
+or another appropriate state can be generated.
+
+Design this so future overtime/comp-off can consume this information.
+
+---
+
+# 27. ATTENDANCE REGULARIZATION FOUNDATION
+
+Prepare a regularization system.
+
+Example:
+
+Employee forgot checkout:
+
+```text
+Employee
+ ↓
+Regularization Request
+ ↓
+Manager Approval
+ ↓
+Attendance Updated
+```
+
+Create the necessary architecture but do not build a complete advanced approval workflow if it belongs to a later phase.
+
+Possible fields:
+
+```text
+id
+tenant_id
+employee_id
+attendance_date
+requested_check_in
+requested_check_out
+reason
+status
+approved_by
+approved_at
+rejection_reason
+```
+
+---
+
+# 28. ADMIN ATTENDANCE CORRECTION
+
+Authorized administrators should be able to correct attendance.
+
+Requirements:
+
+* RBAC
+* tenant validation
+* audit logging
+* reason required
+* before/after values captured
+
+Never silently modify historical attendance.
+
+---
+
+# 29. ATTENDANCE HISTORY
+
+Create API:
+
+```http
+GET /api/v1/attendance
+```
+
+Support:
+
+```text
+employee
+date_from
+date_to
+status
+branch
+department
+shift
+```
+
+Add:
+
+* pagination
+* sorting
+* filtering
+
+Never return unlimited records.
+
+---
+
+# 30. EMPLOYEE ATTENDANCE VIEW
+
+Employee should be able to see:
+
+```text
+Today's status
+Check-in time
+Check-out time
+Worked duration
+Break duration
+Late minutes
+Early exit
+Shift
+Attendance history
+```
+
+Employees must only see their own data unless their role permits broader access.
+
+---
+
+# 31. MANAGER ATTENDANCE VIEW
+
+Managers should be able to see attendance for employees they are authorized to manage.
+
+Do not simply give access to all employees.
+
+Use reporting hierarchy/RBAC from previous phases.
+
+---
+
+# 32. ADMIN ATTENDANCE DASHBOARD
+
+Create an attendance dashboard foundation.
+
+Metrics:
+
+```text
+Present
+Absent
+Late
+On Leave
+Half Day
+Work From Home
+Week Off
+Holiday
+```
+
+Example:
+
+```text
+Total Employees: 500
+
+Present: 420
+Absent: 35
+Late: 25
+Leave: 10
+WFH: 10
+```
+
+Use database-level aggregation.
+
+Do not calculate large dashboard statistics by loading all records into Python/frontend.
+
+---
+
+# 33. ATTENDANCE CALCULATION ENGINE
+
+Do not put all attendance rules directly inside API route handlers.
+
+Create a reusable service/domain layer.
+
+Example conceptual structure:
+
+```text
+AttendanceService
+      |
+      +-- ShiftResolver
+      |
+      +-- AttendancePolicyEngine
+      |
+      +-- AttendanceCalculator
+      |
+      +-- WorkDayResolver
+      |
+      +-- HolidayResolver
+      |
+      +-- AttendanceEventService
+```
+
+Keep business rules testable independently.
+
+---
+
+# 34. DATE/TIME & TIMEZONE
+
+Timezone handling is critical.
+
+The platform must support tenant-specific timezones.
+
+Never assume:
+
+```text
+UTC = local attendance time
+```
+
+Store timestamps appropriately.
+
+Convert timestamps into tenant/branch/employee timezone when applying business rules.
+
+Example:
+
+```text
+Tenant timezone:
+Asia/Kolkata
+```
+
+Future tenants may use:
+
+```text
+America/New_York
+Europe/London
+Asia/Singapore
+```
+
+Do not hard-code India time.
+
+---
+
+# 35. DST SUPPORT
+
+Design timestamp calculations so daylight-saving transitions do not corrupt attendance calculations.
+
+Avoid manually adding/subtracting hours from timestamps.
+
+Use timezone-aware datetime handling.
+
+---
+
+# 36. DATABASE CONSTRAINTS
+
+Use PostgreSQL constraints to protect data integrity.
+
+Examples:
+
+* Employee must belong to tenant.
+* Shift must belong to tenant.
+* Department/branch relationships must belong to tenant.
+* Attendance must belong to tenant.
+* Attendance event must belong to the same tenant as attendance.
+* Valid foreign keys.
+* Unique constraints where required.
+
+Prevent cross-tenant references.
+
+---
+
+# 37. INDEXING
+
+Optimize attendance queries.
+
+Important indexes may include:
+
+```text
+tenant_id
+employee_id
+attendance_date
+status
+shift_id
+created_at
+```
+
+Important composite indexes:
+
+```text
+tenant_id + employee_id + attendance_date
+tenant_id + attendance_date
+tenant_id + status + attendance_date
+```
+
+Choose indexes based on actual query patterns.
+
+Do not create unnecessary indexes.
+
+---
+
+# 38. IDEMPOTENCY
+
+Attendance APIs are particularly vulnerable to duplicate requests.
+
+Implement appropriate idempotency behavior for:
+
+```text
+check-in
+check-out
+attendance event creation
+```
+
+Handle:
+
+* double-click
+* mobile retry
+* network retry
+* API retry
+* duplicate requests
+
+without corrupting attendance records.
+
+---
+
+# 39. CONCURRENCY
+
+Handle simultaneous requests.
+
+Example:
+
+Two check-in requests arrive at the same time.
+
+The system must not create:
+
+```text
+CHECK_IN #1
+CHECK_IN #2
+```
+
+as two active check-ins.
+
+Use database constraints/transactions/locking where appropriate.
+
+---
+
+# 40. AUDIT LOGGING
+
+Every important attendance modification must be auditable.
+
+Track:
+
+```text
+CHECK_IN
+CHECK_OUT
+ATTENDANCE_UPDATED
+ATTENDANCE_CORRECTED
+REGULARIZATION_CREATED
+REGULARIZATION_APPROVED
+REGULARIZATION_REJECTED
+SHIFT_ASSIGNED
+SHIFT_CHANGED
+POLICY_CHANGED
+```
+
+Capture:
+
+```text
+actor
+tenant
+employee
+action
+timestamp
+before
+after
+reason
+source
+```
+
+Never log authentication secrets.
+
+---
+
+# 41. API SECURITY
+
+All attendance endpoints must integrate with Phase 2 security.
+
+Verify:
+
+```text
+Authentication
+Authorization
+Tenant
+Employee ownership
+Manager scope
+Admin permission
+```
+
+Do not rely on frontend authorization.
+
+Every security check must be enforced server-side.
+
+---
+
+# 42. FRONTEND ATTENDANCE UI
+
+Build UI using the existing design system.
+
+## Employee Dashboard
+
+Show:
+
+```text
+Today's Attendance
+------------------
+Shift
+09:00 - 18:00
+
+Check In
+09:04 AM
+
+Worked
+05:32
+
+Status
+Present
+```
+
+Buttons:
+
+```text
+CHECK IN
+CHECK OUT
+```
+
+Buttons must dynamically reflect attendance state.
+
+---
+
+# 43. ATTENDANCE HISTORY UI
+
+Create:
+
+```text
+Attendance History
+```
+
+Filters:
+
+```text
+Date Range
+Status
+Shift
+```
+
+Table:
+
+```text
+Date
+Shift
+Check In
+Check Out
+Worked Hours
+Late
+Early Exit
+Status
+```
+
+Use server-side pagination.
+
+---
+
+# 44. SHIFT MANAGEMENT UI
+
+Create:
+
+```text
+Shift List
+Create Shift
+Edit Shift
+Shift Details
+Assign Employees
+```
+
+Show:
+
+```text
+Shift Name
+Start
+End
+Grace Period
+Status
+Employees Assigned
+```
+
+---
+
+# 45. EMPLOYEE SHIFT ASSIGNMENT UI
+
+Inside employee details:
+
+```text
+Employee
+  |
+  +-- Profile
+  +-- Employment
+  +-- Documents
+  +-- Attendance
+  +-- Shift
+```
+
+Allow authorized users to:
+
+```text
+Assign Shift
+Change Shift
+Set Effective Date
+View Shift History
+```
+
+---
+
+# 46. ADMIN ATTENDANCE DASHBOARD UI
+
+Create a dashboard containing:
+
+```text
+Total Employees
+Present
+Absent
+Late
+On Leave
+WFH
+Half Day
+```
+
+Add:
+
+```text
+Date selector
+Branch filter
+Department filter
+Shift filter
+```
+
+Keep the dashboard responsive.
+
+---
+
+# 47. API ENDPOINTS
+
+At minimum consider:
+
+```text
+POST   /api/v1/attendance/check-in
+POST   /api/v1/attendance/check-out
+
+GET    /api/v1/attendance
+GET    /api/v1/attendance/{id}
+
+GET    /api/v1/attendance/my
+GET    /api/v1/attendance/today
+
+GET    /api/v1/attendance/dashboard
+
+GET    /api/v1/shifts
+POST   /api/v1/shifts
+GET    /api/v1/shifts/{id}
+PUT    /api/v1/shifts/{id}
+PATCH  /api/v1/shifts/{id}
+DELETE /api/v1/shifts/{id}
+
+POST   /api/v1/employees/{employee_id}/shift
+GET    /api/v1/employees/{employee_id}/shift
+GET    /api/v1/employees/{employee_id}/shift-history
+
+GET    /api/v1/holidays
+POST   /api/v1/holidays
+
+POST   /api/v1/attendance/regularization
+GET    /api/v1/attendance/regularization
+```
+
+Follow existing API conventions if they differ.
+
+---
+
+# 48. API RESPONSE FORMAT
+
+Maintain the existing API response format.
+
+If no standard exists, use a consistent structure.
+
+Example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "..."
+  }
+}
+```
+
+Errors:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_ATTENDANCE_STATE",
+    "message": "Employee cannot check out before checking in."
+  }
+}
+```
+
+---
+
+# 49. VALIDATION
+
+Validate:
+
+* employee status
+* employee tenant
+* shift tenant
+* date/time
+* duplicate events
+* invalid event sequence
+* invalid shift
+* inactive shift
+* unauthorized employee
+* invalid manager access
+* invalid attendance date
+* duplicate regularization
+* invalid regularization status
+
+---
+
+# 50. TESTING STRATEGY
+
+Use pytest.
+
+Create tests for:
+
+## Attendance
+
+```text
+check-in success
+check-in duplicate
+check-out success
+check-out without check-in
+double checkout
+overnight shift
+late arrival
+early exit
+grace period
+work duration
+break duration
+```
+
+## Shift
+
+```text
+create
+update
+delete/archive
+duplicate code
+overnight shift
+invalid time
+```
+
+## Tenant Security
+
+Test:
+
+```text
+Tenant A cannot access Tenant B attendance.
+Tenant A cannot access Tenant B shift.
+Tenant A cannot assign Tenant B shift.
+Tenant A cannot modify Tenant B employee attendance.
+```
+
+## RBAC
+
+Test:
+
+```text
+Employee
+Manager
+HR
+Admin
+Super Admin
+```
+
+with appropriate permission boundaries.
+
+---
+
+# 51. PROPERTY / EDGE CASE TESTING
+
+Test important boundary conditions.
+
+Examples:
+
+```text
+Check-in exactly at shift start
+Check-in exactly at grace boundary
+Check-in one minute after grace
+Checkout exactly at shift end
+Checkout one minute before end
+Checkout one minute after end
+Midnight crossing
+Month boundary
+Year boundary
+Leap year
+Holiday
+Weekly off
+Inactive employee
+Terminated employee
+```
+
+---
+
+# 52. TIMEZONE TESTING
+
+Test multiple timezones.
+
+At minimum:
+
+```text
+Asia/Kolkata
+UTC
+America/New_York
+Europe/London
+Asia/Singapore
+```
+
+Verify attendance dates and shift calculations.
+
+---
+
+# 53. DATABASE TESTING
+
+Verify:
+
+* migrations
+* foreign keys
+* unique constraints
+* tenant isolation
+* transaction rollback
+* concurrent check-in protection
+* historical shift assignments
+
+---
+
+# 54. PERFORMANCE TESTING
+
+Test with realistic datasets.
+
+Example:
+
+```text
+10,000 employees
+1 year attendance
+multiple shifts
+multiple branches
+```
+
+Verify:
+
+* attendance list performance
+* employee attendance history
+* dashboard aggregation
+* date filtering
+* pagination
+* shift resolution
+
+Avoid N+1 queries.
+
+---
+
+# 55. SECURITY TESTING
+
+Test for:
+
+```text
+IDOR
+Cross-tenant access
+Privilege escalation
+Unauthorized attendance modification
+Employee impersonation
+Parameter tampering
+Mass assignment
+```
+
+Example:
+
+A user must not be able to modify:
+
+```json
+{
+  "employee_id": "another_employee"
+}
+```
+
+to manipulate another employee's attendance.
+
+---
+
+# 56. MASS ASSIGNMENT PROTECTION
+
+Do not blindly accept database fields from request payloads.
+
+For example, clients must not be able to directly set:
+
+```text
+tenant_id
+created_by
+updated_by
+approval_status
+approved_by
+```
+
+unless explicitly allowed through controlled workflows.
+
+---
+
+# 57. DATABASE TRANSACTIONS
+
+Check-in/out operations should be transactional.
+
+Conceptually:
+
+```text
+BEGIN
+ |
+ +-- Resolve employee
+ |
+ +-- Resolve shift
+ |
+ +-- Validate state
+ |
+ +-- Create event
+ |
+ +-- Update attendance
+ |
+ +-- Audit
+ |
+COMMIT
+```
+
+If any critical operation fails:
+
+```text
+ROLLBACK
+```
+
+---
+
+# 58. NOTIFICATION FOUNDATION
+
+Prepare event hooks for future notifications.
+
+Example:
+
+```text
+Employee checked in
+Employee checked out
+Late arrival
+Missed checkout
+Regularization approved
+```
+
+Do not build the complete notification system in Phase 4.
+
+Create clean integration points.
+
+---
+
+# 59. EVENT-DRIVEN PREPARATION
+
+Where appropriate, prepare domain events such as:
+
+```text
+AttendanceCheckedIn
+AttendanceCheckedOut
+AttendanceUpdated
+ShiftAssigned
+RegularizationRequested
+```
+
+Future Celery/Redis processing may consume these events.
+
+Do not introduce unnecessary distributed complexity at this stage.
+
+---
+
+# 60. REDIS/CELERY
+
+If Redis/Celery already exists in the project:
+
+Use them only where justified.
+
+Potential future use:
+
+```text
+notifications
+attendance reminders
+missed checkout alerts
+daily attendance processing
+scheduled reports
+```
+
+Do not move core attendance calculations to asynchronous jobs if the user needs an immediate authoritative check-in/check-out response.
+
+---
+
+# 61. IMPORT/EXPORT FOUNDATION
+
+Prepare attendance export architecture.
+
+Future formats:
+
+```text
+CSV
+Excel
+PDF
+```
+
+At this phase, implement only what is necessary.
+
+If export is implemented:
+
+* enforce RBAC
+* enforce tenant isolation
+* apply filters server-side
+* avoid memory-heavy exports
+
+---
+
+# 62. OBSERVABILITY
+
+Add appropriate logging and metrics.
+
+Monitor:
+
+```text
+attendance.check_in.success
+attendance.check_in.failure
+attendance.check_out.success
+attendance.check_out.failure
+attendance.invalid_state
+attendance.cross_tenant_attempt
+```
+
+Do not log sensitive information.
+
+---
+
+# 63. DOCUMENTATION
+
+Document:
+
+* Attendance architecture
+* Shift architecture
+* Attendance state machine
+* API endpoints
+* Database relationships
+* Business rules
+* Timezone handling
+* Tenant isolation
+* RBAC
+* Testing strategy
+
+Create developer documentation where appropriate.
+
+---
+
+# 64. ATTENDANCE STATE MACHINE
+
+Design and document valid transitions.
+
+Example:
+
+```text
+NOT_STARTED
+     |
+     ↓
+CHECKED_IN
+     |
+     ├── BREAK
+     |     |
+     |     ↓
+     |   CHECKED_IN
+     |
+     ↓
+CHECKED_OUT
+```
+
+Invalid transitions must be rejected.
+
+Example:
+
+```text
+NOT_STARTED → CHECK_OUT   ❌
+CHECKED_OUT → CHECK_IN    ❌
+CHECKED_OUT → CHECK_OUT   ❌
+```
+
+unless a clearly defined business rule permits the operation.
+
+---
+
+# 65. FUTURE GPS INTEGRATION
+
+Prepare attendance events to optionally contain:
+
+```text
+latitude
+longitude
+accuracy
+location_timestamp
+device_id
+```
+
+But do not make GPS mandatory in Phase 4.
+
+Future Phase 5 can implement:
+
+```text
+GPS Attendance
+Geofencing
+Location Validation
+```
+
+---
+
+# 66. FUTURE SELFIE VERIFICATION
+
+Prepare attendance events for:
+
+```text
+verification_method
+verification_status
+verification_reference
+```
+
+Do NOT implement biometric processing now unless explicitly requested.
+
+Future implementation may support:
+
+```text
+Selfie
+Face Match
+Liveness
+Verification Score
+```
+
+Keep Phase 4 independent from these services.
+
+---
+
+# 67. MOBILE-READY API
+
+Design APIs so mobile clients can use them later.
+
+Do not depend on browser-specific behavior.
+
+API responses should contain enough information for:
+
+```text
+Android
+iOS
+React Native
+Flutter
+```
+
+without creating a separate attendance API.
+
+---
+
+# 68. FRONTEND STATE MANAGEMENT
+
+Use the existing frontend architecture.
+
+Attendance UI state should correctly handle:
+
+```text
+loading
+checked-in
+checked-out
+error
+network retry
+duplicate request
+```
+
+Prevent accidental multiple check-in requests from rapid clicks.
+
+---
+
+# 69. OFFLINE CONSIDERATION
+
+Do not implement complete offline attendance yet.
+
+However, design the API/event model so mobile offline synchronization can be added later.
+
+Potential future requirement:
+
+```text
+Mobile records attendance event
+        ↓
+Offline queue
+        ↓
+Network restored
+        ↓
+Sync API
+        ↓
+Server validation
+```
+
+---
+
+# 70. SOFT DELETE
+
+Do not physically delete historical:
+
+* Attendance
+* Attendance Events
+* Shift Assignments
+
+unless there is a legally/business-approved archival mechanism.
+
+Historical attendance is important for:
+
+* payroll
+* reports
+* audits
+* compliance
+
+---
+
+# 71. RETENTION & PRIVACY
+
+Attendance records can contain sensitive employee information.
+
+Apply:
+
+* access control
+* tenant isolation
+* minimum necessary data exposure
+* audit logging
+* secure storage
+
+Do not expose unnecessary employee information in attendance APIs.
+
+---
+
+# 72. PRODUCTION QUALITY REQUIREMENT
+
+The implementation must NOT be a simple CRUD module.
+
+The attendance system is a **business-rule engine**.
+
+The final implementation must correctly handle:
+
+```text
+Shift
+Workday
+Holiday
+Weekly Off
+Check-in
+Check-out
+Break
+Grace Period
+Late
+Early Exit
+Overnight Shift
+Work Duration
+Regularization
+Tenant
+RBAC
+Timezone
+Audit
+Concurrency
+```
+
+---
+
+# 73. DEFINITION OF DONE
+
+Phase 4 is complete only when:
+
+## Backend
+
+* Attendance APIs working
+* Check-in working
+* Check-out working
+* Duplicate protection working
+* Shift management working
+* Employee shift assignment working
+* Work-week handling working
+* Holiday foundation working
+* Attendance calculation working
+* Late calculation working
+* Early-exit calculation working
+* Break calculation working
+* Overnight shift working
+* Regularization foundation working
+* RBAC working
+* Tenant isolation working
+* Audit logging working
+* API documentation working
+
+## Database
+
+* Proper relationships
+* Foreign keys
+* Unique constraints
+* Required indexes
+* Historical records preserved
+* Tenant isolation enforced
+* Migrations verified
+
+## Frontend
+
+* Employee attendance dashboard
+* Check-in/check-out UI
+* Attendance history
+* Shift management
+* Shift assignment
+* Admin attendance dashboard
+* Filters
+* Pagination
+* Loading states
+* Error states
+* Responsive UI
+
+## Testing
+
+All important:
+
+* unit tests
+* API tests
+* integration tests
+* security tests
+* tenant isolation tests
+* RBAC tests
+* timezone tests
+* concurrency tests
+* edge-case tests
+
+must pass.
+
+---
+
+# 74. FINAL VALIDATION
+
+Before declaring Phase 4 complete:
+
+```text
+1. Run formatter
+2. Run linter
+3. Run type checking
+4. Run migrations
+5. Run unit tests
+6. Run API tests
+7. Run integration tests
+8. Run security tests
+9. Test tenant isolation
+10. Test RBAC
+11. Test overnight shifts
+12. Test timezone handling
+13. Test duplicate check-in
+14. Test concurrent check-in
+15. Test database constraints
+16. Test frontend
+17. Verify OpenAPI
+18. Verify Phase 1 still works
+19. Verify Phase 2 still works
+20. Verify Phase 3 still works
+```
+
+No regression is acceptable.
+
+---
+
+# 75. FINAL DEVELOPMENT REPORT
+
+After implementation, provide:
+
+## 1. Architecture Changes
+
+Explain the attendance architecture.
+
+## 2. Database Changes
+
+List:
+
+```text
+Tables
+Relationships
+Indexes
+Constraints
+Migrations
+```
+
+## 3. Backend APIs
+
+List all endpoints.
+
+## 4. Attendance Rules
+
+Explain:
+
+```text
+Check-in
+Check-out
+Late
+Early Exit
+Break
+Overnight
+Holiday
+Weekly Off
+Regularization
+```
+
+## 5. Frontend
+
+List all screens/components.
+
+## 6. Security
+
+Explain:
+
+```text
+Authentication
+RBAC
+Tenant isolation
+IDOR protection
+Mass assignment protection
+Audit
+```
+
+## 7. Testing
+
+Report:
+
+```text
+Total tests:
+Passed:
+Failed:
+Skipped:
+Coverage:
+```
+
+## 8. Performance
+
+Report any relevant query/performance improvements.
+
+## 9. Known Issues
+
+List remaining issues honestly.
+
+## 10. Next Phase
+
+Recommend the next logical phase based on the completed architecture.
+
+---
+
+# 76. CRITICAL DEVELOPMENT PRINCIPLE
+
+Do not optimize for merely "making the feature work."
+
+Optimize for:
+
+```text
+Correctness
+Security
+Scalability
+Maintainability
+Testability
+Auditability
+Future extensibility
+```
+
+The attendance engine will become one of the most important components of AxonTimeHR.
+
+Build it as a reusable domain/service layer rather than putting business logic directly into API endpoints.
+
+---
+
+# FINAL INSTRUCTION TO THE AI CODING AGENT
+
+Before coding:
+
+**Inspect the entire AxonTimeHR repository.**
+
+Understand Phase 1, Phase 2, and Phase 3.
+
+Create an implementation plan.
+
+Then implement Phase 4 incrementally.
+
+After each major component:
+
+1. Run tests.
+2. Fix failures.
+3. Check for regressions.
+4. Continue to the next component.
+
+Do not rewrite working code unnecessarily.
+
+Do not create duplicate models.
+
+Do not bypass existing authentication or RBAC.
+
+Do not trust client-provided tenant information.
+
+Do not expose sensitive employee information.
+
+Do not mark the phase complete until the complete validation and test suite passes.
+
+The final result must be a **production-grade Attendance + Shift Management foundation** capable of supporting future GPS, geofencing, selfie verification, mobile attendance, leave, overtime, payroll, reporting, and analytics modules.

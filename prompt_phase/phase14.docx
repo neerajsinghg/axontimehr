@@ -1,0 +1,4381 @@
+# PHASE 14 — LIVE DEV ENVIRONMENT, OPEN-SOURCE DEPLOYMENT, DOCKER, GITHUB CI/CD & PRODUCTION-READY DEVOPS
+
+## PROJECT
+
+**AxonTimeHR — Modern Multi-Tenant Attendance + HRMS SaaS Platform**
+
+---
+
+# 1. ROLE
+
+You are a **Senior DevOps Architect, Cloud Engineer, Backend Architect, Frontend Architect, Security Engineer, Database Engineer, and Release Engineer**.
+
+You are working on the existing **AxonTimeHR** codebase.
+
+Phases 1–13 have already established the application foundation, authentication, RBAC, organization/employee management, attendance, GPS/geofencing, leave, payroll, expenses, performance, recruitment, ESS/MSS, compliance, analytics, AI capabilities, and related infrastructure.
+
+Your responsibility in **PHASE 14** is NOT to rebuild AxonTimeHR.
+
+Your responsibility is to make the existing AxonTimeHR application:
+
+* deployable
+* reproducible
+* containerized
+* accessible over the internet
+* continuously runnable as a DEV environment
+* GitHub-integrated
+* CI/CD-enabled
+* database-persistent
+* backup-capable
+* secure
+* observable
+* upgradeable
+* recoverable
+* suitable for open-source/self-hosted distribution
+* ready for future production deployment
+
+The final result should behave like a **real hosted development environment**, not merely a local project.
+
+---
+
+# 2. MOST IMPORTANT RULE — INSPECT BEFORE MODIFYING
+
+Before writing or modifying code:
+
+1. Inspect the complete repository.
+2. Identify the current frontend architecture.
+3. Identify the current backend architecture.
+4. Identify the database implementation.
+5. Identify the migration system.
+6. Identify Redis configuration.
+7. Identify Celery/background workers.
+8. Identify existing Docker files.
+9. Identify existing environment configuration.
+10. Identify existing CI/CD configuration.
+11. Identify existing tests.
+12. Identify existing logging.
+13. Identify existing health checks.
+14. Identify existing authentication/security configuration.
+15. Identify existing file/object storage architecture.
+16. Identify existing documentation.
+17. Identify existing deployment assumptions.
+
+Do NOT replace working implementations unnecessarily.
+
+Do NOT create duplicate configuration systems.
+
+Do NOT create duplicate Docker configurations.
+
+Do NOT create a second database architecture.
+
+Do NOT break existing functionality.
+
+Reuse existing components wherever possible.
+
+---
+
+# 3. PHASE 14 OBJECTIVE
+
+The objective is to create the following architecture:
+
+```text
+                         INTERNET
+                            |
+                            |
+                     HTTPS / TLS
+                            |
+                            v
+                  +------------------+
+                  | Reverse Proxy    |
+                  | Caddy / Nginx    |
+                  +--------+---------+
+                           |
+              +------------+------------+
+              |                         |
+              v                         v
+       React Frontend             FastAPI Backend
+                                      |
+                       +--------------+--------------+
+                       |              |              |
+                       v              v              v
+                  PostgreSQL       Redis          Celery
+                       |
+                       v
+                 Persistent DB
+                    Volume
+
+                         ^
+                         |
+                    GitHub Actions
+                         ^
+                         |
+                    GitHub Repository
+                         ^
+                         |
+                Developer git push
+```
+
+The DEV environment should be reachable through a domain such as:
+
+```text
+https://dev.axontimehr.com
+```
+
+The exact domain must be configurable.
+
+Do NOT hardcode the domain.
+
+---
+
+# 4. DEVELOPMENT ENVIRONMENT TARGET
+
+Create a real remote DEV environment capable of running:
+
+```text
+Frontend
+Backend
+PostgreSQL
+Redis
+Celery Worker
+Celery Beat
+Reverse Proxy
+Optional Object Storage
+Monitoring/Logging
+```
+
+Recommended container architecture:
+
+```text
+axontimehr-frontend
+axontimehr-backend
+axontimehr-postgres
+axontimehr-redis
+axontimehr-celery-worker
+axontimehr-celery-beat
+axontimehr-proxy
+```
+
+Use Docker Compose initially.
+
+The architecture must remain suitable for migration to:
+
+* Kubernetes
+* managed PostgreSQL
+* managed Redis
+* cloud object storage
+* multiple backend replicas
+* load balancers
+
+later.
+
+---
+
+# 5. OPEN-SOURCE / SELF-HOSTED PRINCIPLE
+
+AxonTimeHR should be capable of being cloned and started by another developer.
+
+The target experience should eventually be:
+
+```bash
+git clone <repository>
+cd axontimehr
+cp .env.example .env
+docker compose up -d
+```
+
+The exact commands may differ depending on the existing project.
+
+Document the final commands clearly.
+
+A new developer should be able to understand:
+
+1. prerequisites
+2. environment configuration
+3. database startup
+4. migration execution
+5. seed/demo data
+6. application startup
+7. frontend URL
+8. backend URL
+9. API documentation
+10. default demo credentials, if seed users are provided
+
+---
+
+# 6. DOCKERIZATION
+
+Containerize every component that needs deployment.
+
+Create or improve:
+
+```text
+Dockerfile
+docker-compose.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+.dockerignore
+```
+
+Use multi-stage builds where appropriate.
+
+---
+
+# 7. FRONTEND DOCKERIZATION
+
+For React + TypeScript:
+
+Development:
+
+```text
+Node
+   |
+npm install
+   |
+npm run dev
+```
+
+Production-style container:
+
+```text
+Node build
+   |
+npm run build
+   |
+Static assets
+   |
+Nginx/Caddy
+```
+
+Do not run unnecessary development tooling in the production-style container.
+
+Ensure:
+
+* API base URL is configurable
+* environment variables are documented
+* frontend does not contain backend secrets
+* source maps are handled intentionally
+* build failures stop CI
+* TypeScript errors are detected
+* lint errors are detected according to project policy
+
+---
+
+# 8. FASTAPI DOCKERIZATION
+
+Create a production-capable FastAPI container.
+
+Requirements:
+
+* configurable host
+* configurable port
+* proper worker configuration
+* environment-based settings
+* health endpoint
+* readiness endpoint if appropriate
+* graceful shutdown
+* structured logging
+* database connection handling
+* Redis connection handling
+* secure CORS configuration
+* trusted host configuration
+* proxy headers handled correctly
+
+Example conceptual architecture:
+
+```text
+Reverse Proxy
+      |
+      v
+FastAPI
+      |
+      +---- PostgreSQL
+      |
+      +---- Redis
+```
+
+Do not expose unnecessary internal services directly to the internet.
+
+---
+
+# 9. POSTGRESQL
+
+Use PostgreSQL as the primary AxonTimeHR database.
+
+Database name:
+
+```text
+axontimehr
+```
+
+However, the database name must remain configurable through environment variables.
+
+Example:
+
+```env
+POSTGRES_DB=axontimehr
+POSTGRES_USER=...
+POSTGRES_PASSWORD=...
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+```
+
+DO NOT hardcode passwords.
+
+DO NOT commit real credentials.
+
+DO NOT expose PostgreSQL port `5432` publicly unless there is an explicit development requirement and proper security controls.
+
+Prefer:
+
+```text
+Internet
+   X
+PostgreSQL
+```
+
+and:
+
+```text
+FastAPI
+   |
+   v
+PostgreSQL
+```
+
+inside the Docker/private network.
+
+---
+
+# 10. DATABASE PERSISTENCE
+
+PostgreSQL must use persistent storage.
+
+Example:
+
+```yaml
+volumes:
+  postgres_data:
+```
+
+The database must survive:
+
+```bash
+docker compose restart
+```
+
+and:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+Do NOT use ephemeral database storage for DEV.
+
+Document exactly when:
+
+```bash
+docker compose down
+```
+
+does and does not delete data.
+
+Explain the difference between:
+
+```bash
+docker compose down
+```
+
+and:
+
+```bash
+docker compose down -v
+```
+
+Make it clear that removing volumes can destroy database data.
+
+---
+
+# 11. DATABASE MIGRATIONS
+
+Use the existing migration system.
+
+If Alembic is already present, continue using Alembic.
+
+Do not introduce another migration framework.
+
+Deployment flow should support:
+
+```text
+Application update
+      |
+      v
+Database migration
+      |
+      v
+Application startup
+```
+
+Migration commands must be documented.
+
+Example:
+
+```bash
+alembic upgrade head
+```
+
+If appropriate, create a deployment entrypoint that performs migrations safely.
+
+Do not automatically destroy or recreate the database.
+
+Never use:
+
+```text
+DROP DATABASE
+```
+
+as part of normal deployment.
+
+---
+
+# 12. DATABASE SEEDING
+
+Create a safe demo-data mechanism.
+
+Provide:
+
+```text
+seed_demo_data
+```
+
+or an equivalent command.
+
+Demo data should include realistic but fake:
+
+* tenant
+* organization
+* branch
+* departments
+* designations
+* users
+* employees
+* shifts
+* attendance
+* leave types
+* holidays
+* payroll configuration
+* sample reports
+* sample notifications
+
+NEVER use real employee data.
+
+NEVER commit production database dumps.
+
+NEVER commit passwords.
+
+---
+
+# 13. DEMO ENVIRONMENT
+
+Create an optional demo environment.
+
+Example:
+
+```text
+DEMO_MODE=true
+```
+
+Demo data must be clearly separated from real production data.
+
+Document:
+
+```bash
+seed-demo
+```
+
+and:
+
+```bash
+reset-demo
+```
+
+if such functionality is implemented.
+
+Demo credentials must be documented only for demo environments.
+
+Never create hardcoded production administrator credentials.
+
+---
+
+# 14. REDIS
+
+Containerize Redis.
+
+Example:
+
+```text
+axontimehr-redis
+```
+
+Redis should be used for:
+
+* caching
+* Celery broker
+* background task coordination
+* rate limiting where applicable
+* temporary state
+
+Do not expose Redis publicly.
+
+Use authentication where appropriate.
+
+Redis configuration must come from environment variables.
+
+---
+
+# 15. CELERY
+
+Containerize the existing Celery architecture.
+
+At minimum support:
+
+```text
+FastAPI
+   |
+   v
+Redis
+   |
+   v
+Celery Worker
+```
+
+If Celery Beat is already required:
+
+```text
+Celery Beat
+     |
+     v
+Redis
+     |
+     v
+Celery Worker
+```
+
+Support background tasks such as:
+
+* notifications
+* scheduled reports
+* compliance reminders
+* attendance processing
+* leave reminders
+* payroll processing
+* analytics refresh
+* AI processing
+* document processing
+* cleanup jobs
+
+Do not execute long-running jobs directly inside HTTP request handlers.
+
+---
+
+# 16. HEALTH CHECKS
+
+Create health checks for all critical services.
+
+Backend:
+
+```text
+GET /health
+```
+
+Readiness:
+
+```text
+GET /ready
+```
+
+Potential response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+Readiness should verify required dependencies when appropriate:
+
+```text
+PostgreSQL
+Redis
+```
+
+Do not make the health endpoint expose:
+
+* passwords
+* connection strings
+* secrets
+* tokens
+* sensitive configuration
+
+Docker Compose should use health checks.
+
+Example dependency flow:
+
+```text
+PostgreSQL healthy
+       |
+       v
+Backend starts
+       |
+       v
+Celery starts
+       |
+       v
+Frontend available
+```
+
+---
+
+# 17. REVERSE PROXY
+
+Implement a reverse proxy.
+
+Choose the technology that best fits the existing project:
+
+```text
+Caddy
+```
+
+or:
+
+```text
+Nginx
+```
+
+The reverse proxy should handle:
+
+* HTTPS
+* TLS certificates
+* HTTP → HTTPS redirect
+* frontend routing
+* backend API routing
+* security headers
+* compression
+* request size limits
+* WebSocket support if required
+* static assets
+
+Architecture:
+
+```text
+Internet
+   |
+   v
+HTTPS
+   |
+   v
+Caddy/Nginx
+   |
+   +---- /
+   |      |
+   |      v
+   |   React
+   |
+   +---- /api
+          |
+          v
+       FastAPI
+```
+
+---
+
+# 18. DOMAIN CONFIGURATION
+
+Make the domain configurable.
+
+Example:
+
+```env
+APP_DOMAIN=dev.axontimehr.com
+```
+
+Do not hardcode:
+
+```text
+dev.axontimehr.com
+```
+
+throughout the application.
+
+Support:
+
+```text
+DEV_DOMAIN
+API_DOMAIN
+```
+
+if frontend and backend require separate domains.
+
+Prefer same-origin API routing where practical:
+
+```text
+https://dev.axontimehr.com
+https://dev.axontimehr.com/api
+```
+
+This can simplify CORS and deployment.
+
+---
+
+# 19. HTTPS
+
+DEV should support HTTPS.
+
+Use:
+
+```text
+Let's Encrypt
+```
+
+through Caddy or another supported reverse proxy.
+
+Requirements:
+
+* automatic certificate acquisition
+* automatic renewal
+* HTTP → HTTPS redirect
+* secure cookies
+* HSTS where appropriate
+* secure headers
+
+Do not manually commit TLS private keys.
+
+---
+
+# 20. ENVIRONMENT MANAGEMENT
+
+Create:
+
+```text
+.env.example
+```
+
+The repository may contain:
+
+```text
+.env.example
+```
+
+but must NOT contain:
+
+```text
+.env
+```
+
+or real secrets.
+
+Example:
+
+```env
+APP_ENV=development
+DEBUG=false
+
+POSTGRES_DB=axontimehr
+POSTGRES_USER=axontimehr
+POSTGRES_PASSWORD=CHANGE_ME
+
+DATABASE_URL=...
+
+REDIS_URL=...
+
+JWT_SECRET=CHANGE_ME
+
+CORS_ORIGINS=...
+
+APP_DOMAIN=...
+```
+
+Separate variables into categories:
+
+```text
+Application
+Database
+Redis
+Authentication
+Email
+Storage
+AI
+Monitoring
+External APIs
+Deployment
+```
+
+Document every variable.
+
+---
+
+# 21. SECRET MANAGEMENT
+
+Never store secrets in:
+
+* GitHub source code
+* Dockerfile
+* docker-compose.yml
+* frontend code
+* JavaScript bundles
+* README
+* screenshots
+* test fixtures
+* seed files
+
+Use:
+
+* server environment variables
+* GitHub Actions Secrets
+* GitHub Environments
+* cloud secret managers later
+
+Implement secret rotation documentation.
+
+---
+
+# 22. GITHUB REPOSITORY
+
+Prepare the repository for open-source development.
+
+Recommended structure:
+
+```text
+axontimehr/
+│
+├── frontend/
+│
+├── backend/
+│
+├── database/
+│
+├── tests/
+│
+├── docker/
+│
+├── scripts/
+│
+├── docs/
+│
+├── deployment/
+│   ├── dev/
+│   ├── staging/
+│   └── production/
+│
+├── .github/
+│   ├── workflows/
+│   ├── ISSUE_TEMPLATE/
+│   ├── pull_request_template.md
+│   ├── CODEOWNERS
+│   └── dependabot.yml
+│
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
+├── .env.example
+├── .gitignore
+├── LICENSE
+├── README.md
+├── CHANGELOG.md
+└── SECURITY.md
+```
+
+Adapt this to the existing repository instead of blindly recreating it.
+
+---
+
+# 23. GITIGNORE
+
+Ensure the following are ignored:
+
+```text
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.pyc
+
+node_modules/
+
+.venv/
+venv/
+
+dist/
+build/
+
+coverage/
+
+.pytest_cache/
+
+logs/
+
+*.log
+
+*.sqlite
+*.sqlite3
+
+database dumps
+backup files
+IDE files
+OS files
+```
+
+Do not accidentally ignore source files required by the project.
+
+---
+
+# 24. GITHUB ACTIONS — CI
+
+Create a CI pipeline.
+
+Every Pull Request should execute appropriate checks.
+
+Pipeline:
+
+```text
+Pull Request
+     |
+     v
+GitHub Actions
+     |
+     +---- Backend lint
+     |
+     +---- Backend type checking
+     |
+     +---- Backend tests
+     |
+     +---- Frontend lint
+     |
+     +---- Frontend typecheck
+     |
+     +---- Frontend tests
+     |
+     +---- Build
+     |
+     +---- Security checks
+     |
+     +---- Docker build
+```
+
+Do not allow broken code to be automatically deployed to DEV.
+
+---
+
+# 25. PYTHON TESTING
+
+Use the existing pytest architecture.
+
+CI should run:
+
+```bash
+pytest
+```
+
+with appropriate configuration.
+
+Support:
+
+* unit tests
+* API tests
+* integration tests
+* database tests
+* security tests
+* RBAC tests
+* tenant isolation tests
+
+Do not require production credentials to run normal CI tests.
+
+Use isolated test databases.
+
+---
+
+# 26. FRONTEND TESTING
+
+Run existing frontend tests.
+
+At minimum support:
+
+```text
+lint
+typecheck
+unit tests
+production build
+```
+
+If Playwright exists in the project, create a deployment smoke-test capability.
+
+---
+
+# 27. DATABASE INTEGRATION TESTING
+
+CI must verify:
+
+```text
+PostgreSQL starts
+      |
+      v
+Migration succeeds
+      |
+      v
+Tables exist
+      |
+      v
+Application starts
+      |
+      v
+API health succeeds
+```
+
+Include migration testing.
+
+Detect:
+
+* invalid migrations
+* broken foreign keys
+* missing indexes
+* incompatible schema changes
+
+---
+
+# 28. DOCKER CI
+
+Build all required Docker images in CI.
+
+Example:
+
+```text
+backend image
+frontend image
+worker image
+```
+
+Verify that images build successfully.
+
+Use pinned or controlled dependency versions where practical.
+
+---
+
+# 29. CONTAINER SECURITY
+
+Implement container security best practices.
+
+Where practical:
+
+* non-root containers
+* minimal base images
+* pinned versions
+* no unnecessary packages
+* read-only filesystem where possible
+* dropped Linux capabilities
+* resource limits
+* health checks
+* vulnerability scanning
+
+Do not expose unnecessary ports.
+
+---
+
+# 30. GITHUB CONTAINER REGISTRY
+
+Prepare support for:
+
+```text
+GitHub Container Registry
+```
+
+Images can eventually be published as:
+
+```text
+ghcr.io/<organization>/axontimehr-backend
+ghcr.io/<organization>/axontimehr-frontend
+```
+
+Do not hardcode a personal GitHub username.
+
+Use repository/org variables.
+
+Tag images with:
+
+```text
+latest
+dev
+version
+commit SHA
+```
+
+according to the release strategy.
+
+---
+
+# 31. AUTOMATIC DEV DEPLOYMENT
+
+Create a GitHub Actions deployment pipeline.
+
+Recommended flow:
+
+```text
+Developer
+   |
+   v
+git push
+   |
+   v
+GitHub
+   |
+   v
+CI
+   |
+   v
+Tests
+   |
+   v
+Docker Build
+   |
+   v
+Publish Image
+   |
+   v
+DEV Server
+   |
+   v
+Pull Image
+   |
+   v
+Database Migration
+   |
+   v
+Restart Services
+   |
+   v
+Health Check
+```
+
+Only deploy if CI succeeds.
+
+---
+
+# 32. DEV SERVER DEPLOYMENT
+
+Prepare deployment for a Linux cloud VM.
+
+The solution should work with a generic Ubuntu-based VM.
+
+Do not tightly couple the application to a single cloud provider.
+
+Document:
+
+```text
+Server requirements
+SSH configuration
+Docker installation
+Firewall configuration
+Domain configuration
+DNS configuration
+Environment variables
+Deployment commands
+Backup configuration
+Monitoring
+Troubleshooting
+```
+
+---
+
+# 33. FIREWALL
+
+Only expose required ports.
+
+Typical public ports:
+
+```text
+80
+443
+```
+
+SSH:
+
+```text
+22
+```
+
+should be restricted where possible.
+
+Do NOT publicly expose:
+
+```text
+5432
+6379
+```
+
+unless explicitly required and secured.
+
+Preferred architecture:
+
+```text
+Internet
+   |
+  80/443
+   |
+Reverse Proxy
+   |
+Docker network
+   |
++-------+-------+
+|       |       |
+API    Redis   DB
+```
+
+---
+
+# 34. DOCKER NETWORKING
+
+Create isolated Docker networks.
+
+For example:
+
+```text
+public network
+private network
+```
+
+Potential:
+
+```text
+proxy
+   |
+frontend
+   |
+backend
+   |
+private
+ +------+------+
+ |             |
+PostgreSQL   Redis
+```
+
+Only expose services that need external access.
+
+---
+
+# 35. DATABASE BACKUPS
+
+Implement automated PostgreSQL backups.
+
+Use:
+
+```bash
+pg_dump
+```
+
+or an appropriate PostgreSQL backup mechanism.
+
+Backup schedule should be configurable.
+
+Example:
+
+```text
+daily backup
+retention: configurable
+```
+
+Backups must NOT be stored only on the same disk as the database.
+
+Document:
+
+* backup location
+* retention
+* encryption
+* restoration
+* backup verification
+* disaster recovery
+
+---
+
+# 36. DATABASE RESTORE TEST
+
+Do not assume a backup is valid simply because it exists.
+
+Create a documented restore test.
+
+Example:
+
+```text
+Production/DEV database
+       |
+       v
+Backup
+       |
+       v
+Temporary PostgreSQL
+       |
+       v
+Restore
+       |
+       v
+Migration/schema verification
+       |
+       v
+Application connectivity test
+```
+
+---
+
+# 37. DISASTER RECOVERY
+
+Document recovery scenarios:
+
+### Scenario 1
+
+Container crashes.
+
+Expected:
+
+```text
+Docker restart
+```
+
+### Scenario 2
+
+Application deployment fails.
+
+Expected:
+
+```text
+rollback
+```
+
+### Scenario 3
+
+Database container crashes.
+
+Expected:
+
+```text
+persistent volume
+```
+
+### Scenario 4
+
+Database is corrupted.
+
+Expected:
+
+```text
+restore backup
+```
+
+### Scenario 5
+
+Entire server is lost.
+
+Expected:
+
+```text
+new server
++
+GitHub repository
++
+environment secrets
++
+database backup
+=
+AxonTimeHR restored
+```
+
+---
+
+# 38. ROLLBACK STRATEGY
+
+Deployment must have a rollback strategy.
+
+Do not rely on:
+
+```text
+docker compose down
+```
+
+as the rollback mechanism.
+
+Use versioned images.
+
+Example:
+
+```text
+axontimehr-backend:1.4.0
+axontimehr-backend:1.3.2
+```
+
+A failed deployment should allow reverting to the previous known-good image.
+
+Database migrations must be designed carefully because some schema changes are not safely reversible.
+
+Prefer backward-compatible migrations where possible.
+
+---
+
+# 39. ZERO-DOWNTIME PREPARATION
+
+For the initial DEV server, zero downtime is not mandatory.
+
+However, architecture should not prevent future:
+
+```text
+multiple backend replicas
+load balancing
+rolling deployment
+```
+
+Design the backend to be stateless wherever possible.
+
+Do not store user session state only in application memory.
+
+Use PostgreSQL/Redis/shared storage where appropriate.
+
+---
+
+# 40. FILE STORAGE
+
+Review existing file upload functionality.
+
+AxonTimeHR may store:
+
+* employee documents
+* profile images
+* attendance/selfie images
+* reports
+* payslips
+* letters
+* attachments
+* compliance documents
+
+Do NOT rely on container filesystem for permanent production storage.
+
+Create an abstraction supporting:
+
+```text
+local filesystem
+object storage
+```
+
+with future compatibility for:
+
+```text
+S3-compatible storage
+```
+
+Never store sensitive files in the Git repository.
+
+---
+
+# 41. SECURITY OF UPLOADED FILES
+
+Implement:
+
+* file type validation
+* MIME validation
+* file size limits
+* safe filenames
+* path traversal protection
+* authorization checks
+* tenant isolation
+* malware scanning architecture where appropriate
+* signed/private access URLs where appropriate
+
+Ensure an employee from Tenant A cannot access documents belonging to Tenant B.
+
+---
+
+# 42. TENANT ISOLATION
+
+Deployment must preserve all existing multi-tenant security.
+
+Verify:
+
+```text
+Tenant A
+   X
+Tenant B database records
+```
+
+Test:
+
+* API
+* UI
+* documents
+* reports
+* analytics
+* AI
+* background jobs
+* exports
+* files
+* search
+
+No cross-tenant leakage.
+
+---
+
+# 43. AUTHENTICATION SECURITY
+
+Production-style DEV must not weaken authentication.
+
+Verify:
+
+* JWT security
+* token expiration
+* refresh token handling
+* password hashing
+* secure cookies where used
+* CSRF protection where applicable
+* CORS
+* rate limiting
+* login throttling
+* session management
+* logout
+* password reset
+* account lockout policy
+
+Never disable security simply because this is DEV.
+
+---
+
+# 44. CORS
+
+CORS must be environment-specific.
+
+Do not use:
+
+```text
+allow_origins=["*"]
+```
+
+for authenticated production-style deployment unless there is a clearly justified architecture.
+
+Configure:
+
+```env
+CORS_ORIGINS=https://dev.axontimehr.com
+```
+
+---
+
+# 45. SECURITY HEADERS
+
+Configure appropriate headers such as:
+
+```text
+Content-Security-Policy
+X-Content-Type-Options
+X-Frame-Options
+Referrer-Policy
+Strict-Transport-Security
+Permissions-Policy
+```
+
+Tune them according to actual application requirements.
+
+Do not break legitimate frontend functionality.
+
+---
+
+# 46. LOGGING
+
+Implement structured application logging.
+
+Logs should identify:
+
+* timestamp
+* service
+* log level
+* request ID
+* tenant context where safe
+* user ID where safe
+* operation
+* duration
+* error details
+
+Never log:
+
+* passwords
+* JWT tokens
+* refresh tokens
+* API keys
+* secrets
+* full sensitive employee data
+
+---
+
+# 47. REQUEST CORRELATION
+
+Implement a request ID.
+
+Example:
+
+```text
+X-Request-ID
+```
+
+Flow:
+
+```text
+Browser
+   |
+request-id
+   |
+Reverse Proxy
+   |
+FastAPI
+   |
+Celery
+```
+
+This should make debugging production-like DEV issues easier.
+
+---
+
+# 48. ERROR HANDLING
+
+Production-style deployment must not expose stack traces to users.
+
+Development logging may contain detailed stack traces internally.
+
+API should return controlled responses:
+
+```json
+{
+  "success": false,
+  "message": "An internal error occurred.",
+  "request_id": "..."
+}
+```
+
+Do not expose:
+
+* SQL statements
+* secrets
+* internal filesystem paths
+* credentials
+
+---
+
+# 49. OBSERVABILITY
+
+Prepare:
+
+```text
+Health
+Metrics
+Logs
+Errors
+```
+
+At minimum implement:
+
+```text
+/health
+/ready
+```
+
+Prepare architecture for:
+
+```text
+Prometheus
+Grafana
+OpenTelemetry
+Sentry
+```
+
+without making them mandatory unless already part of the repository.
+
+---
+
+# 50. RESOURCE LIMITS
+
+Docker services should have reasonable resource configuration.
+
+Consider:
+
+```text
+CPU
+Memory
+Restart policy
+Health checks
+```
+
+Do not allow a runaway Celery task to consume the entire server.
+
+Document expected minimum resources.
+
+---
+
+# 51. EMAIL
+
+Review email architecture.
+
+Development environment should not accidentally send real HR emails.
+
+Create a safe DEV strategy:
+
+```text
+EMAIL_MODE=console
+```
+
+or:
+
+```text
+EMAIL_MODE=development
+```
+
+or a sandbox SMTP provider.
+
+Development notifications should preferably go to a safe test destination.
+
+---
+
+# 52. SMS / WHATSAPP / EXTERNAL SERVICES
+
+Any external notification service must use environment-based configuration.
+
+Example:
+
+```env
+SMS_ENABLED=false
+WHATSAPP_ENABLED=false
+```
+
+for DEV unless explicitly configured.
+
+Do not send real employee notifications accidentally.
+
+---
+
+# 53. AI SERVICES
+
+Phase 13 introduced AI functionality.
+
+Phase 14 must make AI providers configurable.
+
+Support:
+
+```text
+AI_ENABLED=false
+```
+
+by default where credentials are unavailable.
+
+Never commit:
+
+```text
+OPENAI_API_KEY
+GEMINI_API_KEY
+ANTHROPIC_API_KEY
+```
+
+or any other provider secrets.
+
+AI calls must fail gracefully when disabled.
+
+---
+
+# 54. ENVIRONMENT MODES
+
+Support at least:
+
+```text
+development
+testing
+staging
+production
+```
+
+Each environment must have different configuration.
+
+Example:
+
+```text
+.env.development
+.env.testing
+.env.production
+```
+
+Do not commit actual secrets.
+
+Only provide examples/templates.
+
+---
+
+# 55. DEV DATA VS PRODUCTION DATA
+
+Implement strict separation.
+
+Never allow:
+
+```text
+DEV application
+   |
+   v
+PRODUCTION DATABASE
+```
+
+The database URL must be environment-specific.
+
+Add safeguards against accidental production database access from DEV.
+
+---
+
+# 56. DATABASE SAFETY GUARD
+
+If appropriate, implement a startup safeguard.
+
+Example conceptual behavior:
+
+```text
+APP_ENV=development
+DATABASE_ENV=production
+```
+
+should fail startup.
+
+This prevents accidental DEV → PROD database connections.
+
+---
+
+# 57. MIGRATION SAFETY
+
+Before migration:
+
+```text
+backup
+```
+
+For sensitive production migrations:
+
+```text
+backup
+→ migration
+→ verification
+```
+
+DEV migrations may be automated.
+
+Production migrations should eventually support explicit approval.
+
+---
+
+# 58. GITHUB BRANCHING STRATEGY
+
+Recommended:
+
+```text
+main
+develop
+feature/*
+hotfix/*
+release/*
+```
+
+Example:
+
+```text
+feature/attendance-dashboard
+        |
+        v
+develop
+        |
+        v
+DEV
+```
+
+Production:
+
+```text
+main
+   |
+   v
+production
+```
+
+Adapt to the repository's current branch strategy instead of forcing an unnecessary migration.
+
+---
+
+# 59. PULL REQUEST CHECKS
+
+Require successful:
+
+```text
+tests
+lint
+typecheck
+build
+security checks
+```
+
+before merging.
+
+Add:
+
+```text
+pull_request_template.md
+```
+
+with:
+
+```text
+What changed?
+Why?
+Tests performed?
+Database migration?
+Security impact?
+Breaking change?
+Deployment impact?
+```
+
+---
+
+# 60. CODEOWNERS
+
+Create:
+
+```text
+.github/CODEOWNERS
+```
+
+Use placeholders where organization information is unknown.
+
+Do not invent real GitHub usernames.
+
+---
+
+# 61. DEPENDABOT
+
+Create:
+
+```text
+.github/dependabot.yml
+```
+
+for:
+
+```text
+Python dependencies
+npm dependencies
+GitHub Actions
+Docker
+```
+
+Configure sensible update frequency.
+
+---
+
+# 62. SECURITY POLICY
+
+Create:
+
+```text
+SECURITY.md
+```
+
+Explain:
+
+* how to report vulnerabilities
+* what not to disclose publicly
+* supported versions
+* security response process
+
+Do not put private security contact information unless supplied.
+
+---
+
+# 63. OPEN-SOURCE LICENSE
+
+Prepare the repository for licensing.
+
+Do not blindly choose a license without considering the business model.
+
+Document the implications of possible choices such as:
+
+```text
+MIT
+Apache-2.0
+GPL
+AGPL
+```
+
+If AxonTimeHR will have an open-core/commercial SaaS model, document the intended licensing boundary.
+
+Do not provide legal advice.
+
+The final license must be an explicit project decision.
+
+---
+
+# 64. COMMUNITY DOCUMENTATION
+
+Create/update:
+
+```text
+README.md
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md
+LICENSE
+```
+
+README should explain:
+
+1. What AxonTimeHR is
+2. Architecture
+3. Features
+4. Technology stack
+5. Requirements
+6. Local setup
+7. Docker setup
+8. Database setup
+9. Environment variables
+10. Demo data
+11. Running tests
+12. Deployment
+13. DEV environment
+14. Contribution
+15. Security
+16. License
+
+---
+
+# 65. LOCAL DEVELOPMENT
+
+A developer should be able to run:
+
+```bash
+docker compose up -d
+```
+
+and access:
+
+```text
+Frontend
+Backend
+PostgreSQL
+Redis
+```
+
+Document actual URLs generated by the project.
+
+---
+
+# 66. DEV DEPLOYMENT
+
+Document the complete deployment process.
+
+Example:
+
+```text
+1. Provision Ubuntu VM
+2. Configure SSH
+3. Install Docker
+4. Install Docker Compose
+5. Configure firewall
+6. Configure DNS
+7. Configure domain
+8. Clone deployment configuration
+9. Configure secrets
+10. Start PostgreSQL
+11. Run migrations
+12. Start backend
+13. Start Celery
+14. Start frontend
+15. Start reverse proxy
+16. Enable HTTPS
+17. Run smoke tests
+```
+
+---
+
+# 67. AUTOMATED DEPLOYMENT SCRIPT
+
+Create a deployment script where appropriate:
+
+```text
+scripts/deploy.sh
+```
+
+It should perform safe operations such as:
+
+```text
+pull latest image
+backup database when required
+run migration
+restart services
+wait for health
+run smoke test
+```
+
+Do not blindly use destructive commands.
+
+---
+
+# 68. DEPLOYMENT LOCK
+
+Prevent two deployments from running simultaneously.
+
+GitHub Actions should use environment/concurrency controls.
+
+Conceptually:
+
+```text
+DEV deployment #1
+       |
+running
+       |
+DEV deployment #2
+       X
+wait
+```
+
+---
+
+# 69. POST-DEPLOYMENT SMOKE TEST
+
+After deployment:
+
+```text
+GET /
+GET /health
+GET /ready
+```
+
+Then verify:
+
+```text
+Login
+Authentication
+API
+Database
+Frontend
+```
+
+If Playwright is available:
+
+```text
+Open DEV URL
+Login
+Open dashboard
+Verify API call
+Logout
+```
+
+Deployment should fail if critical smoke tests fail.
+
+---
+
+# 70. DATABASE MIGRATION SMOKE TEST
+
+After deployment verify:
+
+```text
+alembic current
+```
+
+and:
+
+```text
+alembic heads
+```
+
+or equivalent migration status.
+
+Detect:
+
+```text
+pending migration
+multiple heads
+failed migration
+```
+
+---
+
+# 71. VERSION INFORMATION
+
+Expose application version safely.
+
+Example:
+
+```text
+GET /api/version
+```
+
+Response:
+
+```json
+{
+  "name": "AxonTimeHR",
+  "version": "1.0.0",
+  "environment": "development",
+  "commit": "abc123"
+}
+```
+
+Do not expose secrets.
+
+---
+
+# 72. RELEASE MANAGEMENT
+
+Implement semantic versioning:
+
+```text
+MAJOR.MINOR.PATCH
+```
+
+Example:
+
+```text
+1.0.0
+1.1.0
+1.1.1
+```
+
+Create Git tags:
+
+```text
+v1.0.0
+```
+
+Maintain:
+
+```text
+CHANGELOG.md
+```
+
+---
+
+# 73. GITHUB RELEASES
+
+Prepare GitHub Releases for stable versions.
+
+Release should contain:
+
+```text
+version
+release notes
+breaking changes
+database migration notes
+upgrade instructions
+Docker image information
+```
+
+---
+
+# 74. DATABASE COMPATIBILITY
+
+For every release document:
+
+```text
+Application version
+Database schema version
+Migration requirement
+Backward compatibility
+Upgrade path
+```
+
+Do not allow application/schema mismatches to go unnoticed.
+
+---
+
+# 75. UPGRADE PROCESS
+
+Document:
+
+```text
+Current version
+      |
+      v
+Backup database
+      |
+      v
+Pull new image
+      |
+      v
+Run migrations
+      |
+      v
+Restart application
+      |
+      v
+Health check
+      |
+      v
+Smoke test
+```
+
+---
+
+# 76. MONITORING CRITICAL SERVICES
+
+Monitor:
+
+```text
+Frontend
+FastAPI
+PostgreSQL
+Redis
+Celery
+Disk
+Memory
+CPU
+```
+
+Alert when:
+
+```text
+service unavailable
+database unavailable
+disk almost full
+memory exhausted
+Celery queue growing
+backup failing
+SSL certificate problem
+```
+
+---
+
+# 77. LOG ROTATION
+
+Prevent logs from filling the server disk.
+
+Configure:
+
+```text
+log rotation
+retention
+size limits
+```
+
+Do not allow unlimited Docker logs.
+
+---
+
+# 78. SERVER BACKUP
+
+Database backup alone is not enough.
+
+Document backup strategy for:
+
+```text
+database
+configuration
+uploaded files
+deployment configuration
+```
+
+Never backup:
+
+```text
+secrets into GitHub
+```
+
+---
+
+# 79. SERVER SECURITY
+
+Document:
+
+* SSH key authentication
+* disable password SSH where appropriate
+* firewall
+* automatic security updates
+* Docker security
+* least privilege
+* non-root application containers
+* restricted database access
+* restricted Redis access
+
+---
+
+# 80. SSH DEPLOYMENT
+
+If GitHub Actions deploys using SSH:
+
+Use:
+
+```text
+GitHub Actions Secret
+```
+
+for the private deployment key.
+
+Never commit:
+
+```text
+.pem
+.id_rsa
+SSH private keys
+```
+
+---
+
+# 81. GITHUB ENVIRONMENTS
+
+Create conceptual environments:
+
+```text
+development
+staging
+production
+```
+
+DEV secrets should be stored separately.
+
+Do not reuse production secrets in DEV.
+
+---
+
+# 82. CONFIGURATION VALIDATION
+
+Application startup should validate required environment variables.
+
+If:
+
+```text
+DATABASE_URL
+JWT_SECRET
+```
+
+is required and missing:
+
+```text
+startup should fail clearly
+```
+
+Do not silently fall back to insecure defaults.
+
+---
+
+# 83. INSECURE DEFAULT DETECTION
+
+Detect dangerous values such as:
+
+```text
+password
+admin
+secret
+changeme
+```
+
+for production.
+
+Production startup should fail if known insecure defaults remain.
+
+---
+
+# 84. API DOCUMENTATION
+
+Ensure FastAPI documentation is environment-aware.
+
+For DEV:
+
+```text
+/swagger
+/redoc
+```
+
+or existing routes.
+
+Production may restrict or disable public API docs depending on security requirements.
+
+Do not expose internal administrative APIs accidentally.
+
+---
+
+# 85. API BASE URL
+
+Frontend must never hardcode:
+
+```text
+localhost
+127.0.0.1
+```
+
+for the deployed environment.
+
+Use configurable API base URL.
+
+Verify all API calls.
+
+Search repository for:
+
+```text
+localhost
+127.0.0.1
+0.0.0.0
+```
+
+and determine whether each occurrence is:
+
+* valid local development configuration
+* test configuration
+* accidental production configuration
+
+---
+
+# 86. WEBSOCKET / REAL-TIME SUPPORT
+
+If AxonTimeHR uses WebSockets or real-time notifications:
+
+Ensure reverse proxy supports:
+
+```text
+Upgrade
+Connection
+```
+
+and appropriate timeout configuration.
+
+Do not break real-time functionality after deployment.
+
+---
+
+# 87. TIMEZONE
+
+Because AxonTimeHR is an HR/attendance system, deployment must handle timezone correctly.
+
+Use:
+
+```text
+UTC
+```
+
+internally where appropriate.
+
+Allow organization/user timezone configuration.
+
+Do not rely on server local timezone.
+
+Verify:
+
+* attendance
+* shifts
+* leave
+* payroll
+* notifications
+* scheduled Celery tasks
+* reports
+
+---
+
+# 88. SCHEDULED JOBS
+
+Verify Celery Beat or equivalent scheduled tasks.
+
+Important:
+
+Do not accidentally run duplicate scheduled jobs if multiple workers are deployed.
+
+Ensure scheduled tasks are idempotent where possible.
+
+---
+
+# 89. DATABASE CONNECTION POOL
+
+Review PostgreSQL connection pooling.
+
+Ensure:
+
+```text
+max connections
+pool size
+timeouts
+retries
+```
+
+are appropriate for the DEV server.
+
+Do not create excessive connections.
+
+---
+
+# 90. REDIS CONNECTION HANDLING
+
+Configure:
+
+```text
+timeouts
+reconnect
+authentication
+connection pool
+```
+
+where appropriate.
+
+Application should fail gracefully if Redis becomes temporarily unavailable.
+
+---
+
+# 91. RATE LIMITING
+
+Ensure production-style rate limits exist for sensitive endpoints:
+
+```text
+login
+password reset
+OTP
+API authentication
+file upload
+AI endpoints
+expensive reports
+```
+
+Do not rely exclusively on frontend controls.
+
+---
+
+# 92. SECURITY TESTING IN CI
+
+Include automated checks for:
+
+```text
+dependency vulnerabilities
+secret scanning
+container vulnerabilities
+tenant isolation
+authentication bypass
+IDOR
+RBAC bypass
+unsafe CORS
+```
+
+Use appropriate GitHub-native or open-source tools where practical.
+
+Do not add tools simply for appearance.
+
+---
+
+# 93. SECRET SCANNING
+
+Ensure CI detects accidentally committed secrets.
+
+Examples of targets:
+
+```text
+API keys
+JWT secrets
+cloud credentials
+database passwords
+private keys
+tokens
+```
+
+If a secret is discovered:
+
+```text
+fail CI
+```
+
+---
+
+# 94. SBOM
+
+Prepare software bill of materials generation for release images.
+
+The purpose is:
+
+```text
+dependency visibility
+security tracking
+supply-chain management
+```
+
+---
+
+# 95. SUPPLY-CHAIN SECURITY
+
+Use:
+
+* pinned GitHub Actions where appropriate
+* dependency lock files
+* trusted base images
+* vulnerability scanning
+* minimal permissions
+* GitHub Actions least privilege
+
+Do not give deployment workflows unnecessary repository permissions.
+
+---
+
+# 96. GITHUB ACTIONS PERMISSIONS
+
+Use least privilege:
+
+```yaml
+permissions:
+  contents: read
+```
+
+and grant additional permissions only when required.
+
+Do not use:
+
+```text
+permissions: write-all
+```
+
+without justification.
+
+---
+
+# 97. DEV SERVER DATABASE ACCESS
+
+For debugging, developers may need PostgreSQL access.
+
+Preferred methods:
+
+```text
+SSH tunnel
+```
+
+rather than public:
+
+```text
+5432
+```
+
+Example conceptual flow:
+
+```text
+Developer
+   |
+ SSH tunnel
+   |
+DEV server
+   |
+PostgreSQL
+```
+
+Document safe database access.
+
+---
+
+# 98. REDIS DEBUG ACCESS
+
+Do not expose Redis publicly.
+
+If debugging is required:
+
+```text
+SSH tunnel
+```
+
+or internal tools.
+
+---
+
+# 99. ADMINISTRATION
+
+Create safe DEV administration procedures.
+
+Examples:
+
+```text
+create demo tenant
+reset demo data
+create developer account
+rotate DEV secret
+restart service
+view logs
+backup database
+restore database
+```
+
+Document commands.
+
+---
+
+# 100. TROUBLESHOOTING GUIDE
+
+Create:
+
+```text
+docs/deployment/troubleshooting.md
+```
+
+Cover:
+
+```text
+Container won't start
+Database won't start
+Migration failed
+Redis unavailable
+Celery not processing
+Frontend shows API error
+CORS failure
+HTTPS certificate failure
+Domain not resolving
+Disk full
+Out of memory
+GitHub deployment failed
+SSH deployment failed
+```
+
+---
+
+# 101. DEPLOYMENT DOCUMENTATION
+
+Create:
+
+```text
+docs/deployment/
+```
+
+with:
+
+```text
+architecture.md
+local-development.md
+dev-server.md
+docker.md
+database.md
+backup-restore.md
+ci-cd.md
+security.md
+troubleshooting.md
+upgrade.md
+```
+
+Adapt names to existing documentation conventions.
+
+---
+
+# 102. ARCHITECTURE DIAGRAM
+
+Document:
+
+```text
+GitHub
+   |
+GitHub Actions
+   |
+Container Registry
+   |
+DEV Server
+   |
+Reverse Proxy
+   |
++-----------------------+
+|                       |
+Frontend             Backend
+                        |
+                  +-----+------+
+                  |            |
+              PostgreSQL     Redis
+                               |
+                             Celery
+```
+
+Also document future:
+
+```text
+DEV
+STAGING
+PRODUCTION
+```
+
+architecture.
+
+---
+
+# 103. DEV VS PRODUCTION
+
+Clearly separate:
+
+### DEV
+
+```text
+dev.axontimehr.com
+DEV database
+DEV secrets
+DEV email
+DEV storage
+DEV AI configuration
+```
+
+### PRODUCTION
+
+```text
+app.axontimehr.com
+PRODUCTION database
+PRODUCTION secrets
+PRODUCTION email
+PRODUCTION storage
+PRODUCTION AI configuration
+```
+
+Never mix them.
+
+---
+
+# 104. OPEN-SOURCE INSTALLATION
+
+A fresh developer should be able to follow:
+
+```text
+README
+    |
+    v
+Prerequisites
+    |
+    v
+Clone repository
+    |
+    v
+Configure .env
+    |
+    v
+docker compose up
+    |
+    v
+Run migrations
+    |
+    v
+Seed demo data
+    |
+    v
+Open application
+```
+
+Document Windows, Linux, and macOS differences where necessary.
+
+---
+
+# 105. WINDOWS DEVELOPMENT
+
+Since many developers may use Windows, ensure Docker-based development minimizes OS-specific setup.
+
+Prefer:
+
+```text
+Docker Desktop
+```
+
+for Windows developers.
+
+Avoid requiring PostgreSQL to be installed directly on Windows if Docker already provides it.
+
+---
+
+# 106. LINUX DEV SERVER
+
+Document Ubuntu deployment.
+
+The server should not require:
+
+```text
+Node.js
+Python
+PostgreSQL
+Redis
+```
+
+to be manually installed on the host if they run inside containers.
+
+The host should primarily need:
+
+```text
+Docker
+Docker Compose
+Git
+```
+
+plus system/network dependencies.
+
+---
+
+# 107. SERVER DIRECTORY STRUCTURE
+
+Use a predictable deployment directory.
+
+Example:
+
+```text
+/opt/axontimehr/
+```
+
+or another appropriate location.
+
+Possible:
+
+```text
+/opt/axontimehr/
+├── compose/
+├── config/
+├── backups/
+├── logs/
+└── scripts/
+```
+
+Do not store application secrets in Git.
+
+---
+
+# 108. DATA DIRECTORY SAFETY
+
+Document:
+
+```text
+database data
+uploaded files
+backups
+logs
+```
+
+and which locations are persistent.
+
+Never accidentally mount:
+
+```text
+host /
+```
+
+into a container.
+
+---
+
+# 109. PRODUCTION-READY DATABASE SETTINGS
+
+Do not blindly use development PostgreSQL settings in production.
+
+Prepare configuration for:
+
+```text
+max_connections
+shared_buffers
+logging
+autovacuum
+timezone
+backup
+```
+
+Do not over-optimize a small DEV server.
+
+---
+
+# 110. DATABASE INDEX REVIEW
+
+Before deployment, inspect existing schema for indexes on:
+
+```text
+tenant_id
+employee_id
+user_id
+organization_id
+created_at
+updated_at
+attendance_date
+leave dates
+payroll period
+foreign keys
+```
+
+Do not add indexes blindly.
+
+Use query patterns and existing migrations.
+
+---
+
+# 111. STARTUP ORDER
+
+Use health checks and dependency conditions where supported.
+
+Expected:
+
+```text
+PostgreSQL
+      |
+      v
+Migration
+      |
+      v
+FastAPI
+      |
+      +---- Redis
+      |
+      v
+Celery
+```
+
+Frontend can start independently once backend routing is available.
+
+---
+
+# 112. RESTART POLICY
+
+Critical services should restart automatically after unexpected failure.
+
+Example:
+
+```text
+restart: unless-stopped
+```
+
+or an equivalent appropriate strategy.
+
+Do not hide persistent crashes through endless restart loops.
+
+Health monitoring must detect repeated failures.
+
+---
+
+# 113. RESOURCE MONITORING
+
+Create a simple operational checklist:
+
+```text
+CPU
+RAM
+Disk
+PostgreSQL size
+Redis memory
+Docker container status
+Celery queue
+Backup status
+SSL status
+```
+
+Document how developers can inspect them.
+
+---
+
+# 114. APPLICATION SHUTDOWN
+
+Ensure FastAPI and Celery shut down gracefully.
+
+Do not abruptly terminate database operations unnecessarily.
+
+---
+
+# 115. DEPENDENCY PINNING
+
+Review:
+
+```text
+requirements.txt
+pyproject.toml
+package.json
+package-lock.json
+```
+
+Use appropriate lock/pinning mechanisms.
+
+Do not upgrade every dependency simply because Phase 14 is being implemented.
+
+---
+
+# 116. DATABASE MIGRATION TEST
+
+Create a CI test:
+
+```text
+empty PostgreSQL
+       |
+       v
+all migrations
+       |
+       v
+latest schema
+       |
+       v
+application startup
+```
+
+This verifies that a new installation works.
+
+---
+
+# 117. EXISTING DATABASE MIGRATION TEST
+
+Also test:
+
+```text
+previous schema
+       |
+       v
+new migration
+       |
+       v
+latest schema
+```
+
+This protects existing deployments.
+
+---
+
+# 118. API SMOKE TESTS
+
+After deployment verify critical APIs:
+
+```text
+health
+login
+current-user
+tenant
+employee
+attendance
+leave
+payroll
+notification
+```
+
+Use only safe demo accounts.
+
+---
+
+# 119. UI SMOKE TEST
+
+Verify:
+
+```text
+Application loads
+Login works
+Dashboard loads
+Navigation works
+API calls succeed
+Logout works
+```
+
+If Playwright is already configured, reuse it.
+
+Do not create a completely separate UI automation framework.
+
+---
+
+# 120. SECURITY SMOKE TEST
+
+Verify:
+
+```text
+unauthenticated API blocked
+invalid token rejected
+expired token rejected
+Tenant A cannot access Tenant B
+employee cannot access admin endpoints
+regular user cannot access protected configuration
+```
+
+---
+
+# 121. PERFORMANCE BASELINE
+
+Establish basic DEV performance metrics:
+
+```text
+frontend load
+login response
+dashboard response
+employee list
+attendance list
+database query time
+```
+
+Do not perform unrealistic load testing against a small free DEV server.
+
+---
+
+# 122. API TIMEOUTS
+
+Configure sensible:
+
+```text
+proxy timeout
+FastAPI timeout
+database timeout
+Redis timeout
+Celery task timeout
+```
+
+Long-running jobs should use Celery rather than keeping HTTP requests open indefinitely.
+
+---
+
+# 123. FILE UPLOAD LIMITS
+
+Configure consistent limits across:
+
+```text
+Reverse Proxy
+FastAPI
+Application
+Object storage
+```
+
+Avoid one layer allowing 500 MB while another allows 10 MB.
+
+---
+
+# 124. CACHING
+
+Ensure frontend and API caching does not expose tenant-specific data.
+
+Particularly review:
+
+```text
+dashboard
+employee data
+reports
+documents
+AI analytics
+```
+
+Do not cache private responses publicly.
+
+---
+
+# 125. COOKIE SECURITY
+
+For authentication cookies where applicable:
+
+```text
+Secure
+HttpOnly
+SameSite
+```
+
+must be configured according to the deployment architecture.
+
+---
+
+# 126. CSRF
+
+If cookie-based authentication is used, verify CSRF protection.
+
+Do not assume JWT automatically eliminates every CSRF scenario.
+
+---
+
+# 127. OBJECT STORAGE SECURITY
+
+If S3-compatible storage is implemented:
+
+* private buckets
+* signed URLs
+* restricted credentials
+* tenant-aware paths
+* lifecycle policies
+* encryption
+
+Never expose private employee documents through public bucket URLs.
+
+---
+
+# 128. EMAIL SECURITY
+
+Never include sensitive information unnecessarily in emails.
+
+Payslips/documents should use secure access mechanisms rather than attaching sensitive documents blindly.
+
+---
+
+# 129. DATA PRIVACY
+
+The DEV environment must contain:
+
+```text
+fake/demo data
+```
+
+only.
+
+Do not copy production employee information into DEV.
+
+If production-like data is ever required for debugging, document anonymization requirements.
+
+---
+
+# 130. AUDIT LOGGING
+
+Deployment and administrative operations should be auditable where the application supports it.
+
+Important events:
+
+```text
+configuration changes
+user creation
+role changes
+security changes
+data export
+database administration
+document access
+```
+
+---
+
+# 131. AI DATA SAFETY
+
+The DEV deployment must preserve Phase 13 AI restrictions.
+
+AI must not:
+
+* receive unrestricted database access
+* execute arbitrary SQL
+* bypass tenant isolation
+* bypass RBAC
+* expose employee secrets
+* make autonomous employment decisions
+
+---
+
+# 132. NO RAW AI SQL
+
+Maintain the Phase 13 rule:
+
+```text
+AI
+ |
+ v
+Controlled analytics/query specification
+ |
+ v
+Validated backend query layer
+ |
+ v
+PostgreSQL
+```
+
+Never:
+
+```text
+AI
+ |
+ v
+raw SQL
+ |
+ v
+production database
+```
+
+---
+
+# 133. BACKUP SECURITY
+
+Database backups may contain extremely sensitive HR data.
+
+Therefore:
+
+* encrypt backups
+* restrict access
+* avoid GitHub storage
+* avoid public URLs
+* use retention policies
+* test restoration
+
+---
+
+# 134. DEVELOPMENT DATABASE RESET
+
+Provide a safe DEV reset process.
+
+Example:
+
+```text
+reset development database
+```
+
+must clearly state:
+
+```text
+THIS DESTROYS DEV DATA
+```
+
+Never expose this capability in production.
+
+---
+
+# 135. FEATURE FLAGS
+
+Prepare environment-aware feature flags.
+
+Example:
+
+```env
+ENABLE_AI=true
+ENABLE_BETA_FEATURES=true
+ENABLE_DEMO_DATA=false
+```
+
+Do not use feature flags as a security boundary.
+
+Authorization must still be enforced by backend RBAC.
+
+---
+
+# 136. EDITION SUPPORT
+
+Prepare architecture for future:
+
+```text
+Community Edition
+Enterprise Edition
+SaaS Edition
+```
+
+Do not duplicate the entire application.
+
+Use:
+
+```text
+configuration
+feature flags
+entitlements
+subscription checks
+```
+
+where appropriate.
+
+Do not accidentally expose commercial-only features in an open-source release.
+
+---
+
+# 137. OPEN-SOURCE COMMUNITY
+
+Prepare:
+
+```text
+CONTRIBUTING.md
+```
+
+including:
+
+```text
+development setup
+branch strategy
+coding standards
+tests
+PR process
+commit guidelines
+security reporting
+```
+
+---
+
+# 138. ISSUE TEMPLATES
+
+Create templates for:
+
+```text
+Bug report
+Feature request
+Deployment issue
+Security issue
+```
+
+Security vulnerabilities should NOT be encouraged to be publicly posted in normal issues.
+
+---
+
+# 139. PULL REQUEST TEMPLATE
+
+Include:
+
+```text
+Summary
+Implementation
+Tests
+Database changes
+Security impact
+Breaking changes
+Deployment impact
+Documentation
+```
+
+---
+
+# 140. CHANGELOG
+
+Use categories:
+
+```text
+Added
+Changed
+Fixed
+Security
+Deprecated
+Removed
+```
+
+---
+
+# 141. DEPLOYMENT STATUS
+
+After deployment, expose or document:
+
+```text
+Application version
+Commit SHA
+Deployment timestamp
+Environment
+```
+
+Do not expose secrets.
+
+---
+
+# 142. RELEASE ARTIFACTS
+
+A release should ideally provide:
+
+```text
+source code
+Docker image
+migration version
+CHANGELOG
+deployment instructions
+```
+
+---
+
+# 143. CI/CD PIPELINE STAGES
+
+Implement logically separated jobs:
+
+```text
+validate
+test-backend
+test-frontend
+security
+build
+publish
+deploy-dev
+smoke-test
+```
+
+Do not make the entire pipeline one giant shell script.
+
+---
+
+# 144. FAILURE HANDLING
+
+If:
+
+```text
+tests fail
+```
+
+do not deploy.
+
+If:
+
+```text
+Docker build fails
+```
+
+do not deploy.
+
+If:
+
+```text
+migration fails
+```
+
+stop deployment.
+
+If:
+
+```text
+health check fails
+```
+
+mark deployment failed.
+
+If:
+
+```text
+smoke test fails
+```
+
+trigger rollback or clearly mark deployment unsuccessful according to the implemented strategy.
+
+---
+
+# 145. DATABASE MIGRATION FAILURE
+
+Never automatically execute destructive recovery such as:
+
+```text
+DROP TABLE
+DROP DATABASE
+```
+
+A migration failure must preserve the database for investigation.
+
+---
+
+# 146. DEPLOYMENT LOCK AND DATABASE LOCK
+
+Prevent simultaneous migration execution.
+
+Only one deployment process should execute migrations at a time.
+
+---
+
+# 147. DEV SERVER COST OPTIMIZATION
+
+The DEV architecture should work on a small cloud VM.
+
+Optimize for:
+
+```text
+low memory
+low CPU
+low storage
+```
+
+without sacrificing reliability.
+
+Avoid unnecessary infrastructure such as Kubernetes at this stage.
+
+Use:
+
+```text
+Docker Compose
+```
+
+for the first live DEV deployment.
+
+---
+
+# 148. FUTURE CLOUD MIGRATION
+
+Do not make the application dependent on one provider.
+
+Prepare for:
+
+```text
+Oracle Cloud
+AWS
+Azure
+Google Cloud
+DigitalOcean
+Hetzner
+other Linux VPS
+```
+
+The application should primarily require:
+
+```text
+Linux
+Docker
+Docker Compose
+domain
+persistent storage
+```
+
+---
+
+# 149. STAGING PREPARATION
+
+Create deployment configuration that can eventually support:
+
+```text
+DEV
+STAGING
+PRODUCTION
+```
+
+without copying the entire codebase.
+
+Only configuration should differ where possible.
+
+---
+
+# 150. PRODUCTION PREPARATION
+
+Do NOT deploy production as part of this phase unless explicitly requested.
+
+However, ensure Phase 14 leaves the project ready for:
+
+```text
+production PostgreSQL
+managed Redis
+object storage
+load balancer
+monitoring
+autoscaling
+```
+
+---
+
+# 151. FINAL REPOSITORY REVIEW
+
+After implementation, inspect the repository again.
+
+Verify:
+
+```text
+No duplicate configuration
+No hardcoded localhost
+No secrets
+No passwords
+No production data
+No broken imports
+No broken migrations
+No broken Docker builds
+No broken tests
+No accidental public ports
+No tenant isolation regressions
+```
+
+---
+
+# 152. REQUIRED TEST MATRIX
+
+Execute at minimum:
+
+## Backend
+
+```text
+pytest
+lint
+typecheck
+```
+
+## Frontend
+
+```text
+lint
+typecheck
+test
+build
+```
+
+## Database
+
+```text
+fresh migration
+existing migration
+seed
+application startup
+```
+
+## Docker
+
+```text
+build
+start
+health
+restart
+shutdown/start
+```
+
+## Security
+
+```text
+auth
+RBAC
+tenant isolation
+IDOR
+CORS
+secret scanning
+```
+
+## Deployment
+
+```text
+GitHub CI
+Docker build
+image publish
+DEV deployment
+health check
+smoke test
+```
+
+---
+
+# 153. ACCEPTANCE TEST
+
+The phase is successful only if this workflow works:
+
+```text
+Developer changes code
+        |
+        v
+git add .
+        |
+        v
+git commit
+        |
+        v
+git push
+        |
+        v
+GitHub
+        |
+        v
+GitHub Actions
+        |
+        +---- Tests
+        |
+        +---- Security
+        |
+        +---- Docker build
+        |
+        v
+Container Registry
+        |
+        v
+DEV Server
+        |
+        v
+Migration
+        |
+        v
+Services restart
+        |
+        v
+Health check
+        |
+        v
+Smoke test
+        |
+        v
+https://<dev-domain>
+```
+
+Then:
+
+```text
+Browser
+   |
+   v
+AxonTimeHR Login
+   |
+   v
+Dashboard
+   |
+   v
+Employee creation
+   |
+   v
+PostgreSQL
+   |
+   v
+Data persists
+```
+
+Restart the application:
+
+```bash
+docker compose restart
+```
+
+Verify the data still exists.
+
+Restart the server.
+
+Verify the data still exists.
+
+---
+
+# 154. REQUIRED FINAL DELIVERABLES
+
+At the end of Phase 14, provide:
+
+### Infrastructure
+
+```text
+Dockerfiles
+docker-compose configuration
+reverse proxy
+health checks
+persistent volumes
+network configuration
+```
+
+### Database
+
+```text
+migration strategy
+seed strategy
+backup
+restore
+database documentation
+```
+
+### CI/CD
+
+```text
+GitHub Actions
+tests
+security checks
+Docker build
+image publishing
+DEV deployment
+smoke testing
+```
+
+### Security
+
+```text
+secret handling
+firewall guidance
+CORS
+security headers
+tenant isolation verification
+container security
+backup security
+```
+
+### Documentation
+
+```text
+README
+CONTRIBUTING
+SECURITY
+CHANGELOG
+deployment documentation
+troubleshooting
+upgrade documentation
+```
+
+---
+
+# 155. FINAL DEFINITION OF DONE
+
+Phase 14 is COMPLETE only when all of the following are true:
+
+* [ ] Existing AxonTimeHR codebase was inspected before modification
+* [ ] Existing Phases 1–13 remain functional
+* [ ] Frontend is containerized
+* [ ] FastAPI backend is containerized
+* [ ] PostgreSQL is containerized
+* [ ] Redis is containerized
+* [ ] Celery worker is containerized
+* [ ] Celery Beat is configured if required
+* [ ] Persistent PostgreSQL storage exists
+* [ ] Database name defaults to `axontimehr`
+* [ ] Database migrations work
+* [ ] Demo seed data works
+* [ ] Reverse proxy works
+* [ ] HTTPS works
+* [ ] Domain is configurable
+* [ ] Local Docker development works
+* [ ] Remote Linux DEV deployment works
+* [ ] PostgreSQL is not unnecessarily exposed publicly
+* [ ] Redis is not publicly exposed
+* [ ] Secrets are not committed
+* [ ] `.env.example` exists
+* [ ] CI pipeline works
+* [ ] Backend tests work
+* [ ] Frontend tests work
+* [ ] Docker build works
+* [ ] Security scanning works
+* [ ] Docker images can be published
+* [ ] GitHub Actions can deploy DEV
+* [ ] Deployment locking exists
+* [ ] Database migration executes safely
+* [ ] Post-deployment health checks work
+* [ ] Smoke tests work
+* [ ] Rollback strategy exists
+* [ ] Database backup exists
+* [ ] Database restore procedure exists
+* [ ] Logging works
+* [ ] Health endpoint works
+* [ ] Readiness endpoint works
+* [ ] Resource monitoring/documentation exists
+* [ ] Troubleshooting documentation exists
+* [ ] Upgrade documentation exists
+* [ ] Open-source contribution documentation exists
+* [ ] Security policy exists
+* [ ] License strategy is documented
+* [ ] No production/real employee data exists in repository
+* [ ] No secrets exist in repository
+* [ ] No hardcoded production credentials exist
+* [ ] No cross-tenant data leakage is introduced
+* [ ] DEV and production configuration are separated
+* [ ] Application can survive container restart
+* [ ] Database data survives container restart
+* [ ] A new developer can reproduce the environment
+* [ ] The application is accessible through the configured DEV domain
+* [ ] Final end-to-end deployment has been verified
+
+---
+
+# 156. FINAL REPORT REQUIRED FROM THE CODING AGENT
+
+When implementation is complete, provide a detailed report containing:
+
+## 1. Repository Changes
+
+List every important file created or modified.
+
+## 2. Docker Architecture
+
+Explain every container.
+
+## 3. Database
+
+Explain:
+
+* database configuration
+* persistence
+* migrations
+* seed
+* backup
+* restore
+
+## 4. CI/CD
+
+Explain the GitHub Actions workflow.
+
+## 5. DEV Deployment
+
+Explain how to deploy to the Linux server.
+
+## 6. Environment Variables
+
+Provide a complete `.env.example` explanation.
+
+## 7. Security
+
+Explain:
+
+* secrets
+* firewall
+* CORS
+* HTTPS
+* tenant isolation
+* container security
+
+## 8. Testing
+
+Provide exact commands executed and their results.
+
+## 9. Deployment
+
+Provide:
+
+```text
+DEV URL
+API URL
+Health URL
+Swagger URL
+```
+
+only if they are actually configured and known.
+
+Do not invent URLs.
+
+## 10. Known Issues
+
+List anything unfinished.
+
+## 11. Future Improvements
+
+List improvements for:
+
+```text
+staging
+production
+Kubernetes
+managed PostgreSQL
+managed Redis
+object storage
+monitoring
+autoscaling
+```
+
+---
+
+# 157. CRITICAL RESTRICTIONS
+
+DO NOT:
+
+* rebuild Phases 1–13
+* delete existing functionality
+* replace working architecture without justification
+* expose PostgreSQL publicly by default
+* expose Redis publicly
+* commit `.env`
+* commit secrets
+* commit production data
+* commit employee data
+* commit database dumps containing real data
+* hardcode cloud credentials
+* hardcode domain names
+* hardcode API keys
+* hardcode production passwords
+* disable authentication
+* disable RBAC
+* bypass tenant isolation
+* expose AI direct database access
+* execute arbitrary AI-generated SQL
+* automatically destroy databases
+* use destructive migrations casually
+* deploy untested code
+* deploy if CI fails
+* silently ignore migration errors
+* use insecure default credentials in production
+* introduce Kubernetes unnecessarily for the initial DEV environment
+
+---
+
+# 158. IMPLEMENTATION ORDER
+
+Follow this sequence:
+
+```text
+STEP 1
+Inspect repository
+
+STEP 2
+Document current architecture
+
+STEP 3
+Identify deployment gaps
+
+STEP 4
+Create/update Docker configuration
+
+STEP 5
+Containerize frontend
+
+STEP 6
+Containerize backend
+
+STEP 7
+Configure PostgreSQL
+
+STEP 8
+Configure persistent database volume
+
+STEP 9
+Configure migrations
+
+STEP 10
+Configure seed/demo data
+
+STEP 11
+Configure Redis
+
+STEP 12
+Configure Celery
+
+STEP 13
+Configure health checks
+
+STEP 14
+Configure reverse proxy
+
+STEP 15
+Configure HTTPS/domain support
+
+STEP 16
+Harden security
+
+STEP 17
+Create/update .env.example
+
+STEP 18
+Create GitHub CI
+
+STEP 19
+Create Docker build pipeline
+
+STEP 20
+Create container publishing pipeline
+
+STEP 21
+Create DEV deployment pipeline
+
+STEP 22
+Configure Linux DEV server deployment
+
+STEP 23
+Configure backups
+
+STEP 24
+Configure monitoring/logging
+
+STEP 25
+Create deployment documentation
+
+STEP 26
+Run complete test suite
+
+STEP 27
+Run deployment smoke test
+
+STEP 28
+Test database persistence
+
+STEP 29
+Test rollback/recovery
+
+STEP 30
+Perform final security review
+
+STEP 31
+Generate final implementation report
+```
+
+---
+
+# FINAL INSTRUCTION
+
+Do not simply generate configuration files and claim Phase 14 is complete.
+
+Actually inspect the existing AxonTimeHR project and integrate the deployment architecture into it.
+
+The final goal is:
+
+```text
+                AXONTIMEHR
+                     |
+              GitHub Repository
+                     |
+              GitHub Actions
+                     |
+             Docker Container Images
+                     |
+                DEV SERVER
+                     |
+          +----------+----------+
+          |                     |
+       HTTPS                  HTTPS
+          |                     |
+       Frontend               API
+                                |
+                    +-----------+-----------+
+                    |                       |
+                PostgreSQL               Redis
+                    |                       |
+              Persistent Data           Celery
+```
+
+The developer should be able to:
+
+```text
+write code
+    ↓
+git push
+    ↓
+GitHub
+    ↓
+automated CI
+    ↓
+automated Docker build
+    ↓
+automated DEV deployment
+    ↓
+open browser
+    ↓
+use live AxonTimeHR
+    ↓
+create/update data
+    ↓
+data persists in PostgreSQL
+```
+
+This is the primary success criterion for **PHASE 14**.

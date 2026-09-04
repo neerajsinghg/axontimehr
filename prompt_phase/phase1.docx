@@ -1,0 +1,1384 @@
+# PHASE 1 — FOUNDATION DEVELOPMENT
+
+## Modern Attendance & HRMS SaaS Platform
+
+---
+
+# PART A — COMPLETE PRODUCT GOAL
+
+## 1. Understand the complete vision before coding
+
+You are building a **modern, advanced, production-ready Attendance + HRMS SaaS platform**.
+
+The final product is intended to become a commercial SaaS product that can be used by many different companies.
+
+The product should eventually provide:
+
+* Employee management
+* Department management
+* Designation management
+* Branch management
+* Location management
+* Attendance
+* Check-in / Check-out
+* GPS attendance
+* Geofencing
+* Selfie attendance
+* Shift management
+* Leave management
+* Holiday management
+* Attendance regularization
+* Overtime
+* Comp-off
+* Approval workflows
+* Payroll preparation
+* Reports
+* Notifications
+* Role-based permissions
+* Audit logs
+* API integrations
+* Webhooks
+* Mobile application
+* Subscription management
+* Advanced analytics
+* AI HR assistant
+* Attendance anomaly detection
+* AI-generated reports
+
+The final system should be capable of growing from:
+
+```text
+1 Company
+     ↓
+10 Companies
+     ↓
+100 Companies
+     ↓
+1,000+ Companies
+```
+
+Therefore, do not build this as a single-company demo application.
+
+It must be architected as a **multi-tenant SaaS platform from the beginning**.
+
+---
+
+# 2. IMPORTANT — PHASED DEVELOPMENT
+
+The complete product will be developed in multiple phases.
+
+The phases are:
+
+```text
+PHASE 1  → Foundation
+PHASE 2  → Authentication
+PHASE 3  → Multi-tenancy + RBAC
+PHASE 4  → Employee Management
+PHASE 5  → Attendance Engine
+PHASE 6  → Shift + GPS + Geofencing
+PHASE 7  → Leave + Holiday
+PHASE 8  → Regularization + Overtime
+PHASE 9  → Reporting
+PHASE 10 → Notifications
+PHASE 11 → Mobile Application
+PHASE 12 → Payroll
+PHASE 13 → APIs + Webhooks
+PHASE 14 → Advanced Analytics
+PHASE 15 → AI Features
+```
+
+### VERY IMPORTANT
+
+You are currently working ONLY on:
+
+# PHASE 1 — FOUNDATION
+
+Do NOT implement the business modules from later phases.
+
+However, the Phase 1 architecture must be designed so that all future phases can be added without rewriting the foundation.
+
+---
+
+# PART B — TARGET ARCHITECTURE
+
+## 3. Technology stack
+
+Use this architecture unless there is a strong technical reason to change something.
+
+### Frontend
+
+```text
+React
+TypeScript
+Vite
+Tailwind CSS
+React Router
+TanStack Query / React Query
+```
+
+### Backend
+
+```text
+Python
+FastAPI
+Pydantic
+SQLAlchemy
+Alembic
+```
+
+### Database
+
+```text
+PostgreSQL
+```
+
+### Background processing
+
+```text
+Redis
+Celery
+```
+
+### Infrastructure
+
+```text
+Docker
+Docker Compose
+Nginx
+```
+
+### Testing
+
+Backend:
+
+```text
+pytest
+```
+
+Frontend:
+
+Use a suitable React/TypeScript testing framework.
+
+End-to-end testing later:
+
+```text
+Playwright
+```
+
+### Code quality
+
+Python:
+
+```text
+Ruff
+Black
+MyPy
+Pytest
+```
+
+Frontend:
+
+```text
+ESLint
+Prettier
+TypeScript
+```
+
+---
+
+# 4. High-level architecture
+
+The final system should eventually follow this architecture:
+
+```text
+                         ┌─────────────────────┐
+                         │     Web Browser      │
+                         │ React + TypeScript   │
+                         └──────────┬──────────┘
+                                    │
+                                    │ HTTPS
+                                    ▼
+                         ┌─────────────────────┐
+                         │       NGINX         │
+                         │ Reverse Proxy       │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │       FastAPI       │
+                         │      Backend        │
+                         └──────────┬──────────┘
+                                    │
+                     ┌──────────────┼──────────────┐
+                     │              │              │
+                     ▼              ▼              ▼
+                PostgreSQL       Redis          Celery
+                Database         Cache        Background
+                                               Processing
+```
+
+Later this will expand to:
+
+```text
+                    React Web
+                       │
+                       ▼
+                    FastAPI
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+   PostgreSQL        Redis          Celery
+        │
+        ▼
+ Attendance Engine
+        │
+   ┌────┼─────────┐
+   ▼    ▼         ▼
+ GPS  Geofence  Selfie
+   │    │         │
+   └────┼─────────┘
+        ▼
+    Attendance
+        │
+ ┌──────┼────────────┐
+ ▼      ▼            ▼
+Leave  Payroll     Reports
+```
+
+---
+
+# 5. Final database vision
+
+The complete system will eventually contain tables such as:
+
+```text
+companies
+users
+employees
+departments
+designations
+branches
+locations
+
+shifts
+shift_assignments
+
+attendance
+attendance_punches
+attendance_regularization
+
+leave_types
+leave_balances
+leave_requests
+holidays
+
+overtime
+payroll
+
+roles
+permissions
+role_permissions
+user_roles
+
+notifications
+audit_logs
+
+subscriptions
+subscription_plans
+
+api_keys
+webhooks
+```
+
+Do NOT implement all these tables in Phase 1.
+
+Phase 1 should only establish the database foundation and migration mechanism.
+
+---
+
+# PART C — PHASE 1 OBJECTIVE
+
+# 6. Main objective
+
+The objective of Phase 1 is to create a **clean, professional, scalable project foundation**.
+
+At the end of Phase 1, we should have:
+
+```text
+Frontend
+    ↓
+Backend
+    ↓
+Database
+```
+
+working correctly through Docker.
+
+The project should be able to start locally with a simple command.
+
+Example:
+
+```bash
+docker compose up
+```
+
+or an equivalent documented command.
+
+---
+
+# 7. FIRST ACTION — INSPECT THE WORKSPACE
+
+Before creating anything:
+
+1. Inspect the complete current repository.
+2. List existing files and folders.
+3. Identify whether the project is empty or already contains code.
+4. Identify existing frontend/backend code.
+5. Identify existing package files.
+6. Identify existing Python configuration.
+7. Identify existing Docker configuration.
+8. Identify existing environment files.
+9. Identify existing tests.
+10. Identify existing documentation.
+
+DO NOT delete existing code.
+
+DO NOT blindly replace existing configuration.
+
+If the repository already has a structure, adapt the architecture intelligently.
+
+---
+
+# 8. Create the project structure
+
+If the repository is empty, create a structure similar to:
+
+```text
+attendance-saas/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── v1/
+│   │   │
+│   │   ├── core/
+│   │   │
+│   │   ├── models/
+│   │   │
+│   │   ├── schemas/
+│   │   │
+│   │   ├── services/
+│   │   │
+│   │   ├── repositories/
+│   │   │
+│   │   ├── middleware/
+│   │   │
+│   │   ├── workers/
+│   │   │
+│   │   └── main.py
+│   │
+│   ├── tests/
+│   │
+│   ├── alembic/
+│   │
+│   ├── requirements.txt
+│   ├── pyproject.toml
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── utils/
+│   │
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── Dockerfile
+│
+├── infrastructure/
+│   └── nginx/
+│
+├── docs/
+│
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+├── README.md
+└── ARCHITECTURE.md
+```
+
+Modify this structure if the existing repository requires it.
+
+---
+
+# 9. Backend foundation
+
+Create a clean FastAPI application.
+
+The backend must have:
+
+```text
+FastAPI
+Pydantic
+SQLAlchemy
+Alembic
+PostgreSQL
+```
+
+Create a basic application entry point:
+
+```text
+backend/app/main.py
+```
+
+The application should start successfully.
+
+---
+
+# 10. API versioning
+
+Use:
+
+```text
+/api/v1/
+```
+
+from the beginning.
+
+Example:
+
+```text
+/api/v1/health
+```
+
+Do not create unversioned business APIs such as:
+
+```text
+/api/employee
+```
+
+Use:
+
+```text
+/api/v1/employees
+```
+
+in future phases.
+
+---
+
+# 11. Health API
+
+Create a health endpoint:
+
+```text
+GET /api/v1/health
+```
+
+Expected response should indicate that the API is running.
+
+For example:
+
+```json
+{
+  "success": true,
+  "message": "API is healthy"
+}
+```
+
+Keep the response format consistent and extensible.
+
+---
+
+# 12. Database foundation
+
+Configure:
+
+```text
+PostgreSQL
+SQLAlchemy
+Alembic
+```
+
+Create the database connection layer.
+
+Use environment variables.
+
+Do NOT hard-code:
+
+```text
+database username
+database password
+database host
+database port
+```
+
+---
+
+# 13. Environment configuration
+
+Create:
+
+```text
+.env.example
+```
+
+Include appropriate placeholders such as:
+
+```text
+APP_NAME=
+APP_ENV=
+APP_DEBUG=
+
+DATABASE_URL=
+
+REDIS_URL=
+
+JWT_SECRET=
+
+ACCESS_TOKEN_EXPIRE_MINUTES=
+REFRESH_TOKEN_EXPIRE_DAYS=
+```
+
+Do not put real secrets in source control.
+
+Create proper configuration management using Pydantic settings or an equivalent clean approach.
+
+---
+
+# 14. Database migrations
+
+Configure Alembic correctly.
+
+The project must support:
+
+```bash
+alembic upgrade head
+```
+
+and future migrations.
+
+Do not manually modify database schema.
+
+Every future schema change must be migration-based.
+
+---
+
+# 15. Redis foundation
+
+Configure Redis.
+
+The goal in Phase 1 is to establish the infrastructure.
+
+Do not implement complex business background jobs yet.
+
+Create a clean Redis configuration/service layer that can later support:
+
+```text
+Caching
+Celery
+Rate limiting
+Sessions if required
+Temporary data
+```
+
+---
+
+# 16. Celery foundation
+
+Configure Celery with Redis as the broker/backend where appropriate.
+
+Create the basic worker structure.
+
+Example:
+
+```text
+backend/app/workers/
+```
+
+Create a simple test task to verify that Celery can communicate with Redis.
+
+Do not implement payroll/reporting jobs yet.
+
+---
+
+# 17. Frontend foundation
+
+Create the React + TypeScript application.
+
+Use:
+
+```text
+React
+TypeScript
+Vite
+Tailwind CSS
+```
+
+The application should have a professional SaaS layout foundation.
+
+Create:
+
+```text
+Sidebar
+Top Header
+Main Content Area
+Responsive Layout
+```
+
+Do not implement full employee/attendance screens yet.
+
+---
+
+# 18. Frontend routing
+
+Configure React Router.
+
+Create basic routes:
+
+```text
+/
+```
+
+and an initial dashboard/home page.
+
+Future routes should be easy to add:
+
+```text
+/dashboard
+/employees
+/attendance
+/shifts
+/leaves
+/reports
+/settings
+```
+
+Do not implement those business pages in Phase 1 unless required only as placeholders.
+
+---
+
+# 19. Initial dashboard
+
+Create a clean foundation dashboard.
+
+It can contain placeholder cards:
+
+```text
+Total Employees
+Present Today
+Absent Today
+On Leave
+```
+
+IMPORTANT:
+
+These values should be clearly identified as placeholder/demo values if the real backend modules do not yet exist.
+
+Do not create fake business functionality.
+
+The purpose is to verify the UI architecture.
+
+---
+
+# 20. Frontend API layer
+
+Create a centralized API service.
+
+Do NOT call APIs randomly from components.
+
+Create something similar to:
+
+```text
+src/services/api/
+```
+
+or another clean architecture.
+
+Future modules should be able to use:
+
+```text
+employeeApi
+attendanceApi
+leaveApi
+reportApi
+```
+
+without duplicating HTTP configuration.
+
+---
+
+# 21. Error handling
+
+Create a centralized backend error-handling mechanism.
+
+Errors should:
+
+* Return appropriate HTTP status codes.
+* Return structured responses.
+* Not expose stack traces to users.
+* Log technical details securely.
+
+Frontend should also have a reusable error handling mechanism.
+
+---
+
+# 22. Logging
+
+Create structured logging.
+
+Logs should eventually support:
+
+```text
+timestamp
+log level
+request ID
+user ID
+tenant ID
+endpoint
+execution time
+```
+
+Tenant/user fields may be unavailable in Phase 1, so design the logging system so they can be added later.
+
+Never log:
+
+```text
+passwords
+JWT tokens
+refresh tokens
+secrets
+```
+
+---
+
+# 23. Request ID / correlation ID
+
+Create middleware or infrastructure support for request IDs.
+
+Example:
+
+```text
+Request
+   ↓
+Request ID
+   ↓
+API
+   ↓
+Database / Services
+   ↓
+Logs
+```
+
+This will make production debugging easier later.
+
+---
+
+# 24. CORS
+
+Configure CORS through environment/configuration.
+
+Do not use unrestricted production configuration such as:
+
+```text
+allow_origins=["*"]
+```
+
+as the permanent solution.
+
+Development can be configured appropriately.
+
+---
+
+# 25. Docker
+
+Create Docker support.
+
+At minimum establish:
+
+```text
+backend
+frontend
+postgres
+redis
+```
+
+Celery should also be runnable as a separate worker service.
+
+Expected conceptual structure:
+
+```text
+Docker Compose
+│
+├── frontend
+├── backend
+├── postgres
+├── redis
+└── celery-worker
+```
+
+---
+
+# 26. Docker networking
+
+Ensure services can communicate using Docker service names.
+
+Do not depend on hard-coded local machine IP addresses.
+
+Example:
+
+```text
+backend → postgres
+backend → redis
+celery → redis
+celery → postgres if required
+frontend → backend
+```
+
+---
+
+# 27. Development environment
+
+Make local setup simple.
+
+Document commands such as:
+
+```bash
+docker compose up --build
+```
+
+and:
+
+```bash
+docker compose down
+```
+
+Include database migration instructions.
+
+---
+
+# 28. Testing foundation
+
+Create a pytest structure.
+
+Example:
+
+```text
+backend/tests/
+├── unit/
+├── integration/
+├── api/
+└── conftest.py
+```
+
+At minimum create tests for:
+
+```text
+Health API
+Application startup
+Basic configuration
+```
+
+Do not create fake tests that only assert `True`.
+
+Tests should verify actual behavior.
+
+---
+
+# 29. Frontend testing foundation
+
+Set up the chosen frontend test framework.
+
+Create at least one meaningful test for the initial application/dashboard rendering.
+
+---
+
+# 30. Code quality
+
+Configure appropriate tooling.
+
+Python:
+
+```text
+Ruff
+Black
+MyPy
+Pytest
+```
+
+Frontend:
+
+```text
+ESLint
+Prettier
+TypeScript
+```
+
+Do not add tools merely for the sake of adding tools.
+
+Use configuration that is practical for development.
+
+---
+
+# 31. Git
+
+Create a proper `.gitignore`.
+
+Ignore:
+
+```text
+.env
+__pycache__
+.pytest_cache
+node_modules
+dist
+build
+coverage
+IDE files
+Docker temporary files
+logs
+```
+
+Never commit secrets.
+
+---
+
+# 32. Documentation
+
+Create/update:
+
+```text
+README.md
+ARCHITECTURE.md
+docs/DEVELOPMENT.md
+docs/TESTING.md
+```
+
+README must explain:
+
+```text
+What the project is
+Technology stack
+Architecture
+How to run locally
+How to run tests
+How to run Docker
+How to run migrations
+Project structure
+```
+
+---
+
+# 33. Architecture documentation
+
+`ARCHITECTURE.md` must explain:
+
+```text
+Frontend architecture
+Backend architecture
+Database architecture
+API architecture
+Docker architecture
+Logging architecture
+Testing architecture
+Future multi-tenancy
+Future authentication
+Future RBAC
+Future attendance engine
+```
+
+Clearly mark which features are:
+
+```text
+Implemented
+Planned
+Future
+```
+
+---
+
+# 34. Do NOT implement these in Phase 1
+
+Do NOT implement the following business functionality yet:
+
+```text
+Employee CRUD
+Attendance engine
+Check-in/check-out
+GPS attendance
+Geofencing
+Selfie verification
+Leave management
+Holiday management
+Shift management
+Payroll
+Overtime
+Regularization
+Subscription billing
+AI assistant
+Face recognition
+Advanced analytics
+```
+
+These belong to later phases.
+
+You may create architectural placeholders/interfaces only where necessary.
+
+---
+
+# 35. Future architecture considerations
+
+Even though we are not implementing them now, Phase 1 must not block:
+
+## Authentication
+
+Future:
+
+```text
+JWT
+Refresh Token
+Password Reset
+Email Verification
+```
+
+## Multi-tenancy
+
+Future:
+
+```text
+Company/Tenant
+Tenant isolation
+Tenant-aware database queries
+```
+
+## RBAC
+
+Future:
+
+```text
+Roles
+Permissions
+Role permissions
+User roles
+```
+
+## Attendance
+
+Future:
+
+```text
+GPS
+Geofence
+Selfie
+Device
+IP
+Shift
+Attendance rules
+```
+
+## Mobile
+
+Future:
+
+```text
+React Native / Flutter
+```
+
+## AI
+
+Future:
+
+```text
+AI HR Assistant
+Anomaly Detection
+Analytics
+```
+
+The Phase 1 architecture should allow these features to be added without major restructuring.
+
+---
+
+# 36. Security mindset
+
+Treat security as a first-class requirement.
+
+Do not:
+
+* Hard-code secrets.
+* Store passwords in plain text.
+* Trust frontend authorization.
+* Trust tenant IDs from the frontend.
+* Expose stack traces.
+* Log authentication secrets.
+* Use unrestricted CORS permanently.
+* Create insecure default credentials.
+
+Security will become even more important in later phases.
+
+---
+
+# 37. Performance mindset
+
+Design for scalability.
+
+Avoid:
+
+```text
+N+1 database queries
+Global mutable state
+Unnecessary API calls
+Blocking background work
+Huge unpaginated responses
+Duplicated business logic
+```
+
+Future APIs must support pagination and filtering.
+
+---
+
+# 38. IMPORTANT ARCHITECTURAL PRINCIPLE
+
+Use separation of concerns.
+
+For backend:
+
+```text
+Router
+   ↓
+Schema
+   ↓
+Service
+   ↓
+Repository
+   ↓
+Database
+```
+
+For frontend:
+
+```text
+Page
+   ↓
+Hook
+   ↓
+API Service
+   ↓
+Backend
+```
+
+Do not put all logic inside:
+
+```text
+main.py
+```
+
+or React page components.
+
+---
+
+# 39. QUALITY REQUIREMENT
+
+Do not optimize for:
+
+> "Make something that looks like it works."
+
+Optimize for:
+
+> "Build a foundation that can safely become a production SaaS product."
+
+Code must be:
+
+* Readable
+* Maintainable
+* Testable
+* Modular
+* Extensible
+* Secure
+
+---
+
+# 40. PHASE 1 COMPLETION CRITERIA
+
+Phase 1 is complete only when:
+
+### Backend
+
+* FastAPI starts successfully.
+* `/api/v1/health` works.
+* PostgreSQL connection works.
+* SQLAlchemy is configured.
+* Alembic is configured.
+* Redis connection works.
+* Celery worker can start.
+* Configuration is environment-based.
+* Logging works.
+* Error handling works.
+* CORS is configured.
+* Request ID support exists.
+
+### Frontend
+
+* React starts successfully.
+* TypeScript works.
+* Tailwind works.
+* Routing works.
+* Basic SaaS layout works.
+* API service layer exists.
+* Basic dashboard renders.
+* Responsive design works.
+
+### Infrastructure
+
+* Docker Compose works.
+* PostgreSQL works inside Docker.
+* Redis works inside Docker.
+* Backend works inside Docker.
+* Frontend works inside Docker.
+* Celery worker can start.
+
+### Testing
+
+* Backend pytest configuration works.
+* Health endpoint has a real test.
+* Frontend has a meaningful initial test.
+* All Phase 1 tests pass.
+
+### Documentation
+
+* README updated.
+* Architecture documented.
+* Development setup documented.
+* Testing setup documented.
+
+---
+
+# 41. BEFORE YOU FINISH
+
+Run:
+
+```text
+Backend tests
+Frontend tests
+Linting
+Type checking
+Docker build
+Docker startup
+Database migration
+Health API
+Celery/Redis connectivity
+```
+
+Fix all errors you introduce.
+
+Do not ignore errors simply because they are unrelated unless you clearly document them.
+
+---
+
+# 42. FINAL REPORT
+
+After completing Phase 1, provide a report in this format:
+
+```text
+========================================
+PHASE 1 COMPLETION REPORT
+========================================
+
+Project status:
+
+Architecture:
+
+Backend:
+
+Frontend:
+
+Database:
+
+Redis:
+
+Celery:
+
+Docker:
+
+Testing:
+
+Documentation:
+
+Files created:
+
+Files modified:
+
+Commands to run:
+
+Tests executed:
+
+Tests passed:
+
+Known issues:
+
+Technical decisions:
+
+Future considerations:
+
+Recommended Phase 2:
+```
+
+---
+
+# 43. VERY IMPORTANT FINAL INSTRUCTION
+
+You are currently authorized to implement **PHASE 1 ONLY**.
+
+Do not start Phase 2 automatically.
+
+Do not implement authentication, employee management, attendance, leave, payroll, GPS, geofencing, or AI functionality yet.
+
+Build the foundation correctly.
+
+After Phase 1 is complete, stop and provide the completion report.
+
+The next phase will be explicitly requested separately.
+
+---
+
+# FINAL PRODUCT MINDSET
+
+Always remember the complete goal:
+
+```text
+                MODERN HRMS SaaS
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+    Employees      Attendance       Leave
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+                    Payroll
+                       │
+                  Reporting
+                       │
+                 Analytics
+                       │
+                       AI
+```
+
+The final product must be:
+
+```text
+Modern
+Scalable
+Multi-tenant
+Secure
+API-first
+Mobile-ready
+Cloud-ready
+Highly testable
+Commercially deployable
+AI-ready
+```
+
+Build Phase 1 with that final vision in mind.

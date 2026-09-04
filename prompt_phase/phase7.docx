@@ -1,0 +1,3170 @@
+Absolutely. For **AxonTimeHR**, after Phase 6 (Leave, Holiday, Regularization & Approval Workflow), I recommend making **Phase 7 = Payroll, Salary Structure & Compensation Management**.
+
+Below is a detailed **copy-paste prompt for your AI coding agent**.
+
+# PHASE 7 — PAYROLL, SALARY & COMPENSATION MANAGEMENT
+
+# AXONTIMEHR — PRODUCTION-GRADE PAYROLL ENGINE
+
+You are continuing development of **AxonTimeHR**, a modern, advanced, production-ready, multi-tenant **Attendance + HRMS SaaS platform**.
+
+Do NOT treat this as a standalone project.
+
+You must inspect and extend the existing AxonTimeHR implementation from previous phases.
+
+---
+
+# 1. PREVIOUS PHASES
+
+Assume the platform has been developed incrementally:
+
+```text
+PHASE 1
+Foundation
+```
+
+```text
+PHASE 2
+Authentication + Identity + RBAC
+```
+
+```text
+PHASE 3
+Organization + Employee Management
+```
+
+```text
+PHASE 4
+Attendance + Shift Management
+```
+
+```text
+PHASE 5
+GPS + Geofencing + Verified Attendance
+```
+
+```text
+PHASE 6
+Leave + Holiday + Regularization + Approval Workflow
+```
+
+Now implement:
+
+```text
+PHASE 7
+Payroll + Salary + Compensation Management
+```
+
+---
+
+# 2. PRIMARY OBJECTIVE
+
+Build a complete, configurable, scalable payroll management system capable of calculating employee salary based on:
+
+```text
+Employee
++
+Employment Details
++
+Salary Structure
++
+Attendance
++
+Leave
++
+Holidays
++
+Working Days
++
+Overtime
++
+Deductions
++
+Allowances
++
+Bonuses
++
+Adjustments
++
+Tax/Statutory Configuration
+=
+Payroll
+```
+
+The payroll engine must be:
+
+* Multi-tenant
+* Configurable
+* Auditable
+* Secure
+* Transaction-safe
+* Scalable
+* Extensible
+* Reusable
+* Production-ready
+
+Do not hard-code salary rules.
+
+---
+
+# 3. CRITICAL RULE
+
+Before writing code:
+
+**INSPECT THE ENTIRE EXISTING AXONTIMEHR REPOSITORY.**
+
+Understand:
+
+```text
+Backend architecture
+Frontend architecture
+PostgreSQL schema
+Migration system
+Employee module
+Organization module
+Attendance engine
+Shift engine
+Leave engine
+Holiday engine
+Approval workflow
+RBAC
+Tenant isolation
+Audit logging
+Notification system
+Redis/Celery
+Docker
+Configuration
+Testing framework
+```
+
+Do not recreate existing functionality.
+
+Reuse existing:
+
+```text
+Employee
+Department
+Branch
+Attendance
+Shift
+Leave
+Holiday
+Workflow
+Authentication
+RBAC
+Tenant
+Audit
+Notification
+```
+
+models/services wherever appropriate.
+
+---
+
+# 4. FIRST TASK — REPOSITORY ANALYSIS
+
+Before implementation, produce a technical analysis:
+
+```text
+1. Existing employee architecture
+2. Existing employment information
+3. Existing attendance calculations
+4. Existing shift calculations
+5. Existing leave calculations
+6. Existing holiday calculations
+7. Existing approval workflow
+8. Existing tenant architecture
+9. Existing RBAC
+10. Existing audit logging
+11. Existing background jobs
+12. Existing notification infrastructure
+13. Existing database conventions
+14. Existing API conventions
+15. Existing frontend conventions
+16. Existing testing architecture
+17. Existing reporting architecture
+```
+
+Then identify:
+
+```text
+Tables to create
+Tables to modify
+Services to create
+Services to modify
+APIs to create
+Frontend screens to create
+Background jobs
+Tests required
+```
+
+Do not start implementation until the existing architecture is understood.
+
+---
+
+# 5. PAYROLL ARCHITECTURE
+
+Use a service-oriented architecture:
+
+```text
+                    AXONTIMEHR
+                        |
+                  Tenant Context
+                        |
+                    Employee
+                        |
+                 Payroll Engine
+                        |
+        +---------------+---------------+
+        |               |               |
+ Salary Structure   Attendance      Leave Engine
+        |               |               |
+        +---------------+---------------+
+                        |
+                Earnings / Deductions
+                        |
+                  Payroll Calculation
+                        |
+                Approval Workflow
+                        |
+                  Payroll Processing
+                        |
+              Payslip / Reports
+```
+
+Supporting:
+
+```text
+PostgreSQL
+Redis
+Celery
+Audit
+Notifications
+Object Storage
+```
+
+---
+
+# 6. PAYROLL MODULES
+
+Implement the following logical modules:
+
+```text
+Salary Structure
+Salary Components
+Earnings
+Allowances
+Deductions
+Employee Compensation
+Payroll Period
+Payroll Processing
+Attendance Integration
+Leave Integration
+Overtime Integration Foundation
+Bonus
+Incentive
+Adjustment
+Tax/Statutory Configuration Foundation
+Payroll Approval
+Payroll Locking
+Payslip
+Payroll Reports
+Payroll Audit
+```
+
+---
+
+# 7. SALARY COMPONENT MASTER
+
+Create configurable salary components.
+
+Examples:
+
+```text
+Basic Salary
+HRA
+Conveyance
+Special Allowance
+Medical Allowance
+Transport Allowance
+Performance Bonus
+Attendance Bonus
+Overtime
+Incentive
+Commission
+Other Earnings
+```
+
+Deductions:
+
+```text
+PF
+ESI
+Professional Tax
+TDS
+Loan Deduction
+Advance Deduction
+Late Deduction
+Other Deduction
+```
+
+Do not hard-code these components.
+
+---
+
+# 8. COMPONENT TYPES
+
+Support:
+
+```text
+EARNING
+DEDUCTION
+EMPLOYER_CONTRIBUTION
+REIMBURSEMENT
+TAX
+```
+
+Also support:
+
+```text
+FIXED
+PERCENTAGE
+FORMULA
+VARIABLE
+```
+
+---
+
+# 9. SALARY COMPONENT MODEL
+
+Possible fields:
+
+```text
+id
+tenant_id
+code
+name
+description
+component_type
+calculation_type
+percentage
+fixed_amount
+formula
+taxable
+included_in_ctc
+affects_gross
+affects_net
+status
+effective_from
+effective_to
+created_at
+updated_at
+created_by
+updated_by
+```
+
+Use the existing schema conventions.
+
+---
+
+# 10. SALARY STRUCTURE
+
+Create salary structures.
+
+Example:
+
+```text
+Software Engineer
+
+Basic              ₹40,000
+HRA                ₹20,000
+Special Allowance  ₹10,000
+Transport           ₹5,000
+---------------------------
+Gross               ₹75,000
+```
+
+Employer contribution:
+
+```text
+Employer PF
+Employer ESI
+Other contribution
+```
+
+---
+
+# 11. CTC
+
+Support:
+
+```text
+Monthly CTC
+Annual CTC
+Gross Salary
+Net Salary
+Employer Contributions
+```
+
+Example:
+
+```text
+Annual CTC
+= Gross Salary
++ Employer Contributions
++ Other Benefits
+```
+
+Do not assume CTC always equals gross salary.
+
+---
+
+# 12. EMPLOYEE SALARY ASSIGNMENT
+
+Employees should be assigned salary structures.
+
+Store:
+
+```text
+employee_id
+salary_structure_id
+effective_from
+effective_to
+version
+status
+```
+
+Salary changes must preserve history.
+
+Do not overwrite old salary information.
+
+---
+
+# 13. SALARY VERSIONING
+
+Example:
+
+```text
+Jan-Jun:
+₹60,000
+
+Jul-Dec:
+₹70,000
+```
+
+Payroll must calculate using the salary applicable during that payroll period.
+
+---
+
+# 14. RETROACTIVE SALARY CHANGE
+
+Prepare architecture for:
+
+```text
+Salary effective from previous date
+```
+
+Example:
+
+```text
+Current date:
+September
+
+Salary revision:
+Effective July
+```
+
+The system should identify whether payroll needs recalculation or arrears.
+
+If arrears are not fully implemented in this phase, create a clean extension point.
+
+---
+
+# 15. PAYROLL PERIOD
+
+Create payroll periods.
+
+Example:
+
+```text
+September 2026
+```
+
+Fields:
+
+```text
+id
+tenant_id
+name
+start_date
+end_date
+pay_date
+status
+```
+
+Statuses:
+
+```text
+DRAFT
+OPEN
+PROCESSING
+PROCESSED
+PENDING_APPROVAL
+APPROVED
+LOCKED
+PAID
+CANCELLED
+```
+
+---
+
+# 16. PAYROLL PERIOD RULES
+
+Prevent:
+
+```text
+Overlapping payroll periods
+Multiple active payroll periods for same scope
+Processing locked payroll
+Editing paid payroll
+```
+
+---
+
+# 17. PAYROLL CALCULATION ENGINE
+
+Create a dedicated service:
+
+```text
+PayrollCalculationService
+```
+
+It should calculate:
+
+```text
+Working Days
+Calendar Days
+Paid Days
+Unpaid Days
+Leave Days
+Absent Days
+Present Days
+Half Days
+Loss of Pay
+Overtime
+Gross Earnings
+Deductions
+Employer Contributions
+Tax
+Net Salary
+```
+
+---
+
+# 18. PAYROLL CALCULATION FLOW
+
+Use:
+
+```text
+Employee
+   ↓
+Salary Assignment
+   ↓
+Payroll Period
+   ↓
+Working Calendar
+   ↓
+Attendance
+   ↓
+Leave
+   ↓
+Holiday
+   ↓
+Overtime
+   ↓
+Earnings
+   ↓
+Deductions
+   ↓
+Taxes
+   ↓
+Net Salary
+   ↓
+Payroll Result
+```
+
+---
+
+# 19. ATTENDANCE INTEGRATION
+
+Use the existing attendance engine.
+
+Payroll must consume:
+
+```text
+Present
+Absent
+Late
+Early Exit
+Half Day
+Weekly Off
+Holiday
+Work From Home
+On Duty
+```
+
+Do not recreate attendance calculations inside payroll.
+
+---
+
+# 20. PAID DAYS
+
+Define clearly:
+
+```text
+Paid Days
+Unpaid Days
+LOP Days
+```
+
+Example:
+
+```text
+Calendar Days = 30
+Weekly Off = 8
+Holiday = 2
+Present = 18
+Paid Leave = 1
+LOP = 1
+```
+
+The exact formula must come from configured payroll policy.
+
+Do not hard-code one universal formula.
+
+---
+
+# 21. LOSS OF PAY
+
+Support configurable LOP calculation.
+
+Example:
+
+```text
+Monthly Salary = ₹60,000
+Payroll Days = 30
+LOP = 2
+
+LOP Deduction =
+60,000 / 30 × 2
+```
+
+Different tenants may use:
+
+```text
+Calendar Days
+Working Days
+Fixed 30
+```
+
+Allow configuration.
+
+---
+
+# 22. HALF-DAY PAYROLL
+
+If an employee has:
+
+```text
+Half-day attendance
+```
+
+calculate payroll according to policy.
+
+Integrate with Phase 6:
+
+```text
+Half-day Leave
++
+Half-day Work
+```
+
+must not result in double deduction.
+
+---
+
+# 23. LEAVE INTEGRATION
+
+Use Phase 6 leave engine.
+
+Payroll should distinguish:
+
+```text
+Paid Leave
+Unpaid Leave
+Pending Leave
+Approved Leave
+Rejected Leave
+```
+
+Only approved/valid leave should affect payroll according to policy.
+
+Do not directly query raw leave requests without status validation.
+
+---
+
+# 24. HOLIDAY INTEGRATION
+
+Use Phase 6 holiday calendar.
+
+Holiday should normally not cause salary deduction.
+
+But if an employee works on a holiday:
+
+```text
+Holiday
++
+Attendance
+```
+
+provide an extension point for:
+
+```text
+Overtime
+Holiday Pay
+Comp-Off
+```
+
+---
+
+# 25. OVERTIME FOUNDATION
+
+If full overtime module is not yet implemented:
+
+Create a payroll-compatible interface:
+
+```text
+OvertimeService
+```
+
+Example:
+
+```text
+approved_overtime_hours
+overtime_rate
+overtime_amount
+```
+
+Payroll should consume approved overtime only.
+
+Do not calculate unauthorized overtime from raw attendance automatically.
+
+---
+
+# 26. EARNINGS ENGINE
+
+Calculate:
+
+```text
+Basic
+HRA
+Allowances
+Bonus
+Incentive
+Commission
+Overtime
+Reimbursement
+Other Earnings
+```
+
+Each component must have its own calculation result.
+
+---
+
+# 27. DEDUCTION ENGINE
+
+Calculate:
+
+```text
+LOP
+Tax
+PF
+ESI
+Professional Tax
+Loan
+Advance
+Other deductions
+```
+
+Each deduction must be independently traceable.
+
+---
+
+# 28. COMPONENT CALCULATION
+
+Support:
+
+```text
+FIXED
+PERCENTAGE_OF_BASIC
+PERCENTAGE_OF_GROSS
+FORMULA
+VARIABLE
+```
+
+Example:
+
+```text
+HRA = 40% of Basic
+```
+
+Do not use unsafe arbitrary Python execution for formulas.
+
+If formula support is implemented, create a controlled expression evaluator.
+
+---
+
+# 29. FORMULA SECURITY
+
+NEVER execute user-provided formulas using:
+
+```text
+eval()
+exec()
+```
+
+Create a safe formula engine.
+
+Allow only approved operations:
+
+```text
++
+-
+*
+/
+%
+min()
+max()
+round()
+```
+
+and approved variables.
+
+---
+
+# 30. PAYROLL VARIABLES
+
+Potential variables:
+
+```text
+BASIC
+GROSS
+PAID_DAYS
+LOP_DAYS
+WORKING_DAYS
+OVERTIME_HOURS
+OVERTIME_AMOUNT
+BONUS
+INCENTIVE
+```
+
+Only expose explicitly approved variables.
+
+---
+
+# 31. ROUNDING
+
+Create configurable rounding rules.
+
+Examples:
+
+```text
+Nearest integer
+Two decimals
+Round half up
+Floor
+Ceiling
+```
+
+Apply rounding consistently.
+
+Do not round intermediate values unnecessarily.
+
+---
+
+# 32. TAX / STATUTORY FOUNDATION
+
+Create configurable architecture for statutory deductions.
+
+Support foundation for:
+
+```text
+PF
+ESI
+Professional Tax
+TDS
+```
+
+Do not hard-code rates without effective dates/configuration.
+
+For India-specific rules, design the system so rates and thresholds can be updated without code changes.
+
+---
+
+# 33. EFFECTIVE-DATED STATUTORY RULES
+
+Each rule should support:
+
+```text
+effective_from
+effective_to
+region/state
+employee applicability
+status
+```
+
+This is essential because statutory rules change over time.
+
+---
+
+# 34. STATE/REGION CONFIGURATION
+
+Prepare architecture for regional rules such as:
+
+```text
+Professional Tax
+ESI applicability
+Other state-specific deductions
+```
+
+Do not assume every employee follows identical rules.
+
+---
+
+# 35. TAX REGIME FOUNDATION
+
+Prepare support for:
+
+```text
+Tax Regime
+Tax Configuration
+Employee Tax Declaration
+Taxable Income
+Tax Deduction
+```
+
+If complete income-tax computation is too large for this phase, implement a clean foundation and clearly mark advanced tax computation for a future phase.
+
+Do not pretend a partial tax engine is production-ready.
+
+---
+
+# 36. BONUS
+
+Support variable bonuses.
+
+Example:
+
+```text
+Performance Bonus
+Festival Bonus
+Joining Bonus
+Retention Bonus
+Annual Bonus
+```
+
+Fields:
+
+```text
+employee
+amount
+effective_date
+reason
+taxable
+payroll_period
+approval_status
+```
+
+---
+
+# 37. INCENTIVES
+
+Support:
+
+```text
+Sales Incentive
+Performance Incentive
+Attendance Incentive
+Productivity Incentive
+```
+
+Only approved incentives should enter payroll.
+
+---
+
+# 38. SALARY ADJUSTMENTS
+
+Support one-time adjustments:
+
+```text
+arrears
+correction
+bonus
+deduction
+reimbursement
+manual adjustment
+```
+
+Every adjustment must have:
+
+```text
+reason
+amount
+created_by
+approval
+audit
+```
+
+---
+
+# 39. PAYROLL ADJUSTMENT APPROVAL
+
+Use the reusable Phase 6 approval workflow.
+
+Example:
+
+```text
+HR
+ ↓
+Payroll Adjustment
+ ↓
+Manager/HR approval
+ ↓
+Payroll
+```
+
+Do not create another independent approval engine.
+
+---
+
+# 40. PAYROLL APPROVAL
+
+Payroll should support:
+
+```text
+Calculate
+ ↓
+Review
+ ↓
+Approve
+ ↓
+Lock
+ ↓
+Generate Payslips
+ ↓
+Mark Paid
+```
+
+Once locked:
+
+```text
+Salary
+Attendance input
+Leave input
+Payroll calculation
+```
+
+must not be casually modified.
+
+---
+
+# 41. PAYROLL SNAPSHOT
+
+When payroll is finalized, create an immutable snapshot of calculation inputs/results.
+
+Store:
+
+```text
+salary structure version
+attendance summary
+leave summary
+earnings
+deductions
+tax
+contributions
+net salary
+```
+
+This ensures future employee changes do not alter historical payroll.
+
+---
+
+# 42. HISTORICAL PAYROLL
+
+If an employee's salary changes later:
+
+```text
+July payroll
+```
+
+must remain unchanged.
+
+Never dynamically recalculate historical paid payroll using current salary configuration.
+
+---
+
+# 43. PAYROLL TRANSACTION MODEL
+
+Use a detailed payroll result.
+
+Example:
+
+```text
+Employee:
+Neeraj
+
+Basic               40,000
+HRA                 20,000
+Special Allowance   10,000
+Overtime             2,000
+--------------------------
+Gross               72,000
+
+PF                   4,800
+Professional Tax       200
+LOP                  1,500
+--------------------------
+Total Deduction      6,500
+
+Net Salary          65,500
+```
+
+Each line item must be independently identifiable.
+
+---
+
+# 44. PAYROLL LINE ITEMS
+
+Create:
+
+```text
+PayrollRun
+PayrollEmployee
+PayrollLineItem
+```
+
+or equivalent existing architecture.
+
+Line item types:
+
+```text
+EARNING
+DEDUCTION
+EMPLOYER_CONTRIBUTION
+TAX
+REIMBURSEMENT
+```
+
+---
+
+# 45. NET SALARY
+
+Calculate:
+
+```text
+Net Salary =
+Total Earnings
+-
+Employee Deductions
+```
+
+Employer contributions must not accidentally reduce employee net salary.
+
+---
+
+# 46. CTC
+
+Calculate separately:
+
+```text
+CTC =
+Gross
++
+Employer Contributions
++
+Applicable Benefits
+```
+
+Do not mix:
+
+```text
+Net Salary
+Gross Salary
+CTC
+```
+
+---
+
+# 47. PAYROLL LOCK
+
+Implement:
+
+```text
+LOCKED
+```
+
+state.
+
+After locking:
+
+```text
+No normal edits
+No salary structure changes affecting snapshot
+No attendance edits affecting payroll
+No leave edits affecting payroll
+```
+
+Any correction must use a controlled adjustment/reversal process.
+
+---
+
+# 48. PAYROLL REPROCESSING
+
+Before lock:
+
+```text
+Calculate
+Recalculate
+```
+
+should be allowed.
+
+After lock:
+
+```text
+Recalculate
+```
+
+should be blocked unless an authorized controlled reopen process exists.
+
+---
+
+# 49. PAYROLL REOPEN
+
+If implemented:
+
+```text
+Payroll Admin
+   ↓
+Reopen Request
+   ↓
+Approval
+   ↓
+Unlock
+```
+
+Every reopen must be audited.
+
+---
+
+# 50. PAYROLL STATUS MACHINE
+
+Implement a controlled state machine:
+
+```text
+DRAFT
+ ↓
+OPEN
+ ↓
+PROCESSING
+ ↓
+PROCESSED
+ ↓
+PENDING_APPROVAL
+ ↓
+APPROVED
+ ↓
+LOCKED
+ ↓
+PAID
+```
+
+Invalid transitions must be rejected.
+
+---
+
+# 51. PAYROLL APPROVAL HISTORY
+
+Record:
+
+```text
+actor
+action
+timestamp
+comment
+previous_status
+new_status
+```
+
+Never overwrite approval history.
+
+---
+
+# 52. PAYSLIP GENERATION
+
+Generate professional payslips.
+
+Include:
+
+```text
+Company
+Employee
+Employee ID
+Designation
+Department
+Payroll Period
+Pay Date
+Bank/Payment information where authorized
+Earnings
+Deductions
+Employer Contributions
+Gross
+Total Deductions
+Net Salary
+```
+
+Do not expose sensitive bank information unnecessarily.
+
+---
+
+# 53. PAYSLIP PDF
+
+Generate a production-quality PDF.
+
+The PDF should have:
+
+```text
+Company Header
+Employee Information
+Earnings Table
+Deductions Table
+Employer Contributions
+Net Salary
+Payment Summary
+Footer
+```
+
+Use the existing document-generation architecture if available.
+
+---
+
+# 54. PAYSLIP SECURITY
+
+Payslips must only be downloadable by authorized users.
+
+Employee:
+
+```text
+Own payslip
+```
+
+Manager:
+
+```text
+Only where authorized
+```
+
+HR/Payroll:
+
+```text
+Authorized organization scope
+```
+
+Prevent IDOR.
+
+---
+
+# 55. PAYROLL DASHBOARD
+
+Create dashboard:
+
+```text
+Total Employees
+Payroll Cost
+Gross Salary
+Total Deductions
+Employer Contributions
+Net Payroll
+Pending Approval
+Processed
+Paid
+```
+
+---
+
+# 56. EMPLOYEE PAYROLL DASHBOARD
+
+Employee should see:
+
+```text
+Current Salary
+Salary Structure
+Current Payroll
+Payslips
+Year-to-Date Summary
+```
+
+Only show information authorized for the employee.
+
+---
+
+# 57. SALARY STRUCTURE UI
+
+Create:
+
+```text
+Salary Structures
+```
+
+Features:
+
+```text
+Create
+Edit
+Duplicate
+Activate
+Deactivate
+Version
+Assign
+View History
+```
+
+---
+
+# 58. EMPLOYEE COMPENSATION UI
+
+Show:
+
+```text
+Current Salary
+Effective Date
+CTC
+Gross
+Basic
+Allowances
+Employer Contributions
+```
+
+Also show salary history.
+
+---
+
+# 59. PAYROLL PROCESSING UI
+
+Create workflow:
+
+```text
+Select Payroll Period
+        ↓
+Select Scope
+        ↓
+Preview
+        ↓
+Validate
+        ↓
+Calculate
+        ↓
+Review Exceptions
+        ↓
+Approve
+        ↓
+Lock
+        ↓
+Generate Payslips
+        ↓
+Mark Paid
+```
+
+---
+
+# 60. PAYROLL PREVIEW
+
+Before finalization show:
+
+```text
+Employees
+Gross
+Deductions
+Net
+LOP
+Overtime
+Bonus
+Exceptions
+```
+
+Allow payroll admins to inspect individual employees.
+
+---
+
+# 61. PAYROLL EXCEPTIONS
+
+Detect:
+
+```text
+Missing salary structure
+Missing attendance
+Invalid leave
+Negative balance
+Missing bank/payment information
+Invalid statutory configuration
+Overlapping salary assignment
+Unresolved adjustment
+```
+
+Payroll should not silently process invalid data.
+
+---
+
+# 62. EXCEPTION STATES
+
+Use:
+
+```text
+WARNING
+ERROR
+BLOCKING
+```
+
+Example:
+
+```text
+Missing optional information → WARNING
+Missing salary structure → BLOCKING
+Invalid payroll configuration → BLOCKING
+```
+
+---
+
+# 63. BULK PAYROLL PROCESSING
+
+Support processing many employees efficiently.
+
+Do not perform:
+
+```text
+1 database query × every field × every employee
+```
+
+Avoid N+1 queries.
+
+Use:
+
+```text
+Batch queries
+Prefetching
+Aggregations
+Bulk operations
+```
+
+---
+
+# 64. LARGE DATASET TEST
+
+Test with:
+
+```text
+10,000 employees
+12 months payroll
+Multiple salary structures
+Large attendance data
+Large leave ledger
+Large payroll history
+```
+
+Measure:
+
+```text
+Calculation time
+Database queries
+Memory
+Worker usage
+```
+
+---
+
+# 65. BACKGROUND PAYROLL PROCESSING
+
+If Celery exists, use it for heavy payroll processing:
+
+```text
+Payroll Calculation
+Bulk Payslip Generation
+Payroll Reports
+Email Distribution
+```
+
+The UI should not freeze while calculating thousands of employees.
+
+---
+
+# 66. PAYROLL JOB SAFETY
+
+Background jobs must be:
+
+```text
+Idempotent
+Retry-safe
+Tenant-aware
+Auditable
+Recoverable
+```
+
+A retry must never generate duplicate payroll.
+
+---
+
+# 67. IDEMPOTENCY
+
+Use unique processing identifiers.
+
+Example:
+
+```text
+tenant_id
+payroll_period_id
+employee_id
+```
+
+should uniquely identify a payroll employee result for a run.
+
+---
+
+# 68. DATABASE TABLES
+
+Potential tables:
+
+```text
+salary_components
+salary_structures
+salary_structure_components
+employee_salary_assignments
+payroll_periods
+payroll_runs
+payroll_employees
+payroll_line_items
+payroll_adjustments
+employee_bonuses
+employee_incentives
+statutory_rules
+tax_configurations
+payslips
+payroll_approval_records
+```
+
+Do not create duplicates if equivalent models already exist.
+
+---
+
+# 69. DATABASE CONSTRAINTS
+
+Use:
+
+```text
+Foreign Keys
+Unique Constraints
+Check Constraints
+Tenant Constraints
+Effective Date Constraints
+Status Constraints
+```
+
+Examples:
+
+```text
+salary effective_from < effective_to
+```
+
+and:
+
+```text
+payroll period start_date <= end_date
+```
+
+---
+
+# 70. DATABASE INDEXES
+
+Index common queries:
+
+```text
+tenant_id
+employee_id
+payroll_period_id
+salary_structure_id
+effective_from
+effective_to
+status
+created_at
+```
+
+Composite indexes where justified:
+
+```text
+tenant_id + employee_id
+tenant_id + payroll_period_id
+tenant_id + status
+tenant_id + effective_from
+```
+
+---
+
+# 71. TENANT ISOLATION
+
+Every payroll entity must be tenant-scoped.
+
+Test:
+
+```text
+Tenant A cannot see Tenant B payroll.
+Tenant A cannot see Tenant B salary.
+Tenant A cannot see Tenant B payslips.
+Tenant A cannot modify Tenant B payroll.
+Tenant A cannot access Tenant B salary structure.
+```
+
+---
+
+# 72. RBAC
+
+Add appropriate permissions:
+
+```text
+payroll.view
+payroll.create
+payroll.process
+payroll.calculate
+payroll.approve
+payroll.lock
+payroll.reopen
+payroll.mark_paid
+
+salary.view
+salary.create
+salary.update
+salary.assign
+
+salary_structure.view
+salary_structure.create
+salary_structure.update
+salary_structure.delete
+
+payslip.view
+payslip.download
+
+payroll_adjustment.create
+payroll_adjustment.approve
+
+statutory_rule.view
+statutory_rule.manage
+```
+
+Use existing RBAC.
+
+---
+
+# 73. AUTHORIZATION
+
+Do not rely only on frontend hiding.
+
+Backend must verify:
+
+```text
+Authenticated User
++
+Tenant
++
+Permission
++
+Employee Scope
++
+Payroll Scope
+```
+
+---
+
+# 74. IDOR PROTECTION
+
+Test:
+
+```text
+GET /api/v1/payroll/OTHER_EMPLOYEE
+```
+
+and:
+
+```text
+GET /api/v1/payslips/OTHER_EMPLOYEE
+```
+
+Must return unauthorized/not found according to API security policy.
+
+---
+
+# 75. MASS ASSIGNMENT PROTECTION
+
+Do not allow clients to set:
+
+```text
+tenant_id
+approved_by
+payroll_status
+net_salary
+gross_salary
+created_by
+```
+
+without server authorization.
+
+---
+
+# 76. FINANCIAL DATA SECURITY
+
+Salary information is highly sensitive.
+
+Use:
+
+```text
+Least privilege
+Strict authorization
+Audit logs
+Secure API responses
+Secure PDF access
+Encrypted storage where appropriate
+```
+
+Avoid logging complete salary data unnecessarily.
+
+---
+
+# 77. AUDIT LOGGING
+
+Audit:
+
+```text
+Salary created
+Salary changed
+Salary assigned
+Payroll created
+Payroll calculated
+Payroll approved
+Payroll rejected
+Payroll locked
+Payroll reopened
+Payroll marked paid
+Adjustment created
+Adjustment approved
+Payslip generated
+Payslip accessed
+```
+
+---
+
+# 78. PAYROLL AUDIT
+
+Maintain complete history:
+
+```text
+Who
+What
+When
+Why
+Previous value
+New value
+```
+
+For financial records, audit history must be immutable.
+
+---
+
+# 79. API DESIGN
+
+Follow existing API conventions.
+
+Potential endpoints:
+
+```text
+GET    /api/v1/salary-components
+POST   /api/v1/salary-components
+PUT    /api/v1/salary-components/{id}
+
+GET    /api/v1/salary-structures
+POST   /api/v1/salary-structures
+GET    /api/v1/salary-structures/{id}
+PUT    /api/v1/salary-structures/{id}
+
+GET    /api/v1/employees/{id}/salary
+POST   /api/v1/employees/{id}/salary
+GET    /api/v1/employees/{id}/salary-history
+
+GET    /api/v1/payroll/periods
+POST   /api/v1/payroll/periods
+GET    /api/v1/payroll/periods/{id}
+
+POST   /api/v1/payroll/{id}/calculate
+POST   /api/v1/payroll/{id}/process
+POST   /api/v1/payroll/{id}/approve
+POST   /api/v1/payroll/{id}/lock
+POST   /api/v1/payroll/{id}/mark-paid
+
+GET    /api/v1/payroll/{id}/employees
+GET    /api/v1/payroll/{id}/employees/{employee_id}
+
+GET    /api/v1/payslips
+GET    /api/v1/payslips/{id}
+GET    /api/v1/payslips/{id}/download
+
+POST   /api/v1/payroll/adjustments
+GET    /api/v1/payroll/adjustments
+POST   /api/v1/payroll/adjustments/{id}/approve
+```
+
+Use the project's existing API naming conventions if different.
+
+---
+
+# 80. SERVER-SIDE CALCULATION
+
+Never trust frontend values for:
+
+```text
+Gross Salary
+Net Salary
+Tax
+Deduction
+LOP
+Paid Days
+Overtime Amount
+CTC
+```
+
+The backend must calculate and validate all financial values.
+
+---
+
+# 81. FINANCIAL PRECISION
+
+Do NOT use floating-point arithmetic for money.
+
+Use:
+
+```text
+Decimal
+```
+
+with appropriate PostgreSQL:
+
+```text
+NUMERIC
+```
+
+precision.
+
+Example:
+
+```text
+NUMERIC(14,2)
+```
+
+where appropriate.
+
+---
+
+# 82. CURRENCY
+
+Prepare for multi-currency architecture:
+
+```text
+currency
+currency_code
+```
+
+Even if the first release primarily targets INR.
+
+Do not assume every future tenant uses INR.
+
+---
+
+# 83. NEGATIVE VALUES
+
+Define rules for:
+
+```text
+Negative salary
+Negative deduction
+Negative adjustment
+Negative balance
+```
+
+Do not permit invalid financial values through API manipulation.
+
+---
+
+# 84. PAYROLL RECONCILIATION
+
+Provide reconciliation summary:
+
+```text
+Employees processed
+Employees skipped
+Employees with errors
+Gross total
+Deduction total
+Net total
+Employer contribution total
+```
+
+Totals must equal line-item aggregates.
+
+---
+
+# 85. PAYROLL VALIDATION
+
+Before lock:
+
+```text
+Validate employees
+Validate salary
+Validate attendance
+Validate leave
+Validate deductions
+Validate statutory rules
+Validate calculations
+Validate totals
+```
+
+If blocking errors exist:
+
+```text
+DO NOT LOCK PAYROLL
+```
+
+---
+
+# 86. PAYROLL REPORTS
+
+Implement foundation for:
+
+```text
+Payroll Summary
+Employee Salary Report
+Department Salary Report
+Branch Salary Report
+Earnings Report
+Deductions Report
+LOP Report
+Overtime Report
+Tax Report
+Employer Contribution Report
+```
+
+Support:
+
+```text
+CSV
+Excel
+PDF
+```
+
+using the existing reporting architecture.
+
+---
+
+# 87. REPORT FILTERING
+
+Support:
+
+```text
+Payroll Period
+Employee
+Department
+Branch
+Designation
+Salary Structure
+Status
+```
+
+Use server-side filtering.
+
+---
+
+# 88. EMPLOYEE SELF-SERVICE
+
+Employees should be able to:
+
+```text
+View salary
+View salary history
+View payslips
+Download payslips
+View payroll summary
+```
+
+Employees must never access another employee's salary.
+
+---
+
+# 89. HR SELF-SERVICE
+
+HR/payroll users may:
+
+```text
+Manage salary
+Assign structures
+Process payroll
+Review exceptions
+Approve payroll
+Generate payslips
+Run reports
+```
+
+subject to RBAC.
+
+---
+
+# 90. FRONTEND ROUTES
+
+Add appropriate pages:
+
+```text
+/payroll
+/payroll/periods
+/payroll/processing
+/payroll/review
+/payroll/approvals
+/payroll/reports
+/salary-structures
+/salary-components
+/employee-salary
+/payslips
+```
+
+Follow existing frontend routing conventions.
+
+---
+
+# 91. PAYROLL UI/UX
+
+The UI must be:
+
+```text
+Modern
+Responsive
+Professional
+Fast
+Accessible
+Mobile-friendly
+```
+
+Use the existing AxonTimeHR design system.
+
+Do not introduce a completely unrelated visual design.
+
+---
+
+# 92. PAYROLL PROCESSING TABLE
+
+Show:
+
+```text
+Employee
+Basic
+Gross
+Earnings
+Deductions
+LOP
+Overtime
+Tax
+Net
+Status
+Exception
+```
+
+Allow authorized users to inspect details.
+
+---
+
+# 93. EMPLOYEE PAYROLL DETAIL
+
+Clicking an employee should show:
+
+```text
+Attendance Summary
+Leave Summary
+Salary Components
+Earnings
+Deductions
+Tax
+Employer Contributions
+Net Salary
+Calculation Breakdown
+```
+
+This is critical for payroll transparency.
+
+---
+
+# 94. CALCULATION BREAKDOWN
+
+Provide a clear explanation:
+
+```text
+Basic Salary
+₹40,000
+
+HRA
+40% × Basic
+₹16,000
+
+Gross
+₹65,000
+
+LOP
+2 days
+-₹4,333
+
+PF
+₹4,800
+
+Net
+₹55,867
+```
+
+The exact values must come from the calculation engine.
+
+---
+
+# 95. PAYROLL EXPLANATION
+
+Employees should understand why salary changed.
+
+Display:
+
+```text
+Previous Month
+Current Month
+Difference
+Reason
+```
+
+Example:
+
+```text
+Net Salary Difference: +₹5,000
+
+Reason:
+Salary revision
+```
+
+---
+
+# 96. MONTH-TO-MONTH COMPARISON
+
+Create:
+
+```text
+Current Month
+Previous Month
+Change
+```
+
+for:
+
+```text
+Gross
+Deductions
+Net
+LOP
+Overtime
+Bonus
+```
+
+---
+
+# 97. NOTIFICATIONS
+
+Use existing notification infrastructure.
+
+Events:
+
+```text
+Payroll Processed
+Payroll Approved
+Payroll Locked
+Payslip Generated
+Payslip Available
+Payroll Adjustment Approved
+```
+
+Do not build another notification engine.
+
+---
+
+# 98. EMAIL
+
+Where supported:
+
+```text
+Payslip Available
+Payroll Completed
+```
+
+Do not send salary information in insecure plain email bodies.
+
+Prefer secure authenticated links.
+
+---
+
+# 99. BACKGROUND JOBS
+
+Potential jobs:
+
+```text
+process_payroll
+generate_payslips
+send_payslip_notifications
+generate_payroll_report
+payroll_reconciliation
+```
+
+Jobs must be idempotent.
+
+---
+
+# 100. TESTING
+
+Use pytest and the existing test architecture.
+
+Create:
+
+```text
+Unit Tests
+API Tests
+Integration Tests
+Database Tests
+Security Tests
+Calculation Tests
+Concurrency Tests
+Regression Tests
+```
+
+---
+
+# 101. SALARY TESTS
+
+Test:
+
+```text
+Create salary component
+Create salary structure
+Assign salary
+Change salary
+Salary history
+Effective dates
+Overlapping assignments
+```
+
+---
+
+# 102. PAYROLL CALCULATION TESTS
+
+Test:
+
+```text
+Full attendance
+Absence
+Paid leave
+Unpaid leave
+Half day
+Holiday
+Weekly off
+LOP
+Overtime
+Bonus
+Incentive
+Deduction
+```
+
+---
+
+# 103. FINANCIAL CALCULATION TESTS
+
+Verify:
+
+```text
+Gross
+Deductions
+Net
+CTC
+Employer contributions
+Tax
+```
+
+Use Decimal and exact expected results.
+
+---
+
+# 104. EDGE CASE TESTS
+
+Test:
+
+```text
+Employee joins mid-month
+Employee leaves mid-month
+Salary changes mid-month
+Salary changes mid-year
+Leap year
+Month with 28 days
+Month with 29 days
+Month with 30 days
+Month with 31 days
+Zero attendance
+Full absence
+Full paid leave
+Negative adjustment
+Large salary
+Large deduction
+```
+
+---
+
+# 105. CONCURRENCY TESTS
+
+Test:
+
+```text
+Two payroll processes simultaneously
+Two approval requests
+Duplicate background job
+Payroll calculation retry
+Payslip generation retry
+Salary update during payroll processing
+```
+
+---
+
+# 106. TENANT TESTS
+
+Test:
+
+```text
+Tenant A payroll isolation
+Tenant B payroll isolation
+Cross-tenant salary access
+Cross-tenant payslip access
+Cross-tenant payroll modification
+```
+
+---
+
+# 107. RBAC TESTS
+
+Test:
+
+```text
+Employee
+Manager
+HR
+Payroll Admin
+Tenant Admin
+Super Admin
+```
+
+Ensure each can perform only authorized actions.
+
+---
+
+# 108. PAYROLL SNAPSHOT TEST
+
+Critical test:
+
+```text
+Process payroll
+Lock payroll
+Change employee salary
+Change attendance
+Change leave
+```
+
+Historical payroll must remain unchanged.
+
+---
+
+# 109. AUDIT TESTS
+
+Verify that:
+
+```text
+Salary changes
+Payroll approval
+Payroll lock
+Payroll reopen
+Adjustments
+Payslip generation
+```
+
+all produce appropriate audit records.
+
+---
+
+# 110. PERFORMANCE TESTS
+
+Benchmark:
+
+```text
+1,000 employees
+5,000 employees
+10,000 employees
+```
+
+Measure:
+
+```text
+Payroll calculation duration
+Database queries
+Memory
+Celery worker performance
+Payslip generation time
+```
+
+---
+
+# 111. N+1 QUERY PREVENTION
+
+Use query profiling.
+
+Pay particular attention to:
+
+```text
+Employee → Salary
+Employee → Attendance
+Employee → Leave
+Payroll → Employee
+Payroll → Line Items
+```
+
+Avoid loading related data individually.
+
+---
+
+# 112. DATABASE TRANSACTIONS
+
+Payroll finalization must be transactional.
+
+Example:
+
+```text
+BEGIN
+
+Validate
+Calculate
+Create payroll results
+Create line items
+Create audit
+Update status
+
+COMMIT
+```
+
+If failure:
+
+```text
+ROLLBACK
+```
+
+Do not leave partially finalized payroll.
+
+---
+
+# 113. PAYROLL IMMUTABILITY
+
+Once:
+
+```text
+PAID
+```
+
+historical payroll records should be treated as immutable.
+
+Corrections must use:
+
+```text
+Adjustment
+Reversal
+Next payroll correction
+```
+
+rather than directly rewriting history.
+
+---
+
+# 114. DATA RETENTION
+
+Payroll data is financial history.
+
+Do not allow normal CRUD deletion of:
+
+```text
+Paid payroll
+Payslips
+Payroll line items
+Approval history
+Payroll audit
+```
+
+---
+
+# 115. ERROR HANDLING
+
+Create stable error codes:
+
+```text
+SALARY_STRUCTURE_NOT_FOUND
+SALARY_ASSIGNMENT_INVALID
+SALARY_OVERLAP
+PAYROLL_PERIOD_OVERLAP
+PAYROLL_ALREADY_LOCKED
+PAYROLL_ALREADY_PAID
+PAYROLL_CALCULATION_FAILED
+PAYROLL_VALIDATION_FAILED
+MISSING_SALARY_STRUCTURE
+MISSING_ATTENDANCE
+INVALID_PAYROLL_STATE
+PAYROLL_APPROVAL_REQUIRED
+PAYROLL_ACCESS_DENIED
+PAYSLIP_ACCESS_DENIED
+INVALID_FINANCIAL_VALUE
+```
+
+---
+
+# 116. API PAGINATION
+
+Paginate:
+
+```text
+Payroll Employees
+Payroll History
+Payslips
+Salary History
+Payroll Adjustments
+Payroll Reports
+```
+
+Do not return unlimited records.
+
+---
+
+# 117. SEARCH
+
+Support server-side:
+
+```text
+Employee Name
+Employee ID
+Department
+Branch
+Payroll Period
+Status
+```
+
+---
+
+# 118. DOCUMENTATION
+
+Update:
+
+```text
+README
+Architecture Documentation
+Database Documentation
+API Documentation
+Payroll Calculation Documentation
+RBAC Documentation
+Deployment Documentation
+Testing Documentation
+```
+
+Document all payroll formulas.
+
+---
+
+# 119. ENVIRONMENT CONFIGURATION
+
+Do not hard-code:
+
+```text
+Tax rates
+Payroll configuration
+Currency
+Company details
+Storage
+Email
+```
+
+Use environment/configuration where appropriate.
+
+Never commit secrets.
+
+---
+
+# 120. SEED DATA
+
+Create development/demo configuration:
+
+```text
+Salary Components
+Salary Structure
+Payroll Period
+Sample Compensation
+Sample Payroll
+```
+
+Do not use real employee financial information.
+
+---
+
+# 121. PRODUCTION SAFETY
+
+Never automatically mark payroll as:
+
+```text
+PAID
+```
+
+during development/testing unless explicitly configured.
+
+Payroll payment status must be a controlled operation.
+
+---
+
+# 122. PAYMENT INTEGRATION FOUNDATION
+
+Prepare future interface:
+
+```text
+PaymentService
+```
+
+for:
+
+```text
+Bank Transfer
+Payment Gateway
+Bulk Salary Transfer
+```
+
+Do not implement actual banking integration unless explicitly required.
+
+---
+
+# 123. FUTURE EXTENSIBILITY
+
+Architecture should support future modules:
+
+```text
+Overtime
+Comp-Off
+Expense
+Reimbursement
+Loans
+Advances
+Tax Filing
+Bank Payment
+Accounting
+Full Statutory Compliance
+Arrears
+Full Tax Engine
+```
+
+Do not tightly couple payroll to only the current implementation.
+
+---
+
+# 124. DEFINITION OF DONE
+
+Phase 7 is complete only when:
+
+## Salary
+
+```text
+Salary components
+Salary structures
+Employee salary assignment
+Salary history
+Effective dating
+Versioning
+```
+
+are working.
+
+## Payroll
+
+```text
+Payroll period
+Payroll calculation
+Attendance integration
+Leave integration
+Holiday integration
+LOP
+Earnings
+Deductions
+Bonus
+Incentives
+Adjustments
+```
+
+are working.
+
+## Approval
+
+```text
+Payroll approval
+Approval history
+Payroll locking
+Controlled reopening
+```
+
+are working.
+
+## Payslip
+
+```text
+Payslip generation
+PDF
+Secure download
+Employee self-service
+```
+
+are working.
+
+## Security
+
+```text
+Authentication
+RBAC
+Tenant isolation
+IDOR protection
+Financial data protection
+Audit logging
+```
+
+are working.
+
+## Performance
+
+```text
+Large payroll processing
+Batch processing
+No N+1 queries
+Background jobs
+```
+
+are working.
+
+## Testing
+
+```text
+Unit
+API
+Integration
+Database
+Security
+Concurrency
+Regression
+```
+
+are passing.
+
+---
+
+# 125. FINAL VALIDATION
+
+Run the complete project validation:
+
+```text
+1. Formatter
+2. Linter
+3. Type checking
+4. Database migrations
+5. Migration upgrade test
+6. Unit tests
+7. API tests
+8. Integration tests
+9. Payroll calculation tests
+10. Financial precision tests
+11. Security tests
+12. Tenant isolation tests
+13. RBAC tests
+14. Concurrency tests
+15. Background job tests
+16. Performance tests
+17. Frontend tests
+18. Production frontend build
+19. Docker build
+20. Docker startup
+21. OpenAPI validation
+22. Full regression suite
+```
+
+Do not consider Phase 7 complete while critical failures remain.
+
+---
+
+# 126. FINAL IMPLEMENTATION REPORT
+
+After development provide a detailed report.
+
+## Architecture
+
+Explain:
+
+```text
+Payroll Engine
+Salary Engine
+Earnings Engine
+Deduction Engine
+Statutory Engine
+Approval Engine
+Payslip Engine
+```
+
+## Database
+
+Report:
+
+```text
+New tables
+Modified tables
+Relationships
+Indexes
+Constraints
+Migrations
+```
+
+## Backend
+
+List:
+
+```text
+Services
+Repositories
+Models
+Schemas
+APIs
+Background jobs
+```
+
+## Frontend
+
+List:
+
+```text
+Pages
+Routes
+Components
+Forms
+Dashboards
+Reports
+```
+
+## Payroll Formulas
+
+Document:
+
+```text
+Gross
+LOP
+Earnings
+Deductions
+Tax
+Employer Contributions
+Net
+CTC
+```
+
+## Security
+
+Explain:
+
+```text
+Tenant isolation
+RBAC
+IDOR protection
+Financial data protection
+Audit
+Payslip security
+```
+
+## Testing
+
+Report:
+
+```text
+Total tests
+Passed
+Failed
+Skipped
+Coverage
+```
+
+## Performance
+
+Report:
+
+```text
+Payroll processing time
+Database query optimization
+Batch processing
+Background job performance
+```
+
+## Known Issues
+
+Clearly list all limitations.
+
+Do not hide unresolved issues.
+
+---
+
+# 127. CRITICAL DEVELOPMENT PRINCIPLE
+
+Do NOT build Phase 7 as a simple CRUD application.
+
+Payroll is a **financial calculation engine**.
+
+The implementation must correctly handle:
+
+```text
+Salary history
+Effective dates
+Attendance
+Leave
+Holidays
+Working days
+LOP
+Earnings
+Deductions
+Overtime
+Bonus
+Incentives
+Taxes
+Employer contributions
+Net salary
+CTC
+Payroll approval
+Payroll locking
+Historical snapshots
+Financial precision
+Concurrency
+Audit
+Tenant isolation
+Security
+```
+
+---
+
+# FINAL INSTRUCTION TO THE AI CODING AGENT
+
+Inspect the existing AxonTimeHR repository completely before modifying it.
+
+Do not rewrite working Phase 1–6 functionality.
+
+Do not create duplicate:
+
+```text
+Employee
+Attendance
+Shift
+Leave
+Holiday
+Approval
+Authentication
+RBAC
+Tenant
+Audit
+Notification
+```
+
+systems.
+
+Reuse existing services and models.
+
+Implement Phase 7 incrementally:
+
+```text
+1. Repository analysis
+2. Payroll architecture
+3. Salary component master
+4. Salary structure
+5. Employee salary assignment
+6. Salary versioning
+7. Payroll periods
+8. Payroll calculation engine
+9. Attendance integration
+10. Leave integration
+11. Holiday integration
+12. Earnings engine
+13. Deduction engine
+14. LOP
+15. Overtime foundation
+16. Bonus
+17. Incentive
+18. Adjustments
+19. Statutory foundation
+20. Payroll approval
+21. Payroll locking
+22. Payroll snapshot
+23. Payslip generation
+24. Reports
+25. Employee self-service
+26. Notifications
+27. Background processing
+28. Security
+29. Audit
+30. Testing
+31. Performance optimization
+32. Regression testing
+33. Documentation
+```
+
+After every major component:
+
+```text
+Implement
+   ↓
+Run tests
+   ↓
+Fix failures
+   ↓
+Validate database
+   ↓
+Validate financial calculations
+   ↓
+Validate security
+   ↓
+Validate tenant isolation
+   ↓
+Run regression
+   ↓
+Continue
+```
+
+The final implementation must be:
+
+**production-ready, financially accurate, multi-tenant, secure, auditable, scalable, configurable, workflow-driven, and extensible.**
+
+Most importantly:
+
+**Never modify historical paid payroll directly. Preserve financial history through immutable payroll snapshots, ledger-style records, approvals, adjustments, and audit trails.**
+
+Design the payroll engine so future AxonTimeHR modules such as **Overtime, Comp-Off, Expenses, Loans, Advances, Tax Filing, Accounting and Bank Payment Integration** can plug into it without requiring a major rewrite.

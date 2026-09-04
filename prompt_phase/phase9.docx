@@ -1,0 +1,3391 @@
+Absolutely. Below is a **complete, copy-paste-ready Phase 9 development prompt** for AxonTimeHR. This phase extends Phases 1–8 and focuses on **Performance Management, Goals/KPIs, Appraisals, 360° Feedback, Competency, Training/Learning, and Employee Engagement**.
+
+# AXONTIMEHR — PHASE 9 DEVELOPMENT PROMPT
+
+# PERFORMANCE MANAGEMENT, GOALS/KPIs, APPRAISALS, 360° FEEDBACK, TRAINING, LEARNING & EMPLOYEE ENGAGEMENT
+
+---
+
+# 1. ROLE
+
+You are a **Senior Full-Stack Architect, HRMS Product Engineer, Backend Engineer, Frontend Engineer, Database Architect, Security Engineer, QA Engineer, and DevOps Engineer**.
+
+You are developing **AxonTimeHR**, a modern, enterprise-grade, multi-tenant Attendance + HRMS SaaS platform.
+
+Your responsibility in this phase is to inspect the existing AxonTimeHR repository and implement **Phase 9** completely, cleanly, securely, and production-ready.
+
+---
+
+# 2. IMPORTANT — EXISTING PHASES ARE ALREADY DEVELOPED
+
+The following phases are considered existing functionality:
+
+* Phase 1 — Foundation
+* Phase 2 — Authentication, Identity & RBAC
+* Phase 3 — Organization & Employee Management
+* Phase 4 — Attendance & Shift Management
+* Phase 5 — GPS, Geofencing & Verified Attendance
+* Phase 6 — Leave, Holiday, Regularization & Approval Workflow
+* Phase 7 — Payroll, Salary & Compensation Management
+* Phase 8 — Expense, Reimbursement, Loan & Salary Advance Management
+
+## CRITICAL RULE
+
+**DO NOT REBUILD, REPLACE, DELETE, OR DUPLICATE completed functionality.**
+
+Before writing code:
+
+1. Inspect the complete repository.
+2. Understand the existing architecture.
+3. Identify existing database models.
+4. Identify existing API patterns.
+5. Identify existing authentication and authorization.
+6. Identify existing tenant isolation.
+7. Identify existing employee relationships.
+8. Identify existing approval workflow.
+9. Identify existing notification system.
+10. Identify existing audit logging.
+11. Identify existing file/attachment storage.
+12. Identify existing background-job architecture.
+13. Identify existing frontend design system.
+14. Identify existing reusable components.
+15. Identify existing testing architecture.
+16. Identify existing migrations.
+17. Identify existing reporting/export functionality.
+
+Then extend the existing system.
+
+---
+
+# 3. PHASE 9 OBJECTIVE
+
+Build a complete enterprise-grade:
+
+## PERFORMANCE MANAGEMENT SYSTEM
+
+including:
+
+* Performance Cycles
+* Goal Management
+* KPI Management
+* KRA Management
+* Objectives & Key Results
+* Goal Weightage
+* Goal Progress
+* Milestones
+* Competency Management
+* Rating Scales
+* Self Assessment
+* Manager Assessment
+* Peer Assessment
+* 360° Feedback
+* Performance Reviews
+* Appraisals
+* Calibration
+* Promotion Recommendations
+* Salary Revision Recommendations
+* Performance Improvement Plans
+* Training Needs
+* Learning & Development
+* Training Management
+* Certification Tracking
+* Skills Matrix
+* Employee Engagement
+* Surveys
+* Polls
+* Feedback
+* Performance Dashboards
+* HR Analytics
+* Notifications
+* Reports
+* Audit Trails
+
+The implementation must be scalable enough for a commercial SaaS product.
+
+---
+
+# 4. PRODUCT DESIGN PRINCIPLE
+
+The Phase 9 architecture must support:
+
+```text
+Tenant
+   ↓
+Organization
+   ↓
+Performance Configuration
+   ↓
+Performance Cycle
+   ↓
+Goals / KPIs / KRAs
+   ↓
+Employee Progress
+   ↓
+Self Assessment
+   ↓
+Manager Assessment
+   ↓
+Peer / 360 Feedback
+   ↓
+Calibration
+   ↓
+Final Review
+   ↓
+Approval
+   ↓
+Development Plan
+   ↓
+Training / Learning
+   ↓
+Promotion / Compensation Recommendation
+   ↓
+Analytics
+```
+
+Do not create isolated modules.
+
+All modules must work together.
+
+---
+
+# 5. PERFORMANCE CYCLE MANAGEMENT
+
+Create a configurable performance-cycle system.
+
+Examples:
+
+* Annual
+* Half-yearly
+* Quarterly
+* Monthly
+* Probation
+* Custom cycle
+
+A performance cycle should contain:
+
+```text
+Cycle ID
+Tenant ID
+Name
+Description
+Cycle Type
+Start Date
+End Date
+Goal Start Date
+Goal End Date
+Self Review Start
+Self Review End
+Manager Review Start
+Manager Review End
+Peer Review Start
+Peer Review End
+Calibration Start
+Calibration End
+Finalization Date
+Status
+Created By
+Created At
+Updated At
+```
+
+Statuses:
+
+```text
+DRAFT
+SCHEDULED
+GOAL_SETTING
+IN_PROGRESS
+SELF_REVIEW
+MANAGER_REVIEW
+PEER_REVIEW
+CALIBRATION
+FINAL_REVIEW
+COMPLETED
+CANCELLED
+ARCHIVED
+```
+
+Implement proper state transitions.
+
+Do not allow invalid transitions.
+
+---
+
+# 6. PERFORMANCE CYCLE CONFIGURATION
+
+HR/Admin should be able to configure:
+
+* Cycle duration
+* Review stages
+* Rating scale
+* Goal weightage
+* Competency weightage
+* Manager review weightage
+* Self review weightage
+* Peer review weightage
+* 360 feedback
+* Calibration
+* Approval requirements
+* Required comments
+* Required goals
+* Minimum number of goals
+* Maximum number of goals
+* Mandatory competencies
+* Review visibility
+* Notification schedule
+
+Example:
+
+```text
+Goal Weight = 60%
+Competency = 20%
+Manager Review = 20%
+```
+
+Configuration must be tenant-specific.
+
+---
+
+# 7. GOAL MANAGEMENT
+
+Implement enterprise-grade goal management.
+
+Employees and managers should be able to create goals.
+
+Goal fields:
+
+```text
+Goal ID
+Tenant ID
+Cycle ID
+Employee ID
+Manager ID
+Goal Title
+Description
+Goal Type
+KRA
+KPI
+Target
+Unit
+Baseline
+Current Value
+Target Value
+Weightage
+Priority
+Start Date
+Due Date
+Status
+Progress Percentage
+Achievement Percentage
+Created By
+Created At
+Updated At
+```
+
+Goal types:
+
+```text
+INDIVIDUAL
+TEAM
+DEPARTMENT
+ORGANIZATION
+PROJECT
+KPI
+KRA
+OKR
+DEVELOPMENT
+BEHAVIORAL
+```
+
+---
+
+# 8. GOAL HIERARCHY
+
+Support cascading goals.
+
+Example:
+
+```text
+Company Objective
+      ↓
+Department Objective
+      ↓
+Team Objective
+      ↓
+Manager Goal
+      ↓
+Employee Goal
+```
+
+Allow managers to cascade organizational objectives to employees.
+
+Track relationships:
+
+```text
+parent_goal_id
+child_goal_id
+```
+
+An employee should be able to understand how their goals contribute to organizational objectives.
+
+---
+
+# 9. KPI MANAGEMENT
+
+Create reusable KPI templates.
+
+KPI fields:
+
+```text
+KPI Name
+Description
+Category
+Measurement Type
+Unit
+Target
+Minimum
+Maximum
+Frequency
+Weightage
+Calculation Method
+Active
+```
+
+Measurement types:
+
+```text
+NUMBER
+PERCENTAGE
+CURRENCY
+RATIO
+COUNT
+BOOLEAN
+RATING
+CUSTOM
+```
+
+Examples:
+
+```text
+Sales Target
+Customer Satisfaction
+Defect Rate
+Project Delivery
+Attendance Compliance
+Productivity
+Revenue
+Customer Tickets
+Resolution Time
+```
+
+---
+
+# 10. KRA MANAGEMENT
+
+Implement Key Result Area management.
+
+Examples:
+
+```text
+Quality
+Productivity
+Customer Service
+Leadership
+Team Management
+Innovation
+Process Improvement
+Revenue
+Delivery
+Compliance
+```
+
+Allow:
+
+* KRA templates
+* KRA assignment
+* KRA weightage
+* KRA evaluation
+* KRA reporting
+
+---
+
+# 11. OKR SUPPORT
+
+Support Objectives and Key Results.
+
+Structure:
+
+```text
+Objective
+    ↓
+Key Result 1
+Key Result 2
+Key Result 3
+```
+
+Each Key Result should support:
+
+* Target
+* Current value
+* Progress
+* Confidence level
+* Due date
+* Owner
+* Status
+
+Confidence:
+
+```text
+LOW
+MEDIUM
+HIGH
+```
+
+---
+
+# 12. GOAL MILESTONES
+
+Each goal can contain milestones.
+
+Example:
+
+```text
+Goal
+ ├── Milestone 1
+ ├── Milestone 2
+ ├── Milestone 3
+ └── Final Target
+```
+
+Milestone fields:
+
+```text
+Title
+Description
+Due Date
+Status
+Progress
+Completed Date
+Owner
+```
+
+---
+
+# 13. GOAL PROGRESS TRACKING
+
+Employees should be able to update progress.
+
+Support:
+
+* Percentage progress
+* Numeric progress
+* Comments
+* Evidence
+* Attachments
+* Milestones
+* Achievement notes
+
+Maintain historical progress records.
+
+Do not overwrite historical progress.
+
+Example:
+
+```text
+Goal Progress History
+
+01-Jan → 10%
+01-Feb → 25%
+01-Mar → 40%
+01-Apr → 65%
+01-May → 90%
+```
+
+---
+
+# 14. GOAL APPROVAL
+
+Goals may require manager approval.
+
+Workflow:
+
+```text
+DRAFT
+ ↓
+SUBMITTED
+ ↓
+MANAGER_REVIEW
+ ↓
+APPROVED / REJECTED
+```
+
+If rejected:
+
+```text
+Rejected
+ ↓
+Employee edits
+ ↓
+Resubmits
+```
+
+Reuse the existing approval engine from earlier phases where possible.
+
+---
+
+# 15. WEIGHTAGE MANAGEMENT
+
+Implement configurable weightage.
+
+Example:
+
+```text
+Goal 1 = 30%
+Goal 2 = 20%
+Goal 3 = 25%
+Goal 4 = 25%
+
+Total = 100%
+```
+
+Prevent invalid configurations.
+
+Rules:
+
+* Weight cannot be negative.
+* Weight cannot exceed allowed limits.
+* Total weight should satisfy configured rules.
+* Finalized goals cannot be silently modified.
+
+---
+
+# 16. PERFORMANCE RATING SYSTEM
+
+Create configurable rating scales.
+
+Example:
+
+```text
+1 — Does Not Meet Expectations
+2 — Partially Meets Expectations
+3 — Meets Expectations
+4 — Exceeds Expectations
+5 — Outstanding
+```
+
+Allow tenants to configure:
+
+* Rating name
+* Score
+* Description
+* Minimum score
+* Maximum score
+* Rating color/display metadata
+* Active/inactive
+
+Do not hard-code ratings.
+
+---
+
+# 17. COMPETENCY MANAGEMENT
+
+Implement competency frameworks.
+
+Competency categories:
+
+```text
+Core Competency
+Functional Competency
+Leadership Competency
+Behavioral Competency
+Technical Competency
+```
+
+Example:
+
+```text
+Communication
+Leadership
+Problem Solving
+Teamwork
+Decision Making
+Customer Focus
+Technical Knowledge
+Innovation
+```
+
+Each competency can contain:
+
+```text
+Name
+Description
+Category
+Expected Level
+Behavioral Indicators
+Active
+```
+
+---
+
+# 18. COMPETENCY LEVELS
+
+Support competency levels such as:
+
+```text
+BEGINNER
+INTERMEDIATE
+ADVANCED
+EXPERT
+MASTER
+```
+
+Or numeric levels:
+
+```text
+1
+2
+3
+4
+5
+```
+
+Allow tenant configuration.
+
+---
+
+# 19. SELF-ASSESSMENT
+
+Implement employee self-assessment.
+
+Employee should be able to review:
+
+* Goals
+* KPI achievement
+* Competencies
+* Accomplishments
+* Challenges
+* Development needs
+* Strengths
+* Areas for improvement
+* Overall comments
+
+Self-assessment should support:
+
+```text
+Draft
+Submit
+Edit before submission
+Lock after submission
+```
+
+After submission, employee should not be able to silently modify it.
+
+---
+
+# 20. MANAGER ASSESSMENT
+
+Managers should be able to evaluate employees.
+
+Manager assessment should include:
+
+* Goal achievement
+* KPI performance
+* Competencies
+* Behavioral performance
+* Strengths
+* Weaknesses
+* Development recommendations
+* Overall rating
+* Comments
+
+Manager access must respect reporting hierarchy.
+
+A manager must not be able to review unauthorized employees.
+
+---
+
+# 21. PEER REVIEW
+
+Implement optional peer feedback.
+
+Employees may be selected as reviewers.
+
+Support:
+
+* Reviewer assignment
+* Reviewer acceptance
+* Review submission
+* Anonymous/non-anonymous configuration
+* Deadline
+* Reminder
+* Completion tracking
+
+---
+
+# 22. 360° FEEDBACK
+
+Implement complete 360-degree feedback.
+
+Reviewers may include:
+
+```text
+Employee
+Manager
+Peers
+Subordinates
+Cross-functional colleagues
+HR
+```
+
+Configure feedback categories:
+
+```text
+Communication
+Leadership
+Teamwork
+Ownership
+Problem Solving
+Customer Focus
+Technical Skills
+Behavior
+```
+
+Allow HR to configure anonymity.
+
+If anonymous feedback is enabled:
+
+* Do not expose reviewer identity to employee.
+* Protect identity in APIs.
+* Protect identity in database queries.
+* Prevent indirect information leakage.
+
+---
+
+# 23. FEEDBACK QUESTIONNAIRE
+
+Create configurable questions.
+
+Question types:
+
+```text
+Rating
+Single Choice
+Multiple Choice
+Text
+Yes/No
+Scale
+```
+
+Example:
+
+```text
+How effectively does this employee communicate?
+
+1 2 3 4 5
+```
+
+Support:
+
+* Question banks
+* Templates
+* Mandatory questions
+* Optional questions
+* Categories
+* Scoring
+
+---
+
+# 24. PERFORMANCE REVIEW
+
+Create a unified review page.
+
+Review should combine:
+
+```text
+Goals
+KPIs
+KRAs
+Competencies
+Self Assessment
+Manager Assessment
+Peer Feedback
+360 Feedback
+Achievements
+Development Needs
+Overall Rating
+Final Comments
+```
+
+Provide an overall calculated score.
+
+Example:
+
+```text
+Goal Score         = 4.2
+Competency Score   = 3.8
+Manager Score      = 4.1
+360 Score          = 4.0
+
+Final Score        = 4.05
+```
+
+Calculation must be configurable.
+
+---
+
+# 25. PERFORMANCE CALCULATION ENGINE
+
+Build a reusable calculation service.
+
+Responsibilities:
+
+* Goal achievement calculation
+* Weighted score calculation
+* KPI score calculation
+* Competency score calculation
+* Review score calculation
+* Final rating calculation
+
+Use precise decimal calculations.
+
+Do not use floating-point arithmetic for financial or precision-sensitive calculations.
+
+Maintain calculation snapshots for finalized reviews.
+
+---
+
+# 26. CALIBRATION
+
+Implement performance calibration.
+
+HR/authorized leadership can compare ratings across:
+
+* Departments
+* Teams
+* Managers
+* Locations
+* Job levels
+
+Support:
+
+```text
+Employee
+Manager Rating
+Calculated Rating
+Calibrated Rating
+Calibration Comment
+Calibration Status
+Calibrated By
+Calibrated At
+```
+
+Calibration should never silently modify the original manager rating.
+
+Store:
+
+```text
+Original Rating
+Calibrated Rating
+Reason
+Actor
+Timestamp
+```
+
+---
+
+# 27. APPRAISAL WORKFLOW
+
+Implement complete appraisal workflow.
+
+Example:
+
+```text
+Goal Setting
+ ↓
+Goal Approval
+ ↓
+Performance Period
+ ↓
+Self Review
+ ↓
+Manager Review
+ ↓
+Peer/360 Review
+ ↓
+Calibration
+ ↓
+HR Review
+ ↓
+Final Approval
+ ↓
+Employee Acknowledgement
+ ↓
+Completed
+```
+
+Support rejection and resubmission where appropriate.
+
+---
+
+# 28. EMPLOYEE ACKNOWLEDGEMENT
+
+After finalization:
+
+Employee should be able to:
+
+* View final review
+* Acknowledge
+* Add comments
+* Disagree
+* Raise concern
+* Request clarification
+
+Important:
+
+Acknowledgement does not mean employee agrees with the rating.
+
+Store:
+
+```text
+Acknowledged
+Acknowledged At
+Employee Comment
+Disagreement Flag
+```
+
+---
+
+# 29. PERFORMANCE IMPROVEMENT PLAN — PIP
+
+Implement PIP management.
+
+PIP fields:
+
+```text
+Employee
+Manager
+Start Date
+End Date
+Reason
+Performance Areas
+Expected Improvements
+Action Items
+Milestones
+Support Required
+Review Dates
+Status
+Outcome
+```
+
+Statuses:
+
+```text
+DRAFT
+ACTIVE
+UNDER_REVIEW
+SUCCESSFUL
+EXTENDED
+UNSUCCESSFUL
+CANCELLED
+```
+
+Allow regular progress reviews.
+
+---
+
+# 30. DEVELOPMENT PLAN
+
+Employees should have development plans.
+
+Support:
+
+* Career goals
+* Skill gaps
+* Development objectives
+* Training recommendations
+* Mentorship
+* Coaching
+* Certifications
+* Target completion dates
+
+---
+
+# 31. TRAINING MANAGEMENT
+
+Create Learning & Development module.
+
+Support:
+
+```text
+Training Programs
+Courses
+Workshops
+Webinars
+Certifications
+External Training
+Internal Training
+```
+
+Training fields:
+
+```text
+Training ID
+Name
+Description
+Category
+Provider
+Instructor
+Duration
+Cost
+Mode
+Location
+Start Date
+End Date
+Capacity
+Status
+```
+
+Training modes:
+
+```text
+ONLINE
+OFFLINE
+HYBRID
+SELF_PACED
+```
+
+---
+
+# 32. COURSE MANAGEMENT
+
+Implement courses.
+
+Course fields:
+
+```text
+Course Name
+Description
+Category
+Skill
+Level
+Duration
+Provider
+Content URL
+Active
+```
+
+Support modules/lessons where practical.
+
+---
+
+# 33. TRAINING ENROLLMENT
+
+Employees should be able to enroll in assigned training.
+
+Statuses:
+
+```text
+ASSIGNED
+ENROLLED
+IN_PROGRESS
+COMPLETED
+FAILED
+CANCELLED
+```
+
+Track:
+
+* Enrollment date
+* Start date
+* Completion date
+* Score
+* Attendance
+* Certificate
+* Feedback
+
+---
+
+# 34. CERTIFICATION MANAGEMENT
+
+Track employee certifications.
+
+Fields:
+
+```text
+Certification Name
+Issuing Organization
+Issue Date
+Expiry Date
+Credential ID
+Credential URL
+Certificate File
+Status
+```
+
+Automatically identify:
+
+```text
+ACTIVE
+EXPIRING_SOON
+EXPIRED
+```
+
+Create reminders for upcoming expiry.
+
+---
+
+# 35. SKILLS MATRIX
+
+Create employee skill management.
+
+Skill fields:
+
+```text
+Skill
+Category
+Level
+Years of Experience
+Last Assessed
+Target Level
+Gap
+```
+
+Example:
+
+```text
+Python
+Current Level = 3
+Target Level = 5
+Gap = 2
+```
+
+Managers/HR should be able to view team skill matrices.
+
+---
+
+# 36. SKILL GAP ANALYSIS
+
+Calculate:
+
+```text
+Required Skill
+Current Skill
+Target Skill
+Skill Gap
+Recommended Training
+```
+
+Example:
+
+```text
+Required = Advanced Python
+Current = Intermediate
+Gap = Advanced
+
+Recommendation:
+Python Advanced Training
+```
+
+---
+
+# 37. CAREER DEVELOPMENT
+
+Implement career development framework.
+
+Support:
+
+```text
+Career Path
+Job Level
+Current Role
+Target Role
+Required Skills
+Required Competencies
+Required Experience
+Recommended Training
+Readiness Score
+```
+
+Example:
+
+```text
+Software Engineer
+      ↓
+Senior Software Engineer
+      ↓
+Lead Engineer
+      ↓
+Engineering Manager
+```
+
+---
+
+# 38. PROMOTION RECOMMENDATIONS
+
+Allow managers/HR to recommend promotions.
+
+Recommendation should include:
+
+```text
+Employee
+Current Position
+Proposed Position
+Current Level
+Proposed Level
+Performance Score
+Skill Readiness
+Business Justification
+Effective Date
+Status
+```
+
+Statuses:
+
+```text
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+APPROVED
+REJECTED
+IMPLEMENTED
+```
+
+Do not directly modify employee salary/job information without explicit approval.
+
+---
+
+# 39. SALARY REVISION RECOMMENDATION
+
+Integrate with Phase 7 payroll.
+
+Performance module may recommend:
+
+```text
+Current Salary
+Recommended Increase %
+Recommended Amount
+Reason
+Performance Rating
+Effective Date
+```
+
+However:
+
+**DO NOT directly modify payroll salary records.**
+
+Create a controlled workflow:
+
+```text
+Performance Review
+ ↓
+Salary Recommendation
+ ↓
+HR Review
+ ↓
+Management Approval
+ ↓
+Payroll Change
+```
+
+Use the existing payroll/compensation system.
+
+---
+
+# 40. EMPLOYEE ENGAGEMENT
+
+Implement Employee Engagement module.
+
+Support:
+
+* Surveys
+* Polls
+* Feedback
+* Suggestions
+* Pulse surveys
+* Engagement questionnaires
+
+---
+
+# 41. SURVEY MANAGEMENT
+
+HR should be able to create surveys.
+
+Survey fields:
+
+```text
+Title
+Description
+Start Date
+End Date
+Audience
+Anonymous
+Status
+```
+
+Question types:
+
+```text
+Rating
+Text
+Single Choice
+Multiple Choice
+Yes/No
+NPS
+Scale
+```
+
+---
+
+# 42. PULSE SURVEYS
+
+Support recurring pulse surveys.
+
+Examples:
+
+```text
+Weekly
+Monthly
+Quarterly
+Custom
+```
+
+Questions may include:
+
+```text
+How satisfied are you with your work?
+
+How supported do you feel by your manager?
+
+How likely are you to recommend this organization?
+```
+
+---
+
+# 43. EMPLOYEE FEEDBACK
+
+Employees should be able to submit feedback.
+
+Support:
+
+* Anonymous feedback
+* Category
+* Priority
+* Attachments
+* Status
+* HR response
+
+Categories:
+
+```text
+WORKPLACE
+MANAGEMENT
+PROCESS
+TECHNOLOGY
+CULTURE
+BENEFITS
+OTHER
+```
+
+---
+
+# 44. NPS / ENGAGEMENT SCORE
+
+Support configurable engagement metrics.
+
+Example:
+
+```text
+Engagement Score
+Manager Effectiveness
+Workplace Satisfaction
+Leadership Confidence
+eNPS
+```
+
+Do not expose individual responses when anonymity is enabled.
+
+---
+
+# 45. DASHBOARD — EMPLOYEE
+
+Create employee dashboard containing:
+
+```text
+Current Performance Cycle
+Goal Progress
+Goal Achievement
+Pending Reviews
+Self Assessment
+Training
+Certifications
+Skill Gaps
+Development Plan
+PIP Status
+Feedback
+Career Goals
+```
+
+---
+
+# 46. DASHBOARD — MANAGER
+
+Manager dashboard:
+
+```text
+Team Performance
+Pending Reviews
+Goal Completion
+Team Goal Progress
+Rating Distribution
+Skill Gaps
+Training Status
+PIP Employees
+Upcoming Review Deadlines
+360 Feedback Completion
+```
+
+---
+
+# 47. DASHBOARD — HR
+
+HR dashboard:
+
+```text
+Active Performance Cycles
+Review Completion %
+Goal Completion %
+Average Performance
+Department Comparison
+Rating Distribution
+Calibration Status
+Training Completion
+Certification Expiry
+Skill Gaps
+Promotion Recommendations
+Salary Revision Recommendations
+Engagement Score
+```
+
+---
+
+# 48. ANALYTICS
+
+Create analytics services.
+
+Examples:
+
+```text
+Performance by Department
+Performance by Designation
+Performance by Location
+Performance by Manager
+Goal Achievement
+KPI Achievement
+Training Completion
+Skill Gap
+Certification Expiry
+Promotion Readiness
+Engagement Score
+```
+
+Use aggregated queries.
+
+Avoid loading unnecessary employee-level data.
+
+---
+
+# 49. REPORTS
+
+Implement reports:
+
+### Performance Reports
+
+* Employee Performance
+* Department Performance
+* Goal Achievement
+* KPI Performance
+* Rating Distribution
+* Manager Performance
+* Calibration Report
+
+### Learning Reports
+
+* Training Completion
+* Training Cost
+* Certification Expiry
+* Skill Matrix
+* Skill Gap
+
+### Engagement Reports
+
+* Survey Results
+* Engagement Score
+* eNPS
+* Pulse Survey Results
+
+---
+
+# 50. EXPORT
+
+Support:
+
+```text
+CSV
+Excel
+PDF
+```
+
+Where existing export infrastructure exists, reuse it.
+
+Exports must respect:
+
+* Tenant
+* RBAC
+* Employee access
+* Date filters
+* Department filters
+* Location filters
+
+---
+
+# 51. DATABASE DESIGN
+
+Design normalized PostgreSQL tables.
+
+Potential tables:
+
+```text
+performance_cycles
+performance_cycle_configs
+
+goals
+goal_milestones
+goal_progress_history
+goal_templates
+
+kpi_templates
+kra_templates
+okr_objectives
+okr_key_results
+
+competencies
+competency_categories
+competency_levels
+employee_competencies
+
+rating_scales
+rating_scale_values
+
+performance_reviews
+self_assessments
+manager_assessments
+peer_reviews
+feedback_requests
+feedback_responses
+feedback_questions
+
+performance_calibrations
+performance_finalizations
+performance_acknowledgements
+
+pip_records
+pip_milestones
+development_plans
+development_plan_items
+
+training_programs
+courses
+course_modules
+training_enrollments
+training_attendance
+
+certifications
+employee_certifications
+
+skills
+employee_skills
+skill_assessments
+skill_gap_analysis
+
+career_paths
+career_path_steps
+promotion_recommendations
+salary_revision_recommendations
+
+surveys
+survey_questions
+survey_assignments
+survey_responses
+
+employee_feedback
+
+performance_audit_logs
+```
+
+Do not blindly create all tables.
+
+First inspect existing models and reuse existing entities.
+
+---
+
+# 52. DATABASE REQUIREMENTS
+
+Every tenant-owned table must have proper tenant isolation.
+
+Use:
+
+```text
+tenant_id
+```
+
+where appropriate.
+
+Add:
+
+* Foreign keys
+* Unique constraints
+* Check constraints
+* Indexes
+* Composite indexes
+* Soft-delete where appropriate
+* Created timestamps
+* Updated timestamps
+* Created-by
+* Updated-by
+
+Avoid unnecessary indexes.
+
+---
+
+# 53. MULTI-TENANT SECURITY
+
+This is mandatory.
+
+Every request must enforce:
+
+```text
+authenticated_user
+      ↓
+tenant
+      ↓
+role
+      ↓
+resource ownership
+      ↓
+permission
+```
+
+Prevent:
+
+* Cross-tenant data access
+* IDOR
+* Horizontal privilege escalation
+* Vertical privilege escalation
+* Unauthorized review access
+* Unauthorized feedback access
+* Anonymous reviewer identity leakage
+
+---
+
+# 54. RBAC
+
+Use existing RBAC system.
+
+Possible permissions:
+
+```text
+performance.view
+performance.create
+performance.update
+performance.delete
+performance.configure
+
+goal.view
+goal.create
+goal.update
+goal.approve
+
+review.view
+review.submit
+review.approve
+review.finalize
+
+feedback.create
+feedback.view
+feedback.manage
+
+training.view
+training.create
+training.assign
+training.manage
+
+certification.view
+certification.manage
+
+survey.create
+survey.manage
+survey.respond
+
+promotion.create
+promotion.approve
+
+salary_revision.create
+salary_revision.approve
+```
+
+Do not create a second authorization system.
+
+Extend the existing one.
+
+---
+
+# 55. ROLE ACCESS
+
+### Employee
+
+Can:
+
+* View own goals
+* Update own progress
+* Submit self-assessment
+* View permitted feedback
+* View own training
+* Manage own certifications
+* Submit surveys
+* View own development plan
+
+### Manager
+
+Can:
+
+* View authorized team
+* Approve goals
+* Review employees
+* Give feedback
+* Create development plans
+* Recommend promotion
+* Recommend salary revision
+
+### HR
+
+Can:
+
+* Configure cycles
+* Configure rating systems
+* Manage performance
+* Manage training
+* Manage surveys
+* View analytics
+* Manage calibration
+* Manage engagement
+
+### Admin
+
+Can access tenant-level configuration according to existing RBAC rules.
+
+---
+
+# 56. API DESIGN
+
+Use the existing FastAPI architecture.
+
+Create modular routes such as:
+
+```text
+/api/v1/performance/cycles
+/api/v1/performance/goals
+/api/v1/performance/kpis
+/api/v1/performance/kras
+/api/v1/performance/okrs
+/api/v1/performance/competencies
+/api/v1/performance/reviews
+/api/v1/performance/feedback
+/api/v1/performance/calibration
+/api/v1/performance/pip
+/api/v1/performance/development
+/api/v1/training
+/api/v1/courses
+/api/v1/certifications
+/api/v1/skills
+/api/v1/career
+/api/v1/promotions
+/api/v1/salary-recommendations
+/api/v1/engagement/surveys
+/api/v1/engagement/feedback
+/api/v1/performance/reports
+```
+
+Follow the project's existing naming conventions.
+
+---
+
+# 57. API REQUIREMENTS
+
+Every endpoint must implement:
+
+* Authentication
+* Authorization
+* Tenant isolation
+* Validation
+* Pagination
+* Filtering
+* Sorting where appropriate
+* Consistent error responses
+* Logging
+* Audit where necessary
+
+Do not return internal database errors directly to clients.
+
+---
+
+# 58. PAGINATION
+
+All potentially large endpoints must support pagination.
+
+Example:
+
+```text
+page
+page_size
+```
+
+or the existing project convention.
+
+Never return thousands of records by default.
+
+---
+
+# 59. FILTERING
+
+Support filters such as:
+
+```text
+employee
+department
+designation
+branch
+location
+cycle
+status
+rating
+manager
+date range
+training status
+certification status
+```
+
+---
+
+# 60. FRONTEND
+
+Use the existing React + TypeScript architecture.
+
+Do not introduce a second frontend framework.
+
+Reuse:
+
+* Layout
+* Sidebar
+* Header
+* Authentication
+* API client
+* Form components
+* Table components
+* Modal components
+* Toasts
+* Loading states
+* Error handling
+* Pagination
+* Charts
+* Theme
+* Design system
+
+---
+
+# 61. FRONTEND ROUTES
+
+Implement appropriate routes such as:
+
+```text
+/performance
+/performance/cycles
+/performance/goals
+/performance/reviews
+/performance/feedback
+/performance/calibration
+/performance/pip
+
+/training
+/training/courses
+/training/my-training
+/training/certifications
+
+/skills
+/skills/matrix
+
+/career
+/career/development
+
+/engagement
+/engagement/surveys
+/engagement/feedback
+```
+
+Adapt to the existing routing structure.
+
+---
+
+# 62. UI REQUIREMENTS
+
+The UI must be:
+
+* Responsive
+* Professional
+* Modern
+* Enterprise-ready
+* Accessible
+* Consistent
+* Fast
+
+Support:
+
+```text
+Desktop
+Tablet
+Mobile
+```
+
+Use proper:
+
+* Empty states
+* Loading states
+* Skeleton loaders
+* Validation messages
+* Confirmation dialogs
+* Error states
+* Success notifications
+
+---
+
+# 63. GOAL UI
+
+Create goal dashboard with:
+
+```text
+Goal
+Progress
+Weight
+Target
+Current Value
+Due Date
+Status
+Achievement
+```
+
+Visualize progress clearly.
+
+Provide:
+
+* Goal creation
+* Goal editing
+* Goal approval
+* Goal progress
+* Goal history
+* Milestones
+
+---
+
+# 64. PERFORMANCE REVIEW UI
+
+Create a guided review interface.
+
+Suggested structure:
+
+```text
+Step 1 — Goals
+Step 2 — KPIs
+Step 3 — Competencies
+Step 4 — Self Assessment
+Step 5 — Manager Assessment
+Step 6 — Feedback
+Step 7 — Overall Rating
+Step 8 — Comments
+Step 9 — Submit
+```
+
+Autosave drafts where appropriate.
+
+Prevent data loss.
+
+---
+
+# 65. TRAINING UI
+
+Provide:
+
+```text
+Training Catalog
+My Training
+Assigned Training
+In Progress
+Completed
+Certificates
+Upcoming Training
+```
+
+---
+
+# 66. ENGAGEMENT UI
+
+Provide:
+
+```text
+Available Surveys
+My Surveys
+Completed Surveys
+Feedback
+Pulse Surveys
+Engagement Dashboard
+```
+
+---
+
+# 67. NOTIFICATIONS
+
+Reuse the existing notification framework.
+
+Send notifications for:
+
+### Performance
+
+* Goal assigned
+* Goal approval required
+* Goal rejected
+* Review opened
+* Review deadline approaching
+* Self-review pending
+* Manager review pending
+* Peer feedback requested
+* Calibration required
+* Review finalized
+
+### Training
+
+* Training assigned
+* Training reminder
+* Training completed
+* Certification expiring
+
+### Career
+
+* Promotion recommendation
+* Development plan assigned
+
+Do not create duplicate notification infrastructure.
+
+---
+
+# 68. BACKGROUND JOBS
+
+Use existing Celery/Redis architecture.
+
+Background tasks may include:
+
+```text
+Review deadline reminders
+Goal deadline reminders
+Training reminders
+Certification expiry reminders
+Survey reminders
+Performance cycle transitions
+Engagement survey scheduling
+Analytics aggregation
+```
+
+Tasks must be:
+
+* Idempotent
+* Retry-safe
+* Observable
+* Logged
+
+---
+
+# 69. AUDIT LOGGING
+
+Audit important actions:
+
+```text
+Performance cycle created
+Cycle configuration changed
+Goal created
+Goal approved
+Goal rejected
+Goal finalized
+Review submitted
+Review modified
+Review finalized
+Rating changed
+Calibration performed
+PIP created
+Promotion recommended
+Salary recommendation created
+Training assigned
+Certification updated
+Survey created
+Survey response submitted
+```
+
+Store:
+
+```text
+Actor
+Tenant
+Action
+Resource
+Resource ID
+Timestamp
+Before
+After
+IP where supported
+```
+
+Never expose sensitive audit information to unauthorized users.
+
+---
+
+# 70. IMMUTABILITY OF FINALIZED REVIEWS
+
+Once a performance review is finalized:
+
+**DO NOT allow normal update operations.**
+
+If correction is required:
+
+```text
+Finalized Review
+ ↓
+Correction Request
+ ↓
+Authorized Approval
+ ↓
+Revision
+ ↓
+Audit Trail
+```
+
+Preserve historical versions.
+
+---
+
+# 71. DOCUMENT/ATTACHMENT SECURITY
+
+Where evidence or certificates are uploaded:
+
+Validate:
+
+* File type
+* File size
+* Extension
+* MIME type
+
+Prevent:
+
+* Executable uploads
+* Path traversal
+* Unauthorized download
+* Cross-tenant file access
+
+Reuse the existing file storage service.
+
+---
+
+# 72. CONCURRENCY CONTROL
+
+Protect against:
+
+* Two managers editing the same review
+* Duplicate submissions
+* Duplicate approvals
+* Double calibration
+* Duplicate promotion recommendations
+
+Use:
+
+* Transactions
+* Optimistic locking where appropriate
+* Unique constraints
+* Idempotency keys where appropriate
+
+---
+
+# 73. TRANSACTION SAFETY
+
+Operations such as:
+
+```text
+Finalize Review
+Approve Promotion
+Approve Salary Recommendation
+Submit Assessment
+Calibration
+```
+
+must be atomic.
+
+If one part fails, rollback the entire operation.
+
+---
+
+# 74. SOFT DELETE
+
+Do not physically delete historical HR records unless explicitly required.
+
+Prefer:
+
+```text
+is_deleted
+deleted_at
+deleted_by
+```
+
+for configurable/master data.
+
+Performance history should generally remain immutable.
+
+---
+
+# 75. SEARCH
+
+Provide search for:
+
+* Employees
+* Goals
+* KPIs
+* Training
+* Courses
+* Skills
+* Certifications
+* Reviews
+
+Use appropriate database indexing.
+
+---
+
+# 76. PERFORMANCE OPTIMIZATION
+
+Optimize:
+
+* Database queries
+* Pagination
+* Dashboard APIs
+* Aggregations
+* Reports
+* Large employee datasets
+
+Avoid:
+
+```text
+N+1 queries
+```
+
+Use eager loading/selectin loading where appropriate.
+
+---
+
+# 77. API RESPONSE STANDARDIZATION
+
+Follow existing API response conventions.
+
+For errors, return structured responses such as:
+
+```json
+{
+  "success": false,
+  "message": "Review cannot be submitted in the current state",
+  "error_code": "INVALID_REVIEW_STATE"
+}
+```
+
+Do not expose stack traces.
+
+---
+
+# 78. VALIDATION
+
+Use existing Pydantic schemas.
+
+Validate:
+
+* Dates
+* Weightage
+* Scores
+* Status transitions
+* Employee relationships
+* Cycle relationships
+* Goal ownership
+* Reviewer permissions
+* File uploads
+* Survey responses
+
+---
+
+# 79. TESTING STRATEGY
+
+Testing is mandatory.
+
+Implement:
+
+## Unit Tests
+
+Test:
+
+* Score calculations
+* Goal calculations
+* Weightage calculations
+* Rating calculations
+* Skill gap calculations
+* State transitions
+* Permission checks
+
+---
+
+# 80. API TESTS
+
+Test:
+
+```text
+Authentication
+Authorization
+CRUD
+Pagination
+Filtering
+Validation
+Error handling
+Tenant isolation
+```
+
+---
+
+# 81. SECURITY TESTS
+
+Explicitly test:
+
+### Cross-Tenant Access
+
+Tenant A must never access Tenant B data.
+
+### IDOR
+
+Changing IDs in URLs must not expose another employee's records.
+
+### RBAC
+
+Employee cannot access HR-only APIs.
+
+### Manager Scope
+
+Manager cannot access employees outside authorized scope.
+
+### Anonymous Feedback
+
+Reviewer identity must remain protected.
+
+### Finalized Review
+
+Unauthorized users cannot modify finalized reviews.
+
+---
+
+# 82. INTEGRATION TESTS
+
+Test complete flows.
+
+Example:
+
+```text
+Create Cycle
+ ↓
+Create Goal
+ ↓
+Approve Goal
+ ↓
+Update Progress
+ ↓
+Self Review
+ ↓
+Manager Review
+ ↓
+360 Feedback
+ ↓
+Calibration
+ ↓
+Finalization
+ ↓
+Acknowledgement
+```
+
+---
+
+# 83. TRAINING INTEGRATION TEST
+
+Test:
+
+```text
+Create Course
+ ↓
+Assign Employee
+ ↓
+Employee Enrolls
+ ↓
+Training Starts
+ ↓
+Training Completed
+ ↓
+Certificate Uploaded
+ ↓
+Certification Recorded
+```
+
+---
+
+# 84. PROMOTION INTEGRATION
+
+Test:
+
+```text
+Performance Review
+ ↓
+Promotion Recommendation
+ ↓
+HR Review
+ ↓
+Approval
+ ↓
+Employee Record Update
+```
+
+Only integrate with existing employee/payroll systems after approval.
+
+---
+
+# 85. ENGAGEMENT TESTING
+
+Test:
+
+```text
+Create Survey
+ ↓
+Assign Employees
+ ↓
+Employee Responds
+ ↓
+Response Stored
+ ↓
+Results Aggregated
+```
+
+Verify anonymity rules.
+
+---
+
+# 86. FRONTEND TESTING
+
+Use the existing UI testing strategy.
+
+Test:
+
+* Goal creation
+* Goal progress
+* Review submission
+* Manager review
+* 360 feedback
+* Training enrollment
+* Certification
+* Survey submission
+* Role-based UI visibility
+* Validation
+* Error handling
+
+Use Playwright if it is already part of the project.
+
+---
+
+# 87. DATABASE TESTING
+
+Validate:
+
+* Foreign keys
+* Unique constraints
+* Tenant isolation
+* Indexes
+* Cascading behavior
+* Soft deletion
+* Migration correctness
+
+---
+
+# 88. MIGRATIONS
+
+Create proper PostgreSQL migrations using the project's existing migration framework.
+
+Rules:
+
+* Never manually modify production schema.
+* Every schema change must have a migration.
+* Migration must be reversible where practical.
+* Test migration from clean database.
+* Test migration against existing Phase 1–8 database.
+
+---
+
+# 89. SEED DATA
+
+Create development/demo seed data.
+
+Include:
+
+```text
+Performance Cycle
+Goal Templates
+KPI Templates
+KRA Templates
+Competencies
+Rating Scale
+Training Courses
+Skills
+Survey Templates
+```
+
+Do not insert fake production data automatically.
+
+---
+
+# 90. DOCUMENTATION
+
+Update:
+
+```text
+README
+API documentation
+Environment variables
+Database documentation
+Architecture documentation
+Performance module documentation
+Training documentation
+RBAC documentation
+Testing documentation
+```
+
+Document:
+
+* Setup
+* Migrations
+* Seed data
+* API endpoints
+* Roles
+* Permissions
+* Performance calculations
+* Workflow
+* Background jobs
+
+---
+
+# 91. API DOCUMENTATION
+
+Ensure FastAPI OpenAPI documentation correctly describes:
+
+* Request schemas
+* Response schemas
+* Authentication
+* Error responses
+* Query parameters
+* Pagination
+* Permissions
+
+---
+
+# 92. ENVIRONMENT CONFIGURATION
+
+Do not hard-code:
+
+```text
+URLs
+Secrets
+Credentials
+API keys
+Storage paths
+Notification credentials
+```
+
+Use the existing environment configuration system.
+
+---
+
+# 93. LOGGING
+
+Use the existing structured logging system.
+
+Log:
+
+```text
+Cycle transitions
+Review submission
+Approval
+Calibration
+Background jobs
+Errors
+Security violations
+```
+
+Never log:
+
+* Passwords
+* Tokens
+* Sensitive credentials
+* Private feedback unnecessarily
+
+---
+
+# 94. ERROR HANDLING
+
+Implement centralized error handling.
+
+Handle:
+
+```text
+404
+400
+401
+403
+409
+422
+429
+500
+```
+
+Use meaningful error codes.
+
+---
+
+# 95. BUSINESS RULE ENGINE
+
+Where possible, keep business rules in services rather than routes.
+
+Example:
+
+```text
+PerformanceCycleService
+GoalService
+KPIService
+ReviewService
+FeedbackService
+CalibrationService
+TrainingService
+CertificationService
+SkillService
+CareerService
+EngagementService
+```
+
+Routes should remain thin.
+
+---
+
+# 96. DOMAIN SEPARATION
+
+Maintain clean separation:
+
+```text
+API
+ ↓
+Schema
+ ↓
+Service
+ ↓
+Repository
+ ↓
+Database
+```
+
+Do not put large business logic directly inside FastAPI routes.
+
+---
+
+# 97. FRONTEND ARCHITECTURE
+
+Prefer:
+
+```text
+pages/
+components/
+features/
+services/
+hooks/
+types/
+utils/
+```
+
+Use feature-based organization if that matches the existing project.
+
+Avoid giant components.
+
+---
+
+# 98. TYPESCRIPT TYPE SAFETY
+
+Do not use unnecessary:
+
+```typescript
+any
+```
+
+Create proper interfaces/types for:
+
+* Goals
+* Reviews
+* Ratings
+* Training
+* Skills
+* Surveys
+* Feedback
+* Career
+* Promotion
+
+---
+
+# 99. ACCESSIBILITY
+
+Ensure important UI supports:
+
+* Keyboard navigation
+* Labels
+* Focus management
+* Accessible forms
+* Screen-reader-friendly controls
+* Sufficient contrast
+* Error announcements
+
+---
+
+# 100. RESPONSIVE DESIGN
+
+Ensure the system works correctly on:
+
+```text
+Desktop
+Laptop
+Tablet
+Mobile
+```
+
+Tables should provide appropriate responsive behavior.
+
+---
+
+# 101. PERFORMANCE DASHBOARD OPTIMIZATION
+
+Dashboard endpoints should return aggregated data rather than unnecessary raw records.
+
+Use:
+
+```text
+COUNT
+AVG
+SUM
+GROUP BY
+date aggregation
+department aggregation
+```
+
+where appropriate.
+
+---
+
+# 102. DATA RETENTION
+
+Performance history is valuable HR data.
+
+Do not automatically delete:
+
+* Reviews
+* Ratings
+* Feedback
+* Goal history
+* Calibration records
+* PIP history
+* Training completion history
+
+Respect existing tenant retention policies if implemented.
+
+---
+
+# 103. SECURITY REVIEW
+
+Before completion perform a security review covering:
+
+```text
+Authentication
+Authorization
+Tenant isolation
+IDOR
+RBAC
+File access
+Anonymous feedback
+API exposure
+Input validation
+SQL injection protection
+XSS protection
+CSRF where applicable
+Rate limiting
+Sensitive logging
+```
+
+---
+
+# 104. PERFORMANCE REVIEW DATA PRIVACY
+
+Performance data is sensitive business data.
+
+Implement strict access rules.
+
+Employees should not automatically see:
+
+* Other employees' ratings
+* Manager private comments
+* HR-only notes
+* Calibration discussions
+* Confidential feedback
+
+unless explicitly configured.
+
+---
+
+# 105. NOTIFICATION PREFERENCES
+
+Where the existing system supports notification preferences, allow users to configure appropriate notification channels.
+
+Do not bypass the existing notification preference system.
+
+---
+
+# 106. EMAIL / IN-APP NOTIFICATIONS
+
+Use existing infrastructure for:
+
+```text
+Email
+In-app notifications
+Push notifications
+```
+
+Do not build another notification service.
+
+---
+
+# 107. OBSERVABILITY
+
+Add appropriate monitoring/logging hooks for:
+
+* Slow APIs
+* Background jobs
+* Failed notifications
+* Failed review submissions
+* Database errors
+* Large reports
+* Security violations
+
+---
+
+# 108. CODE QUALITY
+
+Follow the project's existing standards.
+
+Ensure:
+
+* Clean code
+* Type hints
+* Docstrings where appropriate
+* PEP 8
+* Formatting
+* Linting
+* Static analysis
+* No unnecessary duplication
+* No dead code
+
+---
+
+# 109. DO NOT CREATE DUPLICATE SYSTEMS
+
+Before creating anything, search the existing codebase.
+
+Examples:
+
+If an existing:
+
+```text
+ApprovalService
+NotificationService
+AuditService
+FileService
+EmployeeService
+DepartmentService
+RBACService
+TenantService
+PayrollService
+```
+
+exists, reuse it.
+
+Do not create:
+
+```text
+ApprovalServiceV2
+NotificationServiceV2
+TenantServiceV2
+```
+
+unless there is a compelling architectural reason.
+
+---
+
+# 110. BACKWARD COMPATIBILITY
+
+Phase 9 must not break:
+
+* Authentication
+* Employee management
+* Attendance
+* GPS attendance
+* Leave
+* Payroll
+* Expense
+* Loan
+* Existing APIs
+* Existing frontend pages
+
+Run the existing test suite after implementation.
+
+---
+
+# 111. REGRESSION TESTING
+
+Run:
+
+```text
+Phase 1 tests
+Phase 2 tests
+Phase 3 tests
+Phase 4 tests
+Phase 5 tests
+Phase 6 tests
+Phase 7 tests
+Phase 8 tests
+Phase 9 tests
+```
+
+Fix regressions before completion.
+
+---
+
+# 112. DOCKER / DEVELOPMENT ENVIRONMENT
+
+Ensure Phase 9 works with the existing:
+
+```text
+Docker
+Docker Compose
+PostgreSQL
+Redis
+Celery
+FastAPI
+React
+```
+
+Do not introduce unnecessary infrastructure.
+
+---
+
+# 113. CI/CD
+
+Ensure the existing CI/CD pipeline runs:
+
+```text
+Lint
+Type checking
+Unit tests
+API tests
+Integration tests
+Frontend tests
+Build
+Migration checks
+```
+
+Do not break existing GitLab/Jenkins workflows.
+
+---
+
+# 114. FINAL DATABASE VERIFICATION
+
+After migrations:
+
+Verify:
+
+```text
+Tables
+Indexes
+Foreign keys
+Constraints
+Triggers if used
+Tenant isolation
+Seed data
+Migration history
+```
+
+---
+
+# 115. FINAL API VERIFICATION
+
+Verify all Phase 9 endpoints through:
+
+* Automated tests
+* Swagger/OpenAPI
+* Integration tests
+
+Check:
+
+```text
+200
+201
+400
+401
+403
+404
+409
+422
+```
+
+where applicable.
+
+---
+
+# 116. FINAL UI VERIFICATION
+
+Verify:
+
+```text
+Login
+Dashboard
+Performance
+Goals
+Reviews
+Feedback
+Training
+Skills
+Career
+Engagement
+```
+
+Check both authorized and unauthorized access.
+
+---
+
+# 117. DEFINITION OF DONE
+
+Phase 9 is NOT complete until:
+
+### Backend
+
+* [ ] Performance cycle management implemented
+* [ ] Goal management implemented
+* [ ] KPI management implemented
+* [ ] KRA management implemented
+* [ ] OKR support implemented
+* [ ] Goal progress implemented
+* [ ] Competency management implemented
+* [ ] Rating system implemented
+* [ ] Self assessment implemented
+* [ ] Manager assessment implemented
+* [ ] Peer review implemented
+* [ ] 360 feedback implemented
+* [ ] Calibration implemented
+* [ ] Appraisal workflow implemented
+* [ ] PIP implemented
+* [ ] Development plans implemented
+* [ ] Training management implemented
+* [ ] Certification management implemented
+* [ ] Skill matrix implemented
+* [ ] Skill gap analysis implemented
+* [ ] Career development implemented
+* [ ] Promotion recommendations implemented
+* [ ] Salary revision recommendations implemented
+* [ ] Employee engagement implemented
+* [ ] Surveys implemented
+* [ ] Employee feedback implemented
+* [ ] Reports implemented
+* [ ] Notifications implemented
+* [ ] Audit logs implemented
+* [ ] Background jobs implemented
+
+### Database
+
+* [ ] PostgreSQL schema implemented
+* [ ] Migrations created
+* [ ] Foreign keys validated
+* [ ] Constraints validated
+* [ ] Indexes optimized
+* [ ] Tenant isolation verified
+
+### Security
+
+* [ ] RBAC verified
+* [ ] IDOR protection verified
+* [ ] Cross-tenant protection verified
+* [ ] Anonymous feedback protection verified
+* [ ] File security verified
+* [ ] Finalized review protection verified
+
+### Frontend
+
+* [ ] Employee dashboard
+* [ ] Manager dashboard
+* [ ] HR dashboard
+* [ ] Goal UI
+* [ ] Review UI
+* [ ] Feedback UI
+* [ ] Training UI
+* [ ] Skills UI
+* [ ] Career UI
+* [ ] Engagement UI
+* [ ] Responsive design
+* [ ] Accessibility
+
+### Testing
+
+* [ ] Unit tests
+* [ ] API tests
+* [ ] Integration tests
+* [ ] Security tests
+* [ ] RBAC tests
+* [ ] Tenant isolation tests
+* [ ] Database tests
+* [ ] Frontend tests
+* [ ] Regression tests
+
+### Documentation
+
+* [ ] README updated
+* [ ] API documentation updated
+* [ ] Database documentation updated
+* [ ] RBAC documentation updated
+* [ ] Performance calculation documented
+* [ ] Setup documentation updated
+
+---
+
+# 118. REQUIRED FINAL REPORT
+
+After implementation, provide a detailed final report containing:
+
+## 1. Repository Analysis
+
+Explain:
+
+* Existing architecture
+* Existing modules reused
+* Existing services reused
+
+## 2. Files Created
+
+List every new file.
+
+## 3. Files Modified
+
+List every modified file.
+
+## 4. Database Changes
+
+List:
+
+* Tables
+* Columns
+* Indexes
+* Constraints
+* Migrations
+
+## 5. API Changes
+
+List every endpoint.
+
+## 6. Frontend Changes
+
+List every new page/component.
+
+## 7. Business Logic
+
+Explain:
+
+* Goal calculation
+* Rating calculation
+* Review workflow
+* Calibration
+* Skill gap
+* Training
+* Engagement
+
+## 8. Security
+
+Explain:
+
+* RBAC
+* Tenant isolation
+* IDOR protection
+* Privacy
+* Anonymous feedback
+
+## 9. Testing
+
+Report:
+
+```text
+Total tests
+Passed
+Failed
+Skipped
+Coverage
+```
+
+## 10. Known Issues
+
+Clearly identify anything unfinished.
+
+Do not claim completion if functionality is incomplete.
+
+---
+
+# 119. CRITICAL DEVELOPMENT INSTRUCTION
+
+Do NOT start by generating random files.
+
+Follow this sequence:
+
+```text
+STEP 1
+Inspect repository
+
+↓
+
+STEP 2
+Understand existing architecture
+
+↓
+
+STEP 3
+Map existing Phase 1–8 functionality
+
+↓
+
+STEP 4
+Identify reusable services/components
+
+↓
+
+STEP 5
+Design Phase 9 database changes
+
+↓
+
+STEP 6
+Create migrations
+
+↓
+
+STEP 7
+Implement backend domain/services
+
+↓
+
+STEP 8
+Implement APIs
+
+↓
+
+STEP 9
+Implement frontend
+
+↓
+
+STEP 10
+Implement notifications/background jobs
+
+↓
+
+STEP 11
+Implement reports/analytics
+
+↓
+
+STEP 12
+Implement security
+
+↓
+
+STEP 13
+Write automated tests
+
+↓
+
+STEP 14
+Run complete regression suite
+
+↓
+
+STEP 15
+Fix all failures
+
+↓
+
+STEP 16
+Update documentation
+
+↓
+
+STEP 17
+Provide final implementation report
+```
+
+---
+
+# 120. MOST IMPORTANT RULE
+
+**INSPECT FIRST → UNDERSTAND SECOND → DESIGN THIRD → IMPLEMENT FOURTH → TEST FIFTH → REPORT LAST**
+
+Do not assume the repository structure.
+
+Do not recreate existing modules.
+
+Do not replace working code unnecessarily.
+
+Do not break Phase 1–8 functionality.
+
+Do not bypass existing:
+
+* Authentication
+* RBAC
+* Tenant isolation
+* Employee relationships
+* Approval workflows
+* Notification services
+* Audit logging
+* File storage
+* Database conventions
+* Frontend design system
+* CI/CD
+
+The objective is to make **AxonTimeHR Phase 9 production-ready, scalable, secure, maintainable, testable, and fully integrated with all previously completed phases.**
+
+---
+
+# END OF PHASE 9 DEVELOPMENT PROMPT
+
+This phase gives AxonTimeHR a strong **core HR/performance layer** and also creates the foundation for later AI-driven HR analytics. A logical next phase would be **Phase 10 — Advanced HR Analytics, Workforce Planning, Recruitment/ATS & AI-powered HR Intelligence**.

@@ -1,0 +1,3339 @@
+Yes. For **AxonTimeHR**, after Phase 7 (Payroll, Salary & Compensation), I recommend **Phase 8 = Expense, Reimbursement, Loan, Advance & Financial Employee Services**.
+
+This phase should integrate tightly with Payroll rather than creating another isolated financial system.
+
+Below is a detailed **copy-paste prompt** for your AI coding agent.
+
+# PHASE 8 — EXPENSE, REIMBURSEMENT, LOAN & ADVANCE MANAGEMENT
+
+# AXONTIMEHR — PRODUCTION-GRADE EMPLOYEE FINANCIAL SERVICES
+
+You are continuing development of **AxonTimeHR**, a modern, advanced, production-ready, multi-tenant **Attendance + HRMS SaaS platform**.
+
+This is NOT a new project.
+
+You must inspect the existing AxonTimeHR codebase and extend the architecture developed in Phases 1–7.
+
+---
+
+# 1. PHASE HISTORY
+
+The platform has been developed incrementally:
+
+```text
+PHASE 1
+Foundation
+```
+
+```text
+PHASE 2
+Authentication + Identity + RBAC
+```
+
+```text
+PHASE 3
+Organization + Employee Management
+```
+
+```text
+PHASE 4
+Attendance + Shift Management
+```
+
+```text
+PHASE 5
+GPS + Geofencing + Verified Attendance
+```
+
+```text
+PHASE 6
+Leave + Holiday + Regularization + Approval Workflow
+```
+
+```text
+PHASE 7
+Payroll + Salary + Compensation Management
+```
+
+Now implement:
+
+```text
+PHASE 8
+Expense + Reimbursement + Loan + Salary Advance Management
+```
+
+---
+
+# 2. PRIMARY OBJECTIVE
+
+Build a complete employee financial-services module that supports:
+
+```text
+Employee Expenses
+Travel Expenses
+Expense Claims
+Expense Categories
+Expense Policies
+Receipt Upload
+Expense Approval
+Expense Reimbursement
+Reimbursement Processing
+Employee Loans
+Salary Advances
+Loan Repayment
+Advance Recovery
+Financial Adjustments
+Payroll Integration
+Reports
+Audit
+Notifications
+```
+
+The module must be:
+
+```text
+Multi-tenant
+Secure
+Configurable
+Auditable
+Scalable
+Transaction-safe
+RBAC-controlled
+Payroll-integrated
+Extensible
+Production-ready
+```
+
+---
+
+# 3. IMPORTANT DEVELOPMENT RULE
+
+Before writing code:
+
+**INSPECT THE COMPLETE EXISTING AXONTIMEHR REPOSITORY.**
+
+Understand:
+
+```text
+Frontend architecture
+Backend architecture
+PostgreSQL schema
+Migration system
+Employee module
+Organization module
+Attendance
+Leave
+Holiday
+Approval workflow
+Payroll
+Salary
+RBAC
+Tenant isolation
+Audit logging
+File/document storage
+Notifications
+Redis
+Celery
+Docker
+Reporting
+Testing
+```
+
+Do not recreate existing functionality.
+
+Reuse existing:
+
+```text
+Employee
+Organization
+Department
+Branch
+Tenant
+User
+RBAC
+Approval Workflow
+Payroll
+Salary
+Audit
+Notification
+File Storage
+```
+
+where applicable.
+
+---
+
+# 4. ARCHITECTURAL PRINCIPLE
+
+Do NOT create separate approval engines.
+
+Use the existing reusable workflow engine from Phase 6.
+
+The architecture should be:
+
+```text
+Employee
+    |
+    +---- Expense
+    |
+    +---- Reimbursement
+    |
+    +---- Loan
+    |
+    +---- Salary Advance
+              |
+              ↓
+        Approval Workflow
+              |
+              ↓
+       Financial Processing
+              |
+              ↓
+           Payroll
+              |
+              ↓
+        Financial History
+```
+
+---
+
+# 5. MODULES TO IMPLEMENT
+
+Implement these modules:
+
+```text
+Expense Management
+Expense Categories
+Expense Policies
+Expense Claims
+Receipt Management
+Travel Expense
+Expense Approval
+Reimbursement
+Loan Management
+Salary Advance
+Loan Repayment
+Advance Recovery
+Payroll Integration
+Financial Adjustments
+Financial Reports
+Audit
+Notifications
+```
+
+---
+
+# 6. EXPENSE MANAGEMENT
+
+Employees should be able to create expenses.
+
+Examples:
+
+```text
+Travel
+Hotel
+Food
+Taxi
+Fuel
+Parking
+Internet
+Mobile
+Office Supplies
+Client Meeting
+Training
+Business Development
+Other
+```
+
+Do not hard-code categories.
+
+Categories must be configurable by tenant administrators.
+
+---
+
+# 7. EXPENSE MODEL
+
+Create an expense entity using existing database conventions.
+
+Potential fields:
+
+```text
+id
+tenant_id
+employee_id
+expense_category_id
+expense_date
+amount
+currency
+merchant
+description
+location
+payment_method
+receipt_file_id
+status
+submitted_at
+approved_at
+rejected_at
+created_at
+updated_at
+created_by
+updated_by
+```
+
+Use the existing ID strategy.
+
+---
+
+# 8. EXPENSE STATUS
+
+Implement a controlled state machine:
+
+```text
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+APPROVED
+REJECTED
+RETURNED
+REIMBURSEMENT_PENDING
+REIMBURSED
+CANCELLED
+```
+
+Invalid status transitions must be rejected.
+
+---
+
+# 9. EXPENSE LIFECYCLE
+
+Expected workflow:
+
+```text
+Employee
+   ↓
+Create Expense
+   ↓
+Attach Receipt
+   ↓
+Submit
+   ↓
+Manager/HR Review
+   ↓
+Approve
+   ↓
+Reimbursement Queue
+   ↓
+Payroll/Finance
+   ↓
+Reimbursed
+```
+
+Rejected:
+
+```text
+Submit
+ ↓
+Reject
+ ↓
+Employee receives reason
+```
+
+Returned:
+
+```text
+Review
+ ↓
+Return for correction
+ ↓
+Employee edits
+ ↓
+Resubmit
+```
+
+---
+
+# 10. EXPENSE CATEGORY MASTER
+
+Create configurable categories.
+
+Example:
+
+```text
+Travel
+Accommodation
+Meals
+Transportation
+Fuel
+Office Supplies
+Communication
+Training
+Client Entertainment
+Medical
+Miscellaneous
+```
+
+Fields:
+
+```text
+id
+tenant_id
+code
+name
+description
+max_amount
+requires_receipt
+requires_approval
+taxable
+status
+effective_from
+effective_to
+```
+
+---
+
+# 11. EXPENSE POLICY ENGINE
+
+Create configurable policies.
+
+Policies may define:
+
+```text
+Maximum claim amount
+Receipt requirement
+Daily limit
+Category limit
+Employee grade limit
+Department limit
+Location limit
+Currency
+Approval requirement
+```
+
+Example:
+
+```text
+Hotel:
+Maximum ₹5,000/day
+
+Meals:
+Maximum ₹1,000/day
+
+Taxi:
+Maximum ₹2,000/day
+```
+
+Do NOT hard-code these limits.
+
+---
+
+# 12. POLICY VIOLATIONS
+
+Detect:
+
+```text
+Exceeded category limit
+Missing receipt
+Duplicate expense
+Invalid date
+Invalid currency
+Exceeded daily limit
+Exceeded monthly limit
+```
+
+Classify:
+
+```text
+WARNING
+ERROR
+BLOCKING
+```
+
+---
+
+# 13. EXPENSE DUPLICATE DETECTION
+
+Detect potential duplicates using combinations such as:
+
+```text
+Employee
+Date
+Amount
+Merchant
+Category
+Receipt
+```
+
+Do not automatically reject legitimate expenses merely because they look similar.
+
+Mark them for review where appropriate.
+
+---
+
+# 14. RECEIPT MANAGEMENT
+
+Employees should be able to attach receipts.
+
+Support:
+
+```text
+PDF
+JPG
+JPEG
+PNG
+WEBP
+```
+
+Use existing file storage.
+
+Do NOT store large binary files directly in PostgreSQL unless the existing architecture explicitly requires it.
+
+Prefer:
+
+```text
+Object Storage
+File Metadata
+Secure Download
+```
+
+---
+
+# 15. RECEIPT SECURITY
+
+Receipts may contain sensitive information.
+
+Implement:
+
+```text
+Authenticated access
+Authorization checks
+Tenant isolation
+Signed/temporary URLs where supported
+Access logging
+```
+
+Never expose publicly accessible receipt URLs.
+
+---
+
+# 16. FILE VALIDATION
+
+Validate:
+
+```text
+File extension
+MIME type
+File size
+File signature
+```
+
+Do not trust the filename extension alone.
+
+Reject dangerous file types.
+
+---
+
+# 17. RECEIPT DOWNLOAD
+
+Only authorized users can access receipts.
+
+Employee:
+
+```text
+Own expense receipts
+```
+
+Manager:
+
+```text
+Receipts within authorized approval scope
+```
+
+HR/Finance:
+
+```text
+Authorized tenant scope
+```
+
+Prevent IDOR.
+
+---
+
+# 18. EXPENSE SUBMISSION
+
+Before submission validate:
+
+```text
+Category exists
+Employee exists
+Date valid
+Amount valid
+Currency valid
+Receipt requirement satisfied
+Policy satisfied
+Tenant matches
+```
+
+Never trust frontend validation alone.
+
+---
+
+# 19. EXPENSE DATE RULES
+
+Prevent inappropriate dates according to policy.
+
+Support configuration:
+
+```text
+Past-date allowance
+Future-date allowance
+Claim submission deadline
+```
+
+Example:
+
+```text
+Expense Date:
+01 Sep
+
+Submission:
+Within 30 days
+```
+
+---
+
+# 20. TRAVEL EXPENSE
+
+Create support for travel-related expenses.
+
+Potential fields:
+
+```text
+trip_id
+travel_from
+travel_to
+travel_start
+travel_end
+purpose
+client
+project
+```
+
+A future travel-management module should be able to integrate without redesigning expenses.
+
+---
+
+# 21. TRAVEL EXPENSE ITEMS
+
+A single trip may contain:
+
+```text
+Flight
+Train
+Taxi
+Hotel
+Food
+Parking
+Fuel
+Other
+```
+
+Use multiple expense items under a travel claim where appropriate.
+
+---
+
+# 22. EXPENSE CLAIM
+
+Create a claim-level abstraction.
+
+Example:
+
+```text
+Expense Claim #EXP-2026-0012
+
+Employee:
+John
+
+Trip:
+Delhi → Mumbai
+
+Expenses:
+Flight       ₹8,000
+Hotel        ₹5,000
+Taxi         ₹1,500
+Meals        ₹1,200
+
+Total:
+₹15,700
+```
+
+---
+
+# 23. EXPENSE CLAIM MODEL
+
+Potential:
+
+```text
+expense_claims
+expense_items
+```
+
+Claim:
+
+```text
+id
+tenant_id
+employee_id
+claim_number
+claim_date
+description
+total_amount
+currency
+status
+submitted_at
+approved_at
+reimbursed_at
+```
+
+Items:
+
+```text
+id
+claim_id
+category_id
+expense_date
+amount
+merchant
+description
+receipt_file_id
+```
+
+---
+
+# 24. CLAIM TOTAL
+
+The backend must calculate:
+
+```text
+Claim Total
+=
+SUM(Approved Expense Items)
+```
+
+Never trust a frontend-provided total.
+
+---
+
+# 25. PARTIAL APPROVAL
+
+Support:
+
+```text
+Submitted:
+₹20,000
+
+Approved:
+₹17,000
+
+Rejected:
+₹3,000
+```
+
+Each expense item must maintain its own approval result where required.
+
+---
+
+# 26. APPROVAL COMMENTS
+
+Approvers should be able to provide:
+
+```text
+Approval comment
+Rejection reason
+Return reason
+```
+
+Comments must be retained in history.
+
+---
+
+# 27. APPROVAL WORKFLOW
+
+Reuse Phase 6 workflow.
+
+Possible flow:
+
+```text
+Employee
+ ↓
+Manager
+ ↓
+Finance/HR
+ ↓
+Final Approval
+```
+
+The number of approval levels should be configurable.
+
+---
+
+# 28. APPROVAL RULES
+
+Allow workflow conditions based on:
+
+```text
+Amount
+Department
+Employee Grade
+Location
+Expense Category
+Manager
+Organization
+```
+
+Example:
+
+```text
+≤ ₹5,000
+Manager approval
+
+₹5,001–₹25,000
+Manager + Finance
+
+> ₹25,000
+Manager + Finance + HR/Admin
+```
+
+Do not hard-code these thresholds.
+
+---
+
+# 29. EXPENSE REIMBURSEMENT
+
+Approved expenses enter reimbursement.
+
+Statuses:
+
+```text
+PENDING
+PROCESSING
+PROCESSED
+FAILED
+REIMBURSED
+CANCELLED
+```
+
+---
+
+# 30. REIMBURSEMENT METHODS
+
+Prepare support for:
+
+```text
+PAYROLL
+BANK_TRANSFER
+MANUAL
+OTHER
+```
+
+Actual banking integration is NOT required unless explicitly requested.
+
+---
+
+# 31. PAYROLL INTEGRATION
+
+Integrate reimbursement with Phase 7.
+
+Example:
+
+```text
+Salary
++
+Approved Reimbursement
+-
+Deductions
+=
+Net Payable
+```
+
+However, reimbursement should remain separately identifiable from salary.
+
+Do NOT simply merge reimbursement into Basic/Gross salary.
+
+---
+
+# 32. PAYROLL LINE ITEM
+
+Create payroll integration using an explicit line item:
+
+```text
+REIMBURSEMENT
+```
+
+Example:
+
+```text
+Basic Salary       ₹40,000
+HRA                ₹16,000
+Other Earnings      ₹5,000
+---------------------------
+Gross               ₹61,000
+
+Expense Reimbursement
+                     ₹7,500
+
+Deductions           ₹6,000
+
+Net Payable         ₹62,500
+```
+
+The reimbursement amount must remain traceable.
+
+---
+
+# 33. REIMBURSEMENT TAXABILITY
+
+Prepare configuration:
+
+```text
+taxable
+non_taxable
+partially_taxable
+```
+
+Do not hard-code tax treatment.
+
+---
+
+# 34. REIMBURSEMENT SNAPSHOT
+
+Once reimbursement enters finalized payroll, preserve:
+
+```text
+Expense ID
+Claim ID
+Approved Amount
+Employee
+Payroll Period
+Policy
+Approval History
+```
+
+Historical payroll must not change if the expense record is later edited.
+
+---
+
+# 35. EXPENSE REVERSAL
+
+If an already reimbursed expense needs correction:
+
+Do NOT modify historical reimbursement directly.
+
+Use:
+
+```text
+Reversal
+Adjustment
+Recovery
+```
+
+and maintain audit history.
+
+---
+
+# 36. LOAN MANAGEMENT
+
+Implement employee loans.
+
+Examples:
+
+```text
+Personal Loan
+Emergency Loan
+Education Loan
+Vehicle Loan
+Other Employee Loan
+```
+
+Loan configuration should be tenant-specific.
+
+---
+
+# 37. LOAN MODEL
+
+Potential fields:
+
+```text
+id
+tenant_id
+employee_id
+loan_type_id
+loan_number
+principal_amount
+interest_rate
+interest_type
+tenure
+start_date
+end_date
+installment_frequency
+status
+approved_at
+disbursed_at
+created_at
+updated_at
+```
+
+---
+
+# 38. LOAN STATUS
+
+Implement:
+
+```text
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+APPROVED
+REJECTED
+DISBURSED
+ACTIVE
+PAUSED
+COMPLETED
+CANCELLED
+```
+
+---
+
+# 39. LOAN APPROVAL
+
+Reuse the existing approval engine.
+
+Workflow:
+
+```text
+Employee
+ ↓
+Loan Request
+ ↓
+Manager
+ ↓
+HR/Finance
+ ↓
+Approval
+ ↓
+Disbursement
+ ↓
+Active Loan
+```
+
+---
+
+# 40. LOAN ELIGIBILITY
+
+Prepare configurable rules:
+
+```text
+Minimum employment duration
+Maximum loan amount
+Salary multiple
+Existing loan restriction
+Department eligibility
+Employee status
+```
+
+Example:
+
+```text
+Maximum Loan
+=
+3 × Monthly Basic Salary
+```
+
+Do not hard-code the multiplier.
+
+---
+
+# 41. LOAN REPAYMENT
+
+Generate repayment schedules.
+
+Example:
+
+```text
+Principal:
+₹120,000
+
+Tenure:
+12 months
+
+Monthly Principal:
+₹10,000
+```
+
+If interest applies, calculate according to configured method.
+
+---
+
+# 42. INTEREST TYPES
+
+Prepare support for:
+
+```text
+NO_INTEREST
+FLAT
+REDUCING_BALANCE
+```
+
+If reducing-balance calculation is implemented, ensure the formula is tested extensively.
+
+---
+
+# 43. LOAN INSTALLMENT
+
+Each installment should track:
+
+```text
+installment_number
+due_date
+principal
+interest
+total
+paid_amount
+remaining_amount
+status
+```
+
+Statuses:
+
+```text
+PENDING
+PARTIALLY_PAID
+PAID
+OVERDUE
+WAIVED
+CANCELLED
+```
+
+---
+
+# 44. LOAN PAYROLL INTEGRATION
+
+Approved loan repayments can become payroll deductions.
+
+Example:
+
+```text
+Monthly Salary:
+₹70,000
+
+Loan Installment:
+₹10,000
+
+Other deductions:
+₹5,000
+
+Net:
+₹55,000
+```
+
+Payroll must identify:
+
+```text
+LOAN_REPAYMENT
+```
+
+separately.
+
+---
+
+# 45. LOAN BALANCE
+
+Maintain:
+
+```text
+Original Principal
+Paid Principal
+Remaining Principal
+Interest
+Paid Interest
+Remaining Interest
+Outstanding Balance
+```
+
+Do not derive historical balances only from mutable current configuration.
+
+---
+
+# 46. LOAN PREPAYMENT
+
+Prepare support for:
+
+```text
+Full Prepayment
+Partial Prepayment
+```
+
+Any applicable charges should be configurable.
+
+---
+
+# 47. LOAN PAUSE
+
+Support controlled pause:
+
+```text
+Loan
+ ↓
+Pause
+ ↓
+Reason
+ ↓
+Approval
+```
+
+Examples:
+
+```text
+Unpaid Leave
+Special Arrangement
+Management Approval
+```
+
+Do not automatically pause loans based on assumptions.
+
+---
+
+# 48. SALARY ADVANCE
+
+Implement short-term salary advances.
+
+Example:
+
+```text
+Employee requests:
+₹20,000
+
+Approved:
+₹20,000
+
+Recovery:
+₹5,000/month × 4 months
+```
+
+---
+
+# 49. ADVANCE MODEL
+
+Potential:
+
+```text
+id
+tenant_id
+employee_id
+amount
+reason
+request_date
+approved_amount
+recovery_start_date
+recovery_end_date
+status
+```
+
+---
+
+# 50. ADVANCE RECOVERY
+
+Generate recovery schedule.
+
+Example:
+
+```text
+Advance:
+₹20,000
+
+Month 1:
+₹5,000
+
+Month 2:
+₹5,000
+
+Month 3:
+₹5,000
+
+Month 4:
+₹5,000
+```
+
+Integrate with payroll.
+
+---
+
+# 51. ADVANCE PAYROLL DEDUCTION
+
+Use explicit line item:
+
+```text
+SALARY_ADVANCE_RECOVERY
+```
+
+Never mix it into generic deductions without traceability.
+
+---
+
+# 52. FINANCIAL LEDGER CONCEPT
+
+Create a traceable transaction history.
+
+Financial events:
+
+```text
+Expense Approved
+Expense Reimbursed
+Loan Disbursed
+Loan Repayment
+Salary Advance Disbursed
+Advance Recovery
+Adjustment
+Reversal
+```
+
+Each event should be traceable.
+
+---
+
+# 53. TRANSACTION MODEL
+
+If appropriate, create:
+
+```text
+employee_financial_transactions
+```
+
+Potential fields:
+
+```text
+id
+tenant_id
+employee_id
+transaction_type
+reference_type
+reference_id
+amount
+currency
+direction
+transaction_date
+description
+status
+created_at
+created_by
+```
+
+Use the existing financial architecture if one already exists.
+
+---
+
+# 54. TRANSACTION TYPES
+
+Examples:
+
+```text
+EXPENSE_REIMBURSEMENT
+LOAN_DISBURSEMENT
+LOAN_REPAYMENT
+SALARY_ADVANCE
+SALARY_ADVANCE_RECOVERY
+ADJUSTMENT
+REVERSAL
+```
+
+---
+
+# 55. FINANCIAL TRANSACTION IMMUTABILITY
+
+Financial history must not be silently rewritten.
+
+For finalized transactions use:
+
+```text
+Adjustment
+Reversal
+Correction
+```
+
+instead of destructive updates.
+
+---
+
+# 56. DOUBLE-ENTRY PREPARATION
+
+Do not implement a full accounting ledger unless required.
+
+However, design financial events so a future accounting module can consume:
+
+```text
+Transaction ID
+Employee
+Amount
+Currency
+Transaction Type
+Date
+Reference
+Department
+Cost Center
+```
+
+---
+
+# 57. COST CENTER
+
+Prepare optional support for:
+
+```text
+Cost Center
+Project
+Client
+Department
+Branch
+```
+
+Expenses may be allocated against them.
+
+---
+
+# 58. EXPENSE PROJECT ALLOCATION
+
+Support:
+
+```text
+Expense
+ ↓
+Project
+ ↓
+Cost Center
+```
+
+Do not require project information if the tenant does not use projects.
+
+---
+
+# 59. CURRENCY
+
+Support multi-currency expenses.
+
+Fields:
+
+```text
+expense_currency
+base_currency
+exchange_rate
+base_amount
+```
+
+Example:
+
+```text
+USD Expense:
+$100
+
+Exchange Rate:
+₹84
+
+Base Amount:
+₹8,400
+```
+
+Do not hard-code exchange rates.
+
+---
+
+# 60. EXCHANGE RATE SOURCE
+
+Prepare an interface:
+
+```text
+ExchangeRateService
+```
+
+Future integrations can provide rates.
+
+Do not make external API calls from the core calculation layer without abstraction.
+
+---
+
+# 61. ROUNDING
+
+Use:
+
+```text
+Decimal
+```
+
+for all financial calculations.
+
+PostgreSQL:
+
+```text
+NUMERIC
+```
+
+Do NOT use floating-point arithmetic for money.
+
+---
+
+# 62. EXPENSE LIMIT CALCULATION
+
+Use precise monetary calculations.
+
+Example:
+
+```text
+Claim = ₹5,999.75
+Limit = ₹6,000
+```
+
+This should not incorrectly fail due to floating-point precision.
+
+---
+
+# 63. EMPLOYEE FINANCIAL DASHBOARD
+
+Create an employee dashboard:
+
+```text
+Total Expenses
+Pending Claims
+Approved Claims
+Reimbursed
+Outstanding Loan
+Monthly Loan EMI
+Salary Advance Outstanding
+Recent Transactions
+```
+
+---
+
+# 64. HR/FINANCE DASHBOARD
+
+Show:
+
+```text
+Pending Expense Claims
+Pending Loan Requests
+Pending Advances
+Reimbursement Amount
+Outstanding Loans
+Outstanding Advances
+Monthly Reimbursements
+Loan Recovery
+Financial Exceptions
+```
+
+---
+
+# 65. EXPENSE LIST UI
+
+Create:
+
+```text
+Expenses
+```
+
+Columns:
+
+```text
+Claim Number
+Employee
+Date
+Category
+Amount
+Status
+Approval
+Reimbursement
+```
+
+Support:
+
+```text
+Search
+Filter
+Sort
+Pagination
+Export
+```
+
+---
+
+# 66. EXPENSE DETAIL UI
+
+Show:
+
+```text
+Employee
+Expense Date
+Category
+Merchant
+Amount
+Currency
+Receipt
+Description
+Policy Validation
+Approval History
+Reimbursement Status
+```
+
+---
+
+# 67. EXPENSE SUBMISSION UI
+
+Create a modern form:
+
+```text
+Category
+Expense Date
+Amount
+Currency
+Merchant
+Description
+Project
+Cost Center
+Receipt
+```
+
+Provide client-side validation, but perform final validation server-side.
+
+---
+
+# 68. LOAN UI
+
+Create:
+
+```text
+Loans
+Loan Requests
+Loan Details
+Repayment Schedule
+Loan History
+```
+
+Employee should see only their own loans.
+
+Authorized HR/Finance users can see appropriate organizational data.
+
+---
+
+# 69. LOAN REPAYMENT SCHEDULE UI
+
+Display:
+
+```text
+Installment
+Due Date
+Principal
+Interest
+Total
+Paid
+Outstanding
+Status
+```
+
+---
+
+# 70. SALARY ADVANCE UI
+
+Create:
+
+```text
+Salary Advance
+```
+
+Show:
+
+```text
+Requested Amount
+Approved Amount
+Recovery Amount
+Recovery Start
+Outstanding
+Status
+```
+
+---
+
+# 71. POLICY ADMIN UI
+
+Create:
+
+```text
+Expense Categories
+Expense Policies
+Loan Types
+Loan Policies
+Advance Policies
+```
+
+All configuration must be tenant scoped.
+
+---
+
+# 72. RBAC PERMISSIONS
+
+Add permissions such as:
+
+```text
+expense.view
+expense.create
+expense.update
+expense.submit
+expense.approve
+expense.reject
+expense.reimburse
+expense.cancel
+
+expense_policy.view
+expense_policy.create
+expense_policy.update
+
+loan.view
+loan.create
+loan.approve
+loan.reject
+loan.disburse
+loan.pause
+loan.close
+
+loan_repayment.view
+loan_repayment.process
+
+salary_advance.view
+salary_advance.create
+salary_advance.approve
+salary_advance.reject
+salary_advance.recover
+
+financial_transaction.view
+financial_report.view
+```
+
+Reuse existing RBAC architecture.
+
+---
+
+# 73. EMPLOYEE ACCESS
+
+Employee can:
+
+```text
+Create expense
+Edit draft expense
+Submit expense
+View own expenses
+View own reimbursements
+Create loan request
+View own loan
+View repayment schedule
+Create salary advance request
+View own advance
+```
+
+Employee cannot:
+
+```text
+Approve own expense
+Approve own loan
+Modify approved reimbursement
+View another employee's financial information
+```
+
+---
+
+# 74. MANAGER ACCESS
+
+Managers can see only employees within their authorization scope.
+
+They may:
+
+```text
+Review expenses
+Approve/reject expenses
+Review loan requests
+Approve/reject where authorized
+```
+
+---
+
+# 75. FINANCE/HR ACCESS
+
+Authorized finance/HR users may:
+
+```text
+Manage policies
+Process reimbursements
+Manage loans
+Manage advances
+Review financial reports
+Process recovery
+```
+
+subject to permissions.
+
+---
+
+# 76. TENANT ISOLATION
+
+Critical security tests:
+
+```text
+Tenant A
+   X
+Tenant B
+```
+
+Tenant A must never access:
+
+```text
+Expenses
+Receipts
+Loans
+Advances
+Reimbursements
+Financial Transactions
+Reports
+Policies
+```
+
+belonging to Tenant B.
+
+---
+
+# 77. IDOR PROTECTION
+
+Test attempts such as:
+
+```text
+GET /api/v1/expenses/{other_employee_expense}
+GET /api/v1/loans/{other_employee_loan}
+GET /api/v1/payslips/{other_employee_payslip}
+GET /api/v1/receipts/{other_receipt}
+```
+
+must enforce authorization.
+
+---
+
+# 78. MASS ASSIGNMENT PROTECTION
+
+Never allow clients to directly set:
+
+```text
+tenant_id
+approved_by
+approval_status
+reimbursement_status
+financial_status
+created_by
+```
+
+unless authorized and handled server-side.
+
+---
+
+# 79. AUDIT LOGGING
+
+Audit:
+
+```text
+Expense Created
+Expense Updated
+Expense Submitted
+Expense Approved
+Expense Rejected
+Expense Returned
+Expense Reimbursed
+
+Loan Created
+Loan Approved
+Loan Rejected
+Loan Disbursed
+Loan Paused
+Loan Repayment
+Loan Closed
+
+Advance Created
+Advance Approved
+Advance Disbursed
+Advance Recovery
+Advance Closed
+```
+
+---
+
+# 80. AUDIT DETAILS
+
+Store:
+
+```text
+Actor
+Action
+Entity
+Entity ID
+Timestamp
+Previous Status
+New Status
+Reason
+IP/device metadata where supported by existing audit architecture
+```
+
+Do not store unnecessary sensitive information.
+
+---
+
+# 81. NOTIFICATIONS
+
+Use the existing notification system.
+
+Events:
+
+```text
+Expense Submitted
+Expense Approved
+Expense Rejected
+Expense Returned
+Expense Reimbursed
+
+Loan Submitted
+Loan Approved
+Loan Rejected
+Loan Disbursed
+Loan Installment Due
+
+Advance Submitted
+Advance Approved
+Advance Recovered
+```
+
+---
+
+# 82. EMAIL NOTIFICATIONS
+
+Where appropriate:
+
+```text
+Expense Approved
+Expense Rejected
+Reimbursement Completed
+Loan Approved
+Loan Disbursed
+Advance Approved
+```
+
+Use secure authenticated links.
+
+Do not expose unnecessary financial information in email content.
+
+---
+
+# 83. BACKGROUND JOBS
+
+Use existing Celery infrastructure where available.
+
+Potential jobs:
+
+```text
+process_reimbursements
+generate_expense_reports
+generate_financial_reports
+process_loan_repayments
+process_advance_recoveries
+send_financial_notifications
+```
+
+Jobs must be:
+
+```text
+Idempotent
+Retry-safe
+Tenant-aware
+Auditable
+```
+
+---
+
+# 84. DUPLICATE JOB PROTECTION
+
+A retry must NOT:
+
+```text
+Reimburse twice
+Recover loan installment twice
+Recover advance twice
+Create duplicate transaction
+```
+
+Use idempotency keys and database constraints.
+
+---
+
+# 85. DATABASE TRANSACTIONS
+
+Financial operations must be transactional.
+
+Example:
+
+```text
+BEGIN
+
+Validate approval
+Validate amount
+Create financial transaction
+Create reimbursement record
+Update status
+Create audit record
+
+COMMIT
+```
+
+If any operation fails:
+
+```text
+ROLLBACK
+```
+
+---
+
+# 86. DATABASE TABLES
+
+Potential tables:
+
+```text
+expense_categories
+expense_policies
+expenses
+expense_claims
+expense_items
+expense_receipts
+expense_approvals
+reimbursements
+loan_types
+loan_policies
+employee_loans
+loan_installments
+salary_advances
+advance_recoveries
+employee_financial_transactions
+```
+
+Do not create duplicates if equivalent existing models already exist.
+
+---
+
+# 87. DATABASE CONSTRAINTS
+
+Use:
+
+```text
+Foreign Keys
+Unique Constraints
+Check Constraints
+Tenant Constraints
+Status Constraints
+Effective Date Constraints
+```
+
+Examples:
+
+```text
+amount > 0
+approved_amount >= 0
+approved_amount <= submitted_amount
+```
+
+where appropriate.
+
+---
+
+# 88. DATABASE INDEXES
+
+Index:
+
+```text
+tenant_id
+employee_id
+status
+expense_date
+claim_id
+loan_id
+advance_id
+created_at
+due_date
+```
+
+Composite indexes where useful:
+
+```text
+tenant_id + employee_id
+tenant_id + status
+tenant_id + expense_date
+tenant_id + due_date
+```
+
+Avoid unnecessary indexes.
+
+---
+
+# 89. API DESIGN
+
+Follow existing AxonTimeHR API conventions.
+
+Potential APIs:
+
+```text
+GET    /api/v1/expenses
+POST   /api/v1/expenses
+GET    /api/v1/expenses/{id}
+PUT    /api/v1/expenses/{id}
+POST   /api/v1/expenses/{id}/submit
+POST   /api/v1/expenses/{id}/approve
+POST   /api/v1/expenses/{id}/reject
+POST   /api/v1/expenses/{id}/return
+
+GET    /api/v1/expense-categories
+POST   /api/v1/expense-categories
+PUT    /api/v1/expense-categories/{id}
+
+GET    /api/v1/expense-policies
+POST   /api/v1/expense-policies
+PUT    /api/v1/expense-policies/{id}
+
+GET    /api/v1/reimbursements
+POST   /api/v1/reimbursements/{id}/process
+
+GET    /api/v1/loans
+POST   /api/v1/loans
+GET    /api/v1/loans/{id}
+POST   /api/v1/loans/{id}/submit
+POST   /api/v1/loans/{id}/approve
+POST   /api/v1/loans/{id}/reject
+POST   /api/v1/loans/{id}/disburse
+POST   /api/v1/loans/{id}/pause
+POST   /api/v1/loans/{id}/close
+
+GET    /api/v1/loans/{id}/schedule
+GET    /api/v1/loan-installments
+
+GET    /api/v1/salary-advances
+POST   /api/v1/salary-advances
+GET    /api/v1/salary-advances/{id}
+POST   /api/v1/salary-advances/{id}/approve
+POST   /api/v1/salary-advances/{id}/reject
+POST   /api/v1/salary-advances/{id}/disburse
+
+GET    /api/v1/financial-transactions
+GET    /api/v1/financial-reports
+```
+
+Adapt naming to the existing API style.
+
+---
+
+# 90. API PAGINATION
+
+Paginate:
+
+```text
+Expenses
+Claims
+Reimbursements
+Loans
+Installments
+Advances
+Transactions
+Reports
+```
+
+Never return unlimited financial records.
+
+---
+
+# 91. SERVER-SIDE FILTERING
+
+Support:
+
+```text
+Employee
+Department
+Branch
+Category
+Date Range
+Status
+Amount Range
+Project
+Cost Center
+```
+
+---
+
+# 92. API VALIDATION
+
+Validate:
+
+```text
+Amounts
+Dates
+Currencies
+Employee access
+Tenant access
+Statuses
+Approval rules
+Policy rules
+```
+
+Use Pydantic schemas or existing validation architecture.
+
+---
+
+# 93. FINANCIAL PRECISION
+
+All monetary calculations must use:
+
+```text
+Decimal
+```
+
+PostgreSQL:
+
+```text
+NUMERIC
+```
+
+Never:
+
+```text
+float
+```
+
+for financial values.
+
+---
+
+# 94. EXPENSE REPORTS
+
+Create:
+
+```text
+Expense Summary
+Expense by Employee
+Expense by Department
+Expense by Category
+Expense by Branch
+Expense by Project
+Expense by Cost Center
+Reimbursement Report
+```
+
+---
+
+# 95. LOAN REPORTS
+
+Create:
+
+```text
+Loan Summary
+Outstanding Loans
+Loan Disbursement
+Loan Recovery
+Overdue Installments
+Completed Loans
+Employee Loan Report
+```
+
+---
+
+# 96. ADVANCE REPORTS
+
+Create:
+
+```text
+Advance Summary
+Outstanding Advances
+Advance Recovery
+Advance History
+Employee Advance Report
+```
+
+---
+
+# 97. FINANCIAL DASHBOARD
+
+Show:
+
+```text
+Total Expense Claims
+Pending Claims
+Approved Claims
+Reimbursement Pending
+Monthly Reimbursement
+Outstanding Loan
+Loan Recovery
+Outstanding Advances
+Advance Recovery
+```
+
+Use efficient aggregation queries.
+
+---
+
+# 98. EXPORT
+
+Support:
+
+```text
+CSV
+Excel
+PDF
+```
+
+using the existing reporting/export architecture.
+
+---
+
+# 99. PAYROLL RECONCILIATION
+
+Before payroll finalization verify:
+
+```text
+Approved reimbursement
++
+Loan repayment
++
+Advance recovery
+```
+
+matches payroll line items.
+
+Example:
+
+```text
+Approved reimbursement:
+₹50,000
+
+Payroll reimbursement:
+₹50,000
+
+Difference:
+₹0
+```
+
+If difference exists:
+
+```text
+BLOCK PAYROLL FINALIZATION
+```
+
+or flag according to configured policy.
+
+---
+
+# 100. PAYROLL SNAPSHOT
+
+When payroll is locked, snapshot:
+
+```text
+Reimbursement
+Loan Repayment
+Advance Recovery
+Adjustment
+```
+
+Historical payroll must remain unchanged.
+
+---
+
+# 101. EMPLOYEE FINANCIAL SUMMARY
+
+Create an employee-level summary:
+
+```text
+Salary
+Expenses
+Reimbursements
+Loans
+Loan Outstanding
+Advances
+Advance Outstanding
+Financial Transactions
+```
+
+Respect RBAC.
+
+---
+
+# 102. PERFORMANCE
+
+Optimize for:
+
+```text
+1,000 employees
+5,000 employees
+10,000 employees
+```
+
+Avoid N+1 queries.
+
+Use:
+
+```text
+Prefetch
+Select related
+Batch queries
+Aggregations
+Indexes
+Background jobs
+```
+
+where appropriate.
+
+---
+
+# 103. CONCURRENCY TESTS
+
+Test:
+
+```text
+Two users approve same expense
+Two users process reimbursement
+Two workers process same reimbursement
+Two payroll workers recover same installment
+Loan installment processed twice
+Advance recovery processed twice
+```
+
+Only one valid financial transaction should be created.
+
+---
+
+# 104. IDEMPOTENCY
+
+Every financial processing operation should have an idempotency strategy.
+
+Examples:
+
+```text
+expense_id + reimbursement_id
+loan_id + installment_id
+advance_id + recovery_id
+```
+
+must not create duplicate financial transactions.
+
+---
+
+# 105. SECURITY TESTS
+
+Test:
+
+```text
+Cross-tenant expense access
+Cross-tenant receipt access
+Cross-tenant loan access
+Cross-tenant advance access
+Cross-tenant financial report access
+Employee accessing another employee
+Manager accessing unauthorized department
+Unauthorized reimbursement
+Unauthorized loan approval
+```
+
+---
+
+# 106. FILE SECURITY TESTS
+
+Test:
+
+```text
+Invalid file type
+Oversized file
+Fake extension
+Unauthorized download
+Cross-tenant download
+Deleted/missing file
+Expired signed URL
+```
+
+---
+
+# 107. EXPENSE CALCULATION TESTS
+
+Test:
+
+```text
+Single expense
+Multiple expenses
+Partial approval
+Policy limit
+Receipt required
+Receipt optional
+Duplicate detection
+Multi-currency
+Rounding
+```
+
+---
+
+# 108. LOAN TESTS
+
+Test:
+
+```text
+Loan creation
+Eligibility
+Approval
+Disbursement
+Schedule
+Principal
+Interest
+Repayment
+Partial payment
+Prepayment
+Pause
+Completion
+```
+
+---
+
+# 109. ADVANCE TESTS
+
+Test:
+
+```text
+Advance creation
+Approval
+Disbursement
+Recovery
+Partial recovery
+Full recovery
+Early recovery
+Cancellation
+Completion
+```
+
+---
+
+# 110. PAYROLL INTEGRATION TESTS
+
+Critical scenarios:
+
+```text
+Approved expense
+ ↓
+Payroll
+ ↓
+Reimbursement line item
+```
+
+and:
+
+```text
+Active loan
+ ↓
+Installment due
+ ↓
+Payroll
+ ↓
+Loan repayment deduction
+```
+
+and:
+
+```text
+Salary advance
+ ↓
+Recovery schedule
+ ↓
+Payroll
+ ↓
+Advance recovery deduction
+```
+
+---
+
+# 111. HISTORICAL DATA TEST
+
+Test:
+
+```text
+Payroll locked
+ ↓
+Expense edited
+ ↓
+Loan configuration changed
+ ↓
+Advance policy changed
+```
+
+Historical payroll must remain unchanged.
+
+---
+
+# 112. AUDIT TESTS
+
+Verify audit entries for:
+
+```text
+Expense submission
+Expense approval
+Expense rejection
+Reimbursement
+Loan approval
+Loan disbursement
+Loan repayment
+Advance approval
+Advance recovery
+Financial adjustment
+```
+
+---
+
+# 113. ERROR CODES
+
+Create stable errors:
+
+```text
+EXPENSE_NOT_FOUND
+EXPENSE_ALREADY_SUBMITTED
+EXPENSE_ALREADY_APPROVED
+EXPENSE_POLICY_VIOLATION
+RECEIPT_REQUIRED
+INVALID_RECEIPT
+DUPLICATE_EXPENSE
+REIMBURSEMENT_ALREADY_PROCESSED
+
+LOAN_NOT_FOUND
+LOAN_NOT_ELIGIBLE
+LOAN_ALREADY_APPROVED
+LOAN_ALREADY_DISBURSED
+LOAN_INSTALLMENT_ALREADY_PROCESSED
+
+ADVANCE_NOT_FOUND
+ADVANCE_ALREADY_APPROVED
+ADVANCE_ALREADY_DISBURSED
+ADVANCE_RECOVERY_ALREADY_PROCESSED
+
+FINANCIAL_TRANSACTION_DUPLICATE
+FINANCIAL_ACCESS_DENIED
+```
+
+---
+
+# 114. DOCUMENTATION
+
+Update:
+
+```text
+README
+Architecture Documentation
+Database Documentation
+API Documentation
+Expense Policy Documentation
+Loan Calculation Documentation
+Advance Recovery Documentation
+Payroll Integration Documentation
+RBAC Documentation
+Security Documentation
+Testing Documentation
+```
+
+---
+
+# 115. MIGRATIONS
+
+Create clean database migrations.
+
+Verify:
+
+```text
+Fresh database
+Existing database upgrade
+Migration rollback where supported
+Migration idempotency
+Indexes
+Constraints
+Foreign keys
+```
+
+Do not manually modify production tables outside the migration system.
+
+---
+
+# 116. SEED DATA
+
+Create safe development/demo data:
+
+```text
+Expense Categories
+Expense Policies
+Loan Types
+Loan Policies
+Sample Expenses
+Sample Loans
+Sample Advances
+```
+
+Never use real financial information.
+
+---
+
+# 117. FRONTEND ROUTES
+
+Add appropriate routes:
+
+```text
+/expenses
+/expenses/create
+/expenses/{id}
+
+/expense-policies
+/expense-categories
+
+/reimbursements
+
+/loans
+/loans/create
+/loans/{id}
+/loans/{id}/schedule
+
+/salary-advances
+/salary-advances/create
+/salary-advances/{id}
+
+/financial-transactions
+/financial-reports
+```
+
+Follow existing routing conventions.
+
+---
+
+# 118. FRONTEND UX
+
+Use existing AxonTimeHR design system.
+
+UI should be:
+
+```text
+Modern
+Professional
+Responsive
+Accessible
+Mobile-friendly
+Fast
+Consistent
+```
+
+Do not introduce a separate visual language.
+
+---
+
+# 119. FORM VALIDATION
+
+Client-side validation should provide immediate feedback.
+
+Validate:
+
+```text
+Required fields
+Amount
+Date
+File
+Currency
+Description
+```
+
+But server-side validation remains authoritative.
+
+---
+
+# 120. APPROVAL UI
+
+Approvers should see:
+
+```text
+Employee
+Claim
+Amount
+Policy violations
+Receipt
+Previous approval history
+Comments
+```
+
+Actions:
+
+```text
+Approve
+Reject
+Return
+```
+
+with confirmation for important actions.
+
+---
+
+# 121. FINANCIAL CONFIRMATIONS
+
+Require confirmation before:
+
+```text
+Approve large expense
+Disburse loan
+Disburse advance
+Process reimbursement
+Process recovery
+```
+
+Do not rely on confirmation alone for authorization.
+
+---
+
+# 122. NOTIFICATION CENTER
+
+Integrate financial events into the existing notification center.
+
+Examples:
+
+```text
+Expense approved
+Expense rejected
+Loan approved
+Loan installment due
+Advance approved
+Reimbursement processed
+```
+
+---
+
+# 123. EMPLOYEE SELF-SERVICE
+
+Employees must have a complete view of:
+
+```text
+My Expenses
+My Claims
+My Reimbursements
+My Loans
+My Loan Schedule
+My Advances
+My Financial Transactions
+```
+
+---
+
+# 124. MANAGER DASHBOARD
+
+Managers should see only authorized data:
+
+```text
+Pending Expense Approvals
+Pending Loan Approvals
+Pending Advance Approvals
+```
+
+---
+
+# 125. HR/FINANCE DASHBOARD
+
+Show:
+
+```text
+Total Pending Claims
+Reimbursement Liability
+Loan Outstanding
+Advance Outstanding
+Monthly Financial Cost
+Overdue Recoveries
+Financial Exceptions
+```
+
+---
+
+# 126. FINANCIAL RECONCILIATION
+
+Implement reconciliation checks:
+
+```text
+Approved Expense
+        ↓
+Reimbursement
+        ↓
+Payroll
+```
+
+and:
+
+```text
+Loan Schedule
+        ↓
+Payroll Deduction
+        ↓
+Loan Balance
+```
+
+and:
+
+```text
+Advance Schedule
+        ↓
+Payroll Recovery
+        ↓
+Advance Balance
+```
+
+Balances must reconcile exactly.
+
+---
+
+# 127. BALANCE VALIDATION
+
+For every loan:
+
+```text
+Original Amount
+-
+Principal Recovered
+=
+Outstanding Principal
+```
+
+For every advance:
+
+```text
+Approved Advance
+-
+Recovered Amount
+=
+Outstanding Advance
+```
+
+Use Decimal.
+
+---
+
+# 128. NO SILENT FINANCIAL CORRECTIONS
+
+Never silently adjust:
+
+```text
+Loan balance
+Advance balance
+Reimbursement
+Expense amount
+Financial transaction
+```
+
+Every correction must have:
+
+```text
+Reason
+Actor
+Timestamp
+Audit
+Reference
+```
+
+---
+
+# 129. PRODUCTION READINESS
+
+Before marking Phase 8 complete verify:
+
+```text
+Security
+Performance
+Data consistency
+Financial precision
+Tenant isolation
+RBAC
+Audit
+Concurrency
+Idempotency
+Background processing
+File security
+Payroll integration
+Historical immutability
+```
+
+---
+
+# 130. FINAL VALIDATION COMMANDS
+
+Run the complete project validation:
+
+```text
+1. Formatter
+2. Linter
+3. Type checking
+4. Migration validation
+5. Unit tests
+6. API tests
+7. Integration tests
+8. Database tests
+9. Security tests
+10. RBAC tests
+11. Tenant isolation tests
+12. File security tests
+13. Financial calculation tests
+14. Loan calculation tests
+15. Advance calculation tests
+16. Payroll integration tests
+17. Concurrency tests
+18. Idempotency tests
+19. Performance tests
+20. Frontend tests
+21. Production frontend build
+22. Docker build
+23. Docker startup
+24. OpenAPI validation
+25. Full regression suite
+```
+
+---
+
+# 131. DEFINITION OF DONE
+
+Phase 8 is complete only when:
+
+## EXPENSE
+
+```text
+Expense categories
+Expense policies
+Expense creation
+Expense submission
+Receipt upload
+Policy validation
+Approval
+Rejection
+Return
+Partial approval
+Reimbursement
+```
+
+are working.
+
+## LOAN
+
+```text
+Loan types
+Loan policies
+Loan request
+Eligibility
+Approval
+Disbursement
+Repayment schedule
+Repayment
+Prepayment
+Pause
+Completion
+```
+
+are working.
+
+## ADVANCE
+
+```text
+Advance request
+Approval
+Disbursement
+Recovery schedule
+Payroll recovery
+Completion
+```
+
+are working.
+
+## PAYROLL
+
+```text
+Reimbursement
+Loan repayment
+Advance recovery
+```
+
+are correctly integrated into Phase 7.
+
+## SECURITY
+
+```text
+RBAC
+Tenant isolation
+IDOR protection
+Receipt security
+Financial authorization
+Audit
+```
+
+are working.
+
+## FINANCIAL INTEGRITY
+
+```text
+Decimal calculations
+Transaction safety
+Idempotency
+Immutable historical records
+Reconciliation
+No duplicate processing
+```
+
+are working.
+
+---
+
+# 132. FINAL IMPLEMENTATION REPORT
+
+After development provide a detailed report containing:
+
+## Repository Analysis
+
+```text
+Existing modules reused
+Existing services reused
+Existing workflow reused
+Existing payroll integration
+```
+
+## Database
+
+```text
+New tables
+Modified tables
+Relationships
+Indexes
+Constraints
+Migrations
+```
+
+## Backend
+
+```text
+Models
+Schemas
+Services
+Repositories
+APIs
+Background jobs
+```
+
+## Frontend
+
+```text
+Pages
+Routes
+Components
+Forms
+Dashboards
+Reports
+```
+
+## Financial Logic
+
+Explain:
+
+```text
+Expense approval
+Reimbursement
+Loan calculation
+Loan repayment
+Advance recovery
+Payroll integration
+```
+
+## Security
+
+Explain:
+
+```text
+Tenant isolation
+RBAC
+IDOR protection
+Receipt security
+Financial authorization
+```
+
+## Testing
+
+Report:
+
+```text
+Total tests
+Passed
+Failed
+Skipped
+Coverage
+```
+
+## Performance
+
+Report:
+
+```text
+Query optimization
+Processing time
+Background jobs
+Large dataset performance
+```
+
+## Known Issues
+
+Clearly list:
+
+```text
+Incomplete features
+Future integrations
+Known limitations
+```
+
+Never hide unresolved issues.
+
+---
+
+# 133. CRITICAL DEVELOPMENT PRINCIPLE
+
+Do NOT build Phase 8 as a simple CRUD module.
+
+This is a **financial transaction subsystem**.
+
+Every important operation must have:
+
+```text
+Validation
+Authorization
+Approval
+Transaction safety
+Audit
+Idempotency
+Historical traceability
+Payroll integration
+```
+
+---
+
+# 134. FUTURE EXTENSIBILITY
+
+Design Phase 8 so future AxonTimeHR modules can integrate cleanly:
+
+```text
+Travel Management
+Expense Cards
+Corporate Cards
+Accounting
+General Ledger
+Bank Payments
+Tax
+Full Statutory Compliance
+Project Costing
+Client Billing
+Budget Management
+Cost Center Accounting
+Financial Analytics
+```
+
+Do not tightly couple the current implementation to only one reimbursement method.
+
+---
+
+# FINAL INSTRUCTION TO THE AI CODING AGENT
+
+**Inspect first. Implement second.**
+
+Do not rewrite working Phase 1–7 modules.
+
+Do not duplicate:
+
+```text
+Authentication
+RBAC
+Tenant
+Employee
+Approval
+Payroll
+Salary
+Audit
+Notification
+File Storage
+```
+
+systems.
+
+Reuse the existing AxonTimeHR architecture.
+
+Implement Phase 8 incrementally:
+
+```text
+1. Repository analysis
+2. Architecture design
+3. Expense category master
+4. Expense policy engine
+5. Expense creation
+6. Receipt management
+7. Expense claims
+8. Approval integration
+9. Reimbursement
+10. Payroll integration
+11. Loan types
+12. Loan policies
+13. Loan requests
+14. Loan eligibility
+15. Loan approval
+16. Loan disbursement
+17. Loan repayment schedule
+18. Loan payroll deduction
+19. Salary advances
+20. Advance recovery
+21. Financial transaction history
+22. Financial dashboards
+23. Reports
+24. Notifications
+25. Background jobs
+26. Security
+27. Audit
+28. Concurrency protection
+29. Idempotency
+30. Reconciliation
+31. Testing
+32. Performance optimization
+33. Documentation
+34. Full regression
+```
+
+After every major component:
+
+```text
+Implement
+   ↓
+Run tests
+   ↓
+Fix failures
+   ↓
+Validate database
+   ↓
+Validate financial calculations
+   ↓
+Validate authorization
+   ↓
+Validate tenant isolation
+   ↓
+Validate payroll integration
+   ↓
+Run regression
+   ↓
+Continue
+```
+
+The final Phase 8 implementation must be:
+
+**production-ready, secure, multi-tenant, financially accurate, auditable, configurable, scalable, payroll-integrated, and extensible.**
+
+Most importantly:
+
+**Never directly rewrite finalized financial transactions. Use immutable transaction records, adjustments, reversals, approvals, and audit trails so AxonTimeHR maintains a trustworthy financial history.**
+
+**Recommended next phase:** after Phase 8, Phase 9 should focus on **advanced HR operations—Performance Management, Goals/KPIs, Appraisals, 360° Feedback, Training/Learning and Employee Engagement**, which will make AxonTimeHR much closer to a complete enterprise HRMS.

@@ -1,0 +1,1479 @@
+Absolutely. Since **Phase 1 (Foundation)** and **Phase 2 (Authentication & Identity)** are completed, Phase 3 should build the **core organization/employee HRMS foundation** on top of them rather than recreating authentication or the database foundation.
+
+Below is a copy-paste-ready prompt you can give to your coding AI/IDE.
+
+# PHASE 3 — ORGANIZATION & EMPLOYEE MANAGEMENT DEVELOPMENT
+
+## AXONTIMEHR — CORE HRMS MASTER DATA & EMPLOYEE MANAGEMENT
+
+---
+
+# 1. CONTEXT
+
+You are continuing development of **AxonTimeHR**, a modern, production-ready, multi-tenant **Attendance + HRMS SaaS platform**.
+
+The final product is intended to support:
+
+* Multiple companies/tenants
+* Organizations and branches
+* Employees
+* Departments
+* Designations
+* Locations
+* Reporting hierarchy
+* Attendance
+* Shifts
+* GPS/geofencing
+* Selfie verification architecture
+* Leave management
+* Holidays
+* Regularization
+* Overtime
+* Comp-off
+* Approval workflows
+* Payroll preparation
+* Reports and analytics
+* Notifications
+* Audit logs
+* REST APIs
+* Webhooks
+* Subscription and entitlement management
+* Mobile applications
+* Future AI capabilities
+
+The platform must be:
+
+* Production-ready
+* Multi-tenant
+* Secure
+* Scalable
+* API-first
+* Mobile-ready
+* Cloud-ready
+* Testable
+* Maintainable
+
+Target scale:
+
+> 1 to 1,000+ companies with potentially thousands of employees per company.
+
+---
+
+# 2. PREVIOUS PHASES
+
+## PHASE 1 — FOUNDATION
+
+Phase 1 has already been completed.
+
+It established the basic application architecture, project structure, database foundation, configuration, environment handling, API foundation, and other base infrastructure.
+
+## PHASE 2 — AUTHENTICATION & IDENTITY
+
+Phase 2 has already been completed.
+
+It established the authentication and identity foundation including:
+
+* User authentication
+* Password/security handling
+* JWT/token architecture
+* Identity management
+* Role/permission foundation
+* Tenant-aware authentication
+* Protected APIs
+* Authentication-related database structures
+* Security middleware/dependencies
+* Authentication testing
+
+### IMPORTANT
+
+Do NOT rebuild Phase 1 or Phase 2.
+
+Do NOT create duplicate authentication systems.
+
+Do NOT replace the existing architecture unless there is a genuine production-critical problem.
+
+First inspect the existing implementation and integrate Phase 3 into it.
+
+---
+
+# 3. PHASE 3 OBJECTIVE
+
+The objective of Phase 3 is to build the **Organization, Employee and HR Master Data Management layer**.
+
+This phase should create the foundation required by future modules such as:
+
+* Attendance
+* Leave
+* Shift
+* Payroll
+* Reports
+* Notifications
+* Employee self-service
+* Mobile application
+
+Phase 3 must establish a clean and scalable relationship between:
+
+```text
+Tenant
+   ↓
+Organization
+   ↓
+Branch
+   ↓
+Department
+   ↓
+Designation
+   ↓
+Employee
+   ↓
+User Account
+```
+
+The architecture must support employees who may or may not have application login accounts.
+
+---
+
+# 4. FIRST STEP — INSPECT EXISTING CODE
+
+Before writing code:
+
+1. Inspect the complete existing repository.
+2. Understand the current folder structure.
+3. Inspect Phase 1 implementation.
+4. Inspect Phase 2 implementation.
+5. Inspect existing database models.
+6. Inspect existing migrations.
+7. Inspect authentication dependencies.
+8. Inspect tenant identification logic.
+9. Inspect RBAC implementation.
+10. Inspect existing API conventions.
+11. Inspect existing error-handling patterns.
+12. Inspect existing testing structure.
+13. Inspect existing configuration/environment files.
+
+Do not blindly create new files.
+
+Reuse existing architecture wherever appropriate.
+
+Before implementation, provide a short analysis containing:
+
+* Existing architecture
+* Existing database structure
+* Existing authentication flow
+* Existing tenant isolation mechanism
+* Existing RBAC mechanism
+* Existing API patterns
+* Existing testing approach
+* Files that will be modified
+* New files that will be created
+* Potential conflicts with previous phases
+
+Then begin implementation.
+
+---
+
+# 5. MULTI-TENANCY REQUIREMENT
+
+Every organization-level HRMS record must belong to the correct tenant.
+
+Tenant isolation is mandatory.
+
+A user from:
+
+```text
+Tenant A
+```
+
+must NEVER be able to access:
+
+```text
+Tenant B
+```
+
+data through:
+
+* API
+* URL parameters
+* request body
+* query parameters
+* database queries
+* employee IDs
+* department IDs
+* branch IDs
+* UUID manipulation
+* pagination
+* search
+* filtering
+* sorting
+* bulk operations
+
+Never trust tenant IDs supplied by the client.
+
+Determine tenant context from the authenticated identity/current session according to the architecture established in Phase 2.
+
+All queries must enforce tenant boundaries.
+
+---
+
+# 6. CORE MASTER DATA
+
+Implement the following modules.
+
+## 6.1 Organization
+
+Create organization/company management.
+
+Organization fields should include appropriate fields such as:
+
+* id
+* tenant_id
+* organization_code
+* legal_name
+* display_name
+* email
+* phone
+* website
+* address
+* city
+* state
+* country
+* postal_code
+* timezone
+* currency
+* date_format
+* fiscal_year_start
+* status
+* created_at
+* updated_at
+* created_by
+* updated_by
+
+Do not blindly use these exact fields if the existing architecture has equivalent fields.
+
+Avoid duplication.
+
+---
+
+# 7. BRANCH MANAGEMENT
+
+Implement branches/office locations.
+
+A branch should support:
+
+* id
+* tenant_id
+* organization_id
+* branch_code
+* branch_name
+* address
+* city
+* state
+* country
+* postal_code
+* latitude
+* longitude
+* timezone
+* contact information
+* status
+* created_at
+* updated_at
+
+Prepare the model so future attendance geofencing can use branch/location information.
+
+Do not implement the complete attendance engine in this phase.
+
+---
+
+# 8. DEPARTMENT MANAGEMENT
+
+Implement departments.
+
+Example:
+
+```text
+Engineering
+QA
+HR
+Finance
+Operations
+Sales
+Administration
+```
+
+Requirements:
+
+* Unique department code within tenant
+* Department name
+* Description
+* Status
+* Branch/organization relationship where appropriate
+* Audit fields
+* Tenant isolation
+
+Support future department hierarchy where practical.
+
+---
+
+# 9. DESIGNATION MANAGEMENT
+
+Implement designation/job-title management.
+
+Example:
+
+```text
+Software Engineer
+Senior Software Engineer
+QA Engineer
+Automation Engineer
+HR Manager
+Finance Manager
+Team Lead
+Project Manager
+```
+
+Fields should support:
+
+* id
+* tenant_id
+* designation_code
+* designation_name
+* description
+* level/grade
+* status
+* audit fields
+
+Design the model so future payroll and reporting modules can use designation levels.
+
+---
+
+# 10. EMPLOYEE MANAGEMENT
+
+This is the most important component of Phase 3.
+
+Create a production-ready employee module.
+
+Employee should support information such as:
+
+### Identity
+
+* employee_id
+* employee_code
+* first_name
+* middle_name
+* last_name
+* display_name
+* gender where legally/business appropriate
+* date_of_birth
+* profile_photo reference
+
+### Contact
+
+* personal_email
+* work_email
+* personal_phone
+* emergency contact reference
+
+### Employment
+
+* date_of_joining
+* date_of_confirmation
+* date_of_leaving
+* employment_status
+* employment_type
+* employee_category
+* department
+* designation
+* branch
+* reporting_manager
+* HR owner where applicable
+
+### Work information
+
+* employee_code
+* work_email
+* branch
+* department
+* designation
+* manager
+* shift assignment reference for future use
+
+### Address
+
+Support structured address information.
+
+### Audit
+
+Include:
+
+* created_at
+* updated_at
+* created_by
+* updated_by
+
+Do not store unnecessary sensitive information.
+
+---
+
+# 11. EMPLOYEE STATUS
+
+Create a controlled employee lifecycle.
+
+Example statuses:
+
+```text
+ACTIVE
+PROBATION
+ON_NOTICE
+ON_LEAVE
+SUSPENDED
+INACTIVE
+TERMINATED
+RESIGNED
+RETIRED
+```
+
+Use an enum or controlled reference system consistent with the existing architecture.
+
+Do not allow arbitrary status strings.
+
+---
+
+# 12. EMPLOYMENT TYPE
+
+Support:
+
+```text
+FULL_TIME
+PART_TIME
+CONTRACT
+INTERN
+CONSULTANT
+TEMPORARY
+```
+
+Keep this extensible.
+
+---
+
+# 13. EMPLOYEE ↔ USER ACCOUNT
+
+An employee and a user account must NOT automatically be treated as the same entity.
+
+Design the relationship properly.
+
+Example:
+
+```text
+Employee
+   │
+   └── optional User Account
+```
+
+Possible scenarios:
+
+### Employee with login
+
+```text
+Employee
+   ↓
+User
+   ↓
+Role
+```
+
+### Employee without login
+
+```text
+Employee
+   ↓
+No User Account
+```
+
+The system must support both.
+
+Prevent accidental duplicate accounts.
+
+---
+
+# 14. REPORTING HIERARCHY
+
+Implement employee-manager relationships.
+
+Example:
+
+```text
+CEO
+ ├── HR Manager
+ │    ├── HR Executive
+ │    └── Recruiter
+ │
+ └── Engineering Manager
+      ├── Team Lead
+      │    ├── Developer
+      │    └── QA
+      └── Team Lead
+```
+
+Requirements:
+
+* Employee can have a reporting manager.
+* Manager must belong to the same tenant.
+* Employee cannot report to themselves.
+* Prevent invalid hierarchy cycles.
+* Support future approval workflows.
+
+---
+
+# 15. EMPLOYEE DOCUMENT ARCHITECTURE
+
+Prepare an employee document module.
+
+Do NOT unnecessarily store large binary files directly in PostgreSQL.
+
+Create metadata architecture supporting:
+
+* document_id
+* employee_id
+* document_type
+* file_name
+* storage_key/reference
+* mime_type
+* file_size
+* uploaded_by
+* uploaded_at
+* verification_status
+* expiry_date where applicable
+
+Future storage may use:
+
+* S3
+* Azure Blob
+* Google Cloud Storage
+* local development storage
+
+The database should primarily store metadata/storage references.
+
+---
+
+# 16. PROFILE PHOTO ARCHITECTURE
+
+Prepare employee profile photo support.
+
+Do not implement biometric face recognition in Phase 3.
+
+Only establish:
+
+* photo metadata
+* secure storage reference
+* upload/update/delete architecture
+* authorization
+* tenant isolation
+
+Future attendance/selfie verification will extend this.
+
+---
+
+# 17. CRUD APIs
+
+Implement production-ready REST APIs.
+
+At minimum:
+
+```text
+Organizations
+Branches
+Departments
+Designations
+Employees
+Employee Documents
+```
+
+Use consistent API conventions.
+
+Example:
+
+```http
+GET    /api/v1/organizations
+POST   /api/v1/organizations
+GET    /api/v1/organizations/{id}
+PUT    /api/v1/organizations/{id}
+PATCH  /api/v1/organizations/{id}
+DELETE /api/v1/organizations/{id}
+```
+
+Similarly:
+
+```text
+/api/v1/branches
+/api/v1/departments
+/api/v1/designations
+/api/v1/employees
+```
+
+Follow the existing project's route conventions if different.
+
+---
+
+# 18. EMPLOYEE SEARCH
+
+Employee APIs must support scalable search.
+
+Support:
+
+* employee code
+* name
+* email
+* department
+* designation
+* branch
+* status
+* manager
+* employment type
+
+Example:
+
+```http
+GET /api/v1/employees?search=neeraj
+```
+
+Also support:
+
+```text
+pagination
+filtering
+sorting
+```
+
+Do not load thousands of employees into memory unnecessarily.
+
+Use database-level filtering and pagination.
+
+---
+
+# 19. PAGINATION
+
+Implement consistent pagination.
+
+Example:
+
+```text
+page
+page_size
+```
+
+or the project's existing pagination mechanism.
+
+Prevent excessive page sizes.
+
+Example maximum:
+
+```text
+page_size <= 100
+```
+
+Use the existing project's conventions if already established.
+
+Return metadata such as:
+
+```json
+{
+  "items": [],
+  "page": 1,
+  "page_size": 20,
+  "total": 200
+}
+```
+
+---
+
+# 20. RBAC
+
+Integrate Phase 2 RBAC.
+
+Example permissions:
+
+```text
+organization:view
+organization:create
+organization:update
+organization:delete
+
+branch:view
+branch:create
+branch:update
+branch:delete
+
+department:view
+department:create
+department:update
+department:delete
+
+designation:view
+designation:create
+designation:update
+designation:delete
+
+employee:view
+employee:create
+employee:update
+employee:delete
+employee:export
+```
+
+Do not hard-code authorization logic in controllers if Phase 2 already provides a reusable permission mechanism.
+
+Use the existing authorization architecture.
+
+---
+
+# 21. DATA VALIDATION
+
+Implement strong request validation.
+
+Validate:
+
+* required fields
+* email formats
+* phone formats where appropriate
+* date formats
+* invalid dates
+* employee codes
+* duplicate records
+* invalid department
+* invalid designation
+* invalid branch
+* invalid manager
+* cross-tenant references
+* inactive references where business rules prohibit them
+
+Return clean API errors.
+
+Never expose raw database exceptions to clients.
+
+---
+
+# 22. DATABASE DESIGN
+
+Use PostgreSQL.
+
+Create normalized relational models.
+
+Use:
+
+* UUID primary keys where established by Phase 1
+* foreign keys
+* indexes
+* unique constraints
+* check constraints where appropriate
+* timestamps
+* tenant-aware indexes
+
+Important uniqueness examples:
+
+```text
+employee_code + tenant_id
+department_code + tenant_id
+designation_code + tenant_id
+branch_code + tenant_id
+```
+
+Do NOT make these globally unique if they only need to be unique inside a tenant.
+
+---
+
+# 23. DATABASE INDEXING
+
+Add indexes for frequently queried fields.
+
+Especially:
+
+```text
+tenant_id
+employee_code
+work_email
+department_id
+designation_id
+branch_id
+manager_id
+employment_status
+created_at
+```
+
+Use composite indexes where justified.
+
+Do not blindly index every column.
+
+---
+
+# 24. SOFT DELETE
+
+Use soft-delete/archive behavior where business records should remain historically available.
+
+Do not physically delete important employee records simply because an employee leaves the company.
+
+For example:
+
+```text
+employee.status = TERMINATED
+```
+
+rather than deleting the employee.
+
+Future attendance/payroll/reporting systems must still be able to reference historical employees.
+
+---
+
+# 25. AUDIT LOGGING
+
+Integrate with the audit architecture from previous phases.
+
+Track important operations such as:
+
+```text
+Employee Created
+Employee Updated
+Employee Status Changed
+Employee Deleted/Archived
+Department Created
+Department Updated
+Branch Created
+Designation Updated
+```
+
+Record:
+
+* actor
+* tenant
+* action
+* entity
+* entity ID
+* timestamp
+* relevant metadata
+
+Never log passwords, tokens, secrets, or sensitive credentials.
+
+---
+
+# 26. API ERROR HANDLING
+
+Use a consistent error response.
+
+Example:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "EMPLOYEE_NOT_FOUND",
+    "message": "Employee was not found."
+  }
+}
+```
+
+Do not expose:
+
+* SQL errors
+* stack traces
+* internal paths
+* secrets
+* database details
+
+in production responses.
+
+---
+
+# 27. TRANSACTION MANAGEMENT
+
+Use proper database transactions.
+
+For operations involving multiple related records:
+
+```text
+Employee creation
++
+User account creation
++
+Role assignment
+```
+
+must either succeed consistently or roll back safely.
+
+Avoid partially-created records.
+
+---
+
+# 28. CONCURRENCY & DATA INTEGRITY
+
+Handle race conditions for:
+
+* duplicate employee codes
+* duplicate emails
+* duplicate department codes
+* duplicate branch codes
+* duplicate designations
+
+Database constraints must be the final protection layer.
+
+Application-level validation alone is insufficient.
+
+---
+
+# 29. TESTING
+
+Create comprehensive automated tests.
+
+Use pytest and the existing test architecture.
+
+Test:
+
+### Organization
+
+* create
+* read
+* update
+* archive/delete
+* duplicate handling
+
+### Branch
+
+* CRUD
+* tenant isolation
+* validation
+
+### Department
+
+* CRUD
+* duplicate prevention
+* tenant isolation
+
+### Designation
+
+* CRUD
+* duplicate prevention
+
+### Employee
+
+* create
+* read
+* update
+* archive
+* search
+* filtering
+* pagination
+* validation
+* manager relationship
+* status changes
+
+### Security
+
+Test that:
+
+```text
+Tenant A cannot access Tenant B data.
+```
+
+Test:
+
+* unauthorized access
+* insufficient permissions
+* cross-tenant IDs
+* manipulated request payloads
+* invalid foreign keys
+
+### Database
+
+Test:
+
+* unique constraints
+* foreign keys
+* transaction rollback
+* indexes where practical
+
+---
+
+# 30. API DOCUMENTATION
+
+Ensure FastAPI/OpenAPI documentation is correct.
+
+Every endpoint should have:
+
+* summary
+* description
+* request schema
+* response schema
+* authentication requirements
+* authorization requirements
+* error responses
+
+Avoid undocumented endpoints.
+
+---
+
+# 31. FRONTEND REQUIREMENTS
+
+If the Phase 1/2 frontend already exists, integrate Phase 3 into the existing UI architecture.
+
+Create:
+
+## Organization
+
+* Organization profile
+* Organization settings
+
+## Branches
+
+* Branch list
+* Add branch
+* Edit branch
+* Branch details
+
+## Departments
+
+* Department list
+* Add department
+* Edit department
+
+## Designations
+
+* Designation list
+* Add designation
+* Edit designation
+
+## Employees
+
+* Employee list
+* Search
+* Filters
+* Pagination
+* Add employee
+* Edit employee
+* Employee details
+* Employee status
+* Reporting manager
+* Documents
+* Profile photo
+
+Use reusable components.
+
+Do not create a completely separate UI architecture.
+
+---
+
+# 32. UI/UX REQUIREMENTS
+
+The UI must be modern and professional.
+
+Follow the existing design system.
+
+Provide:
+
+* loading states
+* empty states
+* validation messages
+* confirmation dialogs
+* success notifications
+* error notifications
+* responsive design
+* accessible forms
+* keyboard-friendly navigation
+
+Employee list should be suitable for large datasets.
+
+Do not load the entire employee database into the browser.
+
+---
+
+# 33. SECURITY REQUIREMENTS
+
+Follow secure development practices.
+
+Never:
+
+* trust tenant_id from client
+* trust user_id from client for ownership decisions
+* expose internal database IDs unnecessarily
+* expose secrets
+* log passwords
+* log JWT tokens
+* bypass RBAC
+* allow cross-tenant relationships
+* return unnecessary personal information
+
+Validate every object reference against the current tenant.
+
+---
+
+# 34. PERFORMANCE REQUIREMENTS
+
+Design for:
+
+```text
+1,000+ companies
+10,000+ employees per large tenant
+millions of historical attendance records in future phases
+```
+
+Avoid:
+
+* N+1 queries
+* unnecessary joins
+* loading entire tables
+* unbounded API responses
+* inefficient Python-side filtering
+
+Use:
+
+* pagination
+* database filtering
+* proper indexes
+* efficient ORM queries
+* eager/selective loading where appropriate
+
+---
+
+# 35. MIGRATIONS
+
+Create proper PostgreSQL migrations using the project's existing migration system.
+
+Do not manually modify production databases.
+
+Migration requirements:
+
+* forward migration
+* rollback where supported
+* foreign keys
+* indexes
+* constraints
+
+Verify migrations on a clean database.
+
+---
+
+# 36. SEED DATA
+
+Create safe development/demo seed data where the existing project supports seeding.
+
+Example:
+
+```text
+Demo Organization
+Demo Branch
+Engineering
+QA
+HR
+Finance
+Sample Designations
+Sample Employees
+```
+
+Never put real credentials or sensitive data in seed files.
+
+---
+
+# 37. LOGGING
+
+Use the project's existing logging system.
+
+Log:
+
+* API requests where appropriate
+* important business operations
+* errors
+* database failures
+
+Do NOT log:
+
+* passwords
+* JWT tokens
+* secrets
+* sensitive personal data unnecessarily
+
+---
+
+# 38. CODE QUALITY
+
+Follow the project's existing standards.
+
+Use:
+
+* type hints
+* clear naming
+* small reusable functions
+* service layer where appropriate
+* repository/data-access patterns where already established
+* Pydantic schemas
+* proper dependency injection
+* meaningful exceptions
+
+Avoid:
+
+* duplicated code
+* huge controller functions
+* business logic inside route handlers
+* hard-coded values
+* magic strings
+* unnecessary abstractions
+
+---
+
+# 39. ARCHITECTURE TARGET
+
+Maintain a clean architecture similar to:
+
+```text
+Frontend
+   ↓
+API Layer
+   ↓
+Authentication / Authorization
+   ↓
+Service Layer
+   ↓
+Repository / Data Access
+   ↓
+PostgreSQL
+```
+
+Supporting components:
+
+```text
+Redis
+Celery
+Object Storage
+Audit Logging
+Notification System
+```
+
+Do not prematurely implement future modules.
+
+Only create integration points where necessary.
+
+---
+
+# 40. DO NOT IMPLEMENT IN PHASE 3
+
+Do NOT fully implement:
+
+* Attendance engine
+* Check-in/check-out
+* GPS attendance
+* Geofencing engine
+* Selfie verification
+* Face recognition
+* Shift engine
+* Leave engine
+* Payroll engine
+* Salary calculation
+* Advanced analytics
+* AI features
+* Subscription billing
+
+Those will be implemented in later phases.
+
+However, design Phase 3 entities so these future modules can integrate cleanly.
+
+---
+
+# 41. EXPECTED DATABASE RELATIONSHIP
+
+The approximate relationship should be:
+
+```text
+Tenant
+  │
+  └── Organization
+        │
+        ├── Branch
+        │
+        ├── Department
+        │
+        ├── Designation
+        │
+        └── Employee
+              │
+              ├── User Account (optional)
+              ├── Manager
+              ├── Documents
+              └── Profile Photo Reference
+```
+
+The exact relationship must follow the existing Phase 1/2 architecture.
+
+---
+
+# 42. DEFINITION OF DONE
+
+Phase 3 is complete only when:
+
+### Backend
+
+* Organization APIs working
+* Branch APIs working
+* Department APIs working
+* Designation APIs working
+* Employee APIs working
+* Employee search working
+* Filtering working
+* Pagination working
+* Validation working
+* RBAC working
+* Tenant isolation working
+* Audit logging working
+* Error handling working
+* Database migrations working
+* API documentation working
+
+### Database
+
+* Proper relationships
+* Foreign keys
+* Unique constraints
+* Tenant-aware uniqueness
+* Required indexes
+* Migration verified
+* No duplicate/conflicting models
+
+### Frontend
+
+* Organization management
+* Branch management
+* Department management
+* Designation management
+* Employee management
+* Employee search/filter
+* Employee details
+* Proper loading/error/empty states
+* Responsive UI
+
+### Testing
+
+* Unit tests
+* API tests
+* Database tests
+* Authentication tests
+* Authorization tests
+* Tenant-isolation tests
+* Validation tests
+* CRUD tests
+* Pagination/filter tests
+
+All tests must pass.
+
+---
+
+# 43. FINAL VALIDATION
+
+After implementation:
+
+1. Run formatting.
+2. Run linting.
+3. Run type checking if configured.
+4. Run database migrations.
+5. Run backend tests.
+6. Run frontend tests if available.
+7. Run API integration tests.
+8. Verify OpenAPI documentation.
+9. Verify tenant isolation.
+10. Verify RBAC.
+11. Verify database constraints.
+12. Verify no N+1 queries in major employee endpoints.
+13. Verify application starts from a clean environment.
+14. Verify Phase 1 functionality still works.
+15. Verify Phase 2 authentication still works.
+
+Do not declare Phase 3 complete if existing Phase 1 or Phase 2 functionality has been broken.
+
+---
+
+# 44. FINAL REPORT
+
+After implementation, provide a concise development report containing:
+
+### Implemented
+
+List all completed components.
+
+### Database Changes
+
+List:
+
+* tables
+* relationships
+* indexes
+* constraints
+* migrations
+
+### APIs
+
+List all new endpoints.
+
+### Frontend
+
+List all new screens/components.
+
+### Security
+
+Explain:
+
+* tenant isolation
+* RBAC
+* validation
+* authorization
+
+### Testing
+
+Report:
+
+```text
+Total tests:
+Passed:
+Failed:
+Skipped:
+```
+
+### Files Changed
+
+Provide important modified/new files.
+
+### Known Issues
+
+List any remaining issues.
+
+### Next Recommended Phase
+
+At the end, explain what Phase 4 should implement based on the completed architecture.
+
+---
+
+# CRITICAL DEVELOPMENT RULE
+
+Do not simply generate code based on this prompt.
+
+**Inspect the existing AxonTimeHR codebase first.**
+
+Preserve Phase 1 and Phase 2 architecture.
+
+Reuse existing:
+
+* models
+* authentication
+* JWT handling
+* RBAC
+* tenant context
+* database session
+* configuration
+* exception handling
+* logging
+* testing utilities
+* frontend components
+* design system
+
+Only introduce new architecture when necessary.
+
+The goal is not just to make Phase 3 work.
+
+The goal is to build a **production-grade HRMS foundation that can safely support the future Attendance, Leave, Shift, Payroll, Reporting, Mobile and SaaS modules.**
+
+Do not take shortcuts that will create technical debt for later phases.
+
+This Phase 3 is deliberately focused on **Organization + Employee Master Data**, because those entities should exist before building the attendance/shift/leave engines that depend on them.

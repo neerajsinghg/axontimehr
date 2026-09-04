@@ -1,0 +1,3377 @@
+Absolutely. Since **Phase 1 is the foundation**, Phase 2 should focus strictly on building a **production-ready authentication system** without yet implementing Employee Management, Attendance, Leave, Payroll, etc.
+
+Below is a detailed implementation prompt you can give to an AI coding agent (Cursor, Antigravity, Claude Code, etc.). It is intentionally written in the same style as your Phase 1 prompt and preserves the architecture needed for the later **Multi-tenancy + RBAC** phase.
+
+# PHASE 2 — AUTHENTICATION DEVELOPMENT
+
+## Modern Attendance & HRMS SaaS Platform
+
+---
+
+# PART A — COMPLETE PRODUCT CONTEXT
+
+## 1. Understand the complete vision before coding
+
+You are building a **modern, advanced, production-ready Attendance + HRMS SaaS platform**.
+
+The final product will eventually support:
+
+```text
+Companies / Tenants
+        ↓
+Users
+        ↓
+Employees
+        ↓
+Attendance
+        ↓
+Leave
+        ↓
+Payroll
+        ↓
+Reports
+        ↓
+Analytics
+        ↓
+AI
+```
+
+The final platform must support multiple organizations:
+
+```text
+Company A
+Company B
+Company C
+...
+Company 1,000+
+```
+
+The platform must eventually provide:
+
+* Employee management
+* Department management
+* Designation management
+* Branch management
+* Location management
+* Attendance
+* GPS attendance
+* Geofencing
+* Selfie attendance
+* Shift management
+* Leave management
+* Holiday management
+* Overtime
+* Comp-off
+* Payroll
+* Reports
+* Notifications
+* RBAC
+* Audit logs
+* APIs
+* Webhooks
+* Mobile application
+* Subscription management
+* Analytics
+* AI HR assistant
+* Attendance anomaly detection
+
+---
+
+# 2. CURRENT DEVELOPMENT PHASE
+
+The project is being developed in phases:
+
+```text
+PHASE 1  → Foundation                  ✅ Completed
+PHASE 2  → Authentication              ← CURRENT
+PHASE 3  → Multi-tenancy + RBAC
+PHASE 4  → Employee Management
+PHASE 5  → Attendance Engine
+PHASE 6  → Shift + GPS + Geofencing
+PHASE 7  → Leave + Holiday
+PHASE 8  → Regularization + Overtime
+PHASE 9  → Reporting
+PHASE 10 → Notifications
+PHASE 11 → Mobile Application
+PHASE 12 → Payroll
+PHASE 13 → APIs + Webhooks
+PHASE 14 → Advanced Analytics
+PHASE 15 → AI Features
+```
+
+## VERY IMPORTANT
+
+You are authorized to implement **PHASE 2 — AUTHENTICATION ONLY**.
+
+Do not start Phase 3 automatically.
+
+Do not implement:
+
+```text
+Multi-tenancy
+RBAC
+Employee Management
+Attendance
+Leave
+Payroll
+GPS
+Geofencing
+Selfie Verification
+AI
+Subscriptions
+Advanced Analytics
+```
+
+Architectural preparation for these features is allowed, but actual business functionality belongs to later phases.
+
+---
+
+# PART B — PHASE 2 OBJECTIVE
+
+# 3. Main objective
+
+Build a **secure, scalable, production-ready authentication system** on top of the Phase 1 foundation.
+
+At the end of Phase 2, the system should support:
+
+```text
+User
+ │
+ ├── Register
+ │
+ ├── Login
+ │
+ ├── Access Token
+ │
+ ├── Refresh Token
+ │
+ ├── Logout
+ │
+ ├── Current User
+ │
+ ├── Password Hashing
+ │
+ ├── Password Change
+ │
+ ├── Password Reset
+ │
+ └── Email Verification
+```
+
+The architecture must be designed so that Phase 3 can add:
+
+```text
+Tenant
+ │
+ ├── User
+ │
+ ├── Roles
+ │
+ └── Permissions
+```
+
+without rewriting the authentication system.
+
+---
+
+# PART C — INSPECT EXISTING PHASE 1
+
+# 4. FIRST ACTION — INSPECT THE WORKSPACE
+
+Before modifying anything:
+
+1. Inspect the complete repository.
+2. Inspect the Phase 1 architecture.
+3. Inspect backend structure.
+4. Inspect frontend structure.
+5. Inspect SQLAlchemy configuration.
+6. Inspect Alembic configuration.
+7. Inspect Pydantic settings.
+8. Inspect Docker configuration.
+9. Inspect Redis configuration.
+10. Inspect Celery configuration.
+11. Inspect logging.
+12. Inspect request-ID middleware.
+13. Inspect API versioning.
+14. Inspect existing tests.
+15. Inspect existing documentation.
+16. Check whether any authentication-related code already exists.
+
+Do NOT blindly overwrite existing code.
+
+Do NOT delete Phase 1 functionality.
+
+Do NOT replace working infrastructure unnecessarily.
+
+Reuse the Phase 1 foundation wherever possible.
+
+---
+
+# PART D — AUTHENTICATION ARCHITECTURE
+
+# 5. Authentication architecture
+
+Use the following conceptual architecture:
+
+```text
+                    React Frontend
+                          │
+                          │ HTTPS
+                          ▼
+                       NGINX
+                          │
+                          ▼
+                       FastAPI
+                          │
+                ┌─────────┴─────────┐
+                │                   │
+                ▼                   ▼
+        Authentication         Authorization
+           Phase 2              Phase 3
+                │
+                ▼
+             Service
+                │
+                ▼
+           Repository
+                │
+                ▼
+           PostgreSQL
+```
+
+Authentication should be separated into:
+
+```text
+Authentication
+        ↓
+Who are you?
+
+Authorization
+        ↓
+What are you allowed to do?
+```
+
+Phase 2 implements authentication.
+
+Phase 3 will implement authorization/RBAC.
+
+---
+
+# 6. Authentication technology
+
+Use:
+
+```text
+FastAPI
+Pydantic
+SQLAlchemy
+PostgreSQL
+JWT
+Secure password hashing
+Redis
+```
+
+Recommended JWT implementation:
+
+```text
+python-jose
+```
+
+or another well-maintained JWT library compatible with the project.
+
+Password hashing should use a modern password hashing algorithm such as:
+
+```text
+Argon2
+```
+
+or an appropriately configured:
+
+```text
+bcrypt
+```
+
+Prefer Argon2 when practical.
+
+Never store passwords as plaintext.
+
+---
+
+# PART E — USER MODEL
+
+# 7. Create authentication user model
+
+Phase 2 may introduce the foundational `users` table.
+
+Create a proper SQLAlchemy model.
+
+Conceptually:
+
+```text
+users
+```
+
+Possible fields:
+
+```text
+id
+uuid
+email
+password_hash
+first_name
+last_name
+is_active
+is_verified
+is_locked
+failed_login_attempts
+last_login_at
+password_changed_at
+created_at
+updated_at
+```
+
+Do not add unnecessary employee-specific fields.
+
+Employee-specific information belongs to Phase 4.
+
+---
+
+# 8. User ID
+
+Use a scalable identifier strategy.
+
+Prefer:
+
+```text
+UUID
+```
+
+or another globally unique identifier.
+
+The architecture should work correctly when the platform contains:
+
+```text
+1 user
+10,000 users
+1,000,000+ users
+```
+
+Do not expose database implementation details unnecessarily.
+
+---
+
+# 9. Email uniqueness
+
+User email should have an appropriate unique constraint.
+
+Authentication should treat email consistently.
+
+For example:
+
+```text
+Neeraj@example.com
+neeraj@example.com
+```
+
+should not accidentally become two independent login identities if the application uses case-insensitive email identity.
+
+Implement appropriate normalization.
+
+---
+
+# 10. Password storage
+
+Never store:
+
+```text
+password
+```
+
+directly.
+
+Store:
+
+```text
+password_hash
+```
+
+Example conceptual flow:
+
+```text
+User password
+      ↓
+Password hasher
+      ↓
+Argon2/bcrypt
+      ↓
+password_hash
+      ↓
+PostgreSQL
+```
+
+At login:
+
+```text
+Entered password
+      ↓
+Password verifier
+      ↓
+Stored password hash
+      ↓
+Match / Reject
+```
+
+---
+
+# PART F — JWT ARCHITECTURE
+
+# 11. Token architecture
+
+Use two-token authentication:
+
+```text
+Access Token
+Refresh Token
+```
+
+Conceptual flow:
+
+```text
+Login
+  │
+  ├── Access Token
+  │
+  └── Refresh Token
+```
+
+Access tokens should be short-lived.
+
+Example configuration:
+
+```text
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+Refresh tokens should have a longer lifetime.
+
+Example:
+
+```text
+REFRESH_TOKEN_EXPIRE_DAYS=7
+```
+
+These must be configurable through environment variables.
+
+Do not hard-code expiration periods.
+
+---
+
+# 12. Access token
+
+The access token should contain only necessary claims.
+
+Potential claims:
+
+```text
+sub
+iat
+exp
+type
+jti
+```
+
+Example conceptual payload:
+
+```json
+{
+  "sub": "user-uuid",
+  "type": "access",
+  "jti": "token-id",
+  "iat": 1234567890,
+  "exp": 1234569690
+}
+```
+
+Do not put sensitive information into JWT payloads.
+
+Do not store:
+
+```text
+password
+password hash
+security answers
+private personal data
+```
+
+inside JWT claims.
+
+---
+
+# 13. Refresh token
+
+Refresh tokens must be handled more carefully than access tokens.
+
+Prefer a secure design where refresh tokens can be revoked.
+
+A recommended architecture is:
+
+```text
+Refresh Token
+      ↓
+hashed token / token identifier
+      ↓
+Redis or PostgreSQL
+      ↓
+Session / token record
+```
+
+Do not make refresh-token revocation impossible.
+
+---
+
+# 14. Token rotation
+
+Implement refresh-token rotation.
+
+Conceptually:
+
+```text
+Refresh Token A
+       ↓
+Refresh API
+       ↓
+Invalidate A
+       ↓
+Generate B
+       ↓
+Return new access + refresh token
+```
+
+If an old refresh token is reused after rotation, the system should be able to detect it and invalidate the corresponding session/token family.
+
+This is important for production security.
+
+---
+
+# 15. JWT secret
+
+Never hard-code:
+
+```text
+JWT_SECRET
+```
+
+Use environment configuration.
+
+Example:
+
+```text
+JWT_SECRET=
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+```
+
+If asymmetric signing is selected later, the configuration should allow migration to:
+
+```text
+RS256
+```
+
+or another appropriate algorithm.
+
+Do not expose secrets in logs.
+
+---
+
+# PART G — AUTHENTICATION API
+
+# 16. API versioning
+
+Continue using:
+
+```text
+/api/v1/
+```
+
+Authentication endpoints should be grouped under:
+
+```text
+/api/v1/auth/
+```
+
+---
+
+# 17. Authentication endpoints
+
+Create the following endpoints.
+
+### Registration
+
+```http
+POST /api/v1/auth/register
+```
+
+### Login
+
+```http
+POST /api/v1/auth/login
+```
+
+### Refresh token
+
+```http
+POST /api/v1/auth/refresh
+```
+
+### Logout
+
+```http
+POST /api/v1/auth/logout
+```
+
+### Current user
+
+```http
+GET /api/v1/auth/me
+```
+
+### Change password
+
+```http
+POST /api/v1/auth/change-password
+```
+
+### Forgot password
+
+```http
+POST /api/v1/auth/forgot-password
+```
+
+### Reset password
+
+```http
+POST /api/v1/auth/reset-password
+```
+
+### Verify email
+
+```http
+POST /api/v1/auth/verify-email
+```
+
+### Resend verification
+
+```http
+POST /api/v1/auth/resend-verification
+```
+
+Do not implement unrelated business APIs.
+
+---
+
+# PART H — REGISTRATION
+
+# 18. Registration flow
+
+Implement:
+
+```text
+POST /api/v1/auth/register
+```
+
+Expected flow:
+
+```text
+User submits
+email
+password
+first_name
+last_name
+        ↓
+Validate request
+        ↓
+Normalize email
+        ↓
+Check existing user
+        ↓
+Hash password
+        ↓
+Create user
+        ↓
+Create verification token
+        ↓
+Send verification email
+        ↓
+Return safe response
+```
+
+Do not automatically expose sensitive user information.
+
+---
+
+# 19. Registration validation
+
+Validate:
+
+```text
+Email
+Password
+First name
+Last name
+```
+
+Password policy should be configurable.
+
+At minimum enforce sensible security requirements.
+
+Consider:
+
+```text
+Minimum length
+Uppercase
+Lowercase
+Number
+Special character
+```
+
+Do not make the policy unnecessarily complex without a security reason.
+
+---
+
+# 20. Duplicate registration
+
+If email already exists, return an appropriate response.
+
+Avoid leaking unnecessary account existence information in security-sensitive flows such as password reset.
+
+For registration, a clear validation response may be appropriate.
+
+---
+
+# PART I — LOGIN
+
+# 21. Login API
+
+Implement:
+
+```http
+POST /api/v1/auth/login
+```
+
+Expected flow:
+
+```text
+Email
+Password
+   ↓
+Normalize email
+   ↓
+Find user
+   ↓
+Verify password
+   ↓
+Check active status
+   ↓
+Check lock status
+   ↓
+Update login metadata
+   ↓
+Generate access token
+   ↓
+Generate refresh token
+   ↓
+Return authentication response
+```
+
+---
+
+# 22. Login response
+
+Use a consistent response structure.
+
+For example:
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "access_token": "...",
+    "refresh_token": "...",
+    "token_type": "bearer",
+    "expires_in": 1800
+  }
+}
+```
+
+Do not return:
+
+```text
+password
+password_hash
+internal security information
+```
+
+---
+
+# 23. Failed login attempts
+
+Implement protection against repeated failed login attempts.
+
+Possible fields:
+
+```text
+failed_login_attempts
+is_locked
+locked_until
+```
+
+A configurable policy may be used.
+
+Example:
+
+```text
+MAX_LOGIN_ATTEMPTS=5
+LOCKOUT_DURATION_MINUTES=15
+```
+
+The exact policy should be configurable.
+
+---
+
+# 24. Timing/security considerations
+
+Authentication should avoid obvious user enumeration and timing weaknesses.
+
+For invalid credentials, use a generic response such as:
+
+```text
+Invalid email or password
+```
+
+Do not reveal whether:
+
+```text
+email exists
+password was incorrect
+account exists
+```
+
+when such information would create an enumeration risk.
+
+---
+
+# PART J — CURRENT USER
+
+# 25. `/auth/me`
+
+Implement:
+
+```http
+GET /api/v1/auth/me
+```
+
+The endpoint must require a valid access token.
+
+Flow:
+
+```text
+Authorization Header
+        ↓
+Bearer Token
+        ↓
+JWT Validation
+        ↓
+Extract User ID
+        ↓
+Load User
+        ↓
+Return User
+```
+
+---
+
+# 26. Authentication dependency
+
+Create reusable FastAPI dependencies.
+
+For example:
+
+```text
+get_current_user()
+```
+
+Future phases should be able to use:
+
+```text
+get_current_user()
+```
+
+without duplicating JWT validation.
+
+Possible architecture:
+
+```text
+router
+   ↓
+Depends(get_current_user)
+   ↓
+authentication service
+   ↓
+user
+```
+
+---
+
+# PART K — LOGOUT
+
+# 27. Logout
+
+Implement:
+
+```http
+POST /api/v1/auth/logout
+```
+
+Logout should support refresh-token/session revocation.
+
+Conceptually:
+
+```text
+Client
+  ↓
+Logout
+  ↓
+Invalidate refresh session/token
+  ↓
+Session revoked
+```
+
+Because access tokens are stateless, they may remain valid until expiration unless an explicit revocation mechanism is implemented.
+
+Keep access-token lifetime short.
+
+---
+
+# PART L — REFRESH TOKEN
+
+# 28. Refresh API
+
+Implement:
+
+```http
+POST /api/v1/auth/refresh
+```
+
+Flow:
+
+```text
+Refresh Token
+      ↓
+Validate signature
+      ↓
+Validate expiration
+      ↓
+Validate token type
+      ↓
+Check session/token revocation
+      ↓
+Rotate refresh token
+      ↓
+Generate new access token
+      ↓
+Return tokens
+```
+
+Reject:
+
+```text
+expired refresh token
+invalid refresh token
+revoked refresh token
+access token used as refresh token
+malformed token
+```
+
+---
+
+# PART M — PASSWORD CHANGE
+
+# 29. Change password
+
+Implement:
+
+```http
+POST /api/v1/auth/change-password
+```
+
+Require authentication.
+
+Request:
+
+```text
+current_password
+new_password
+```
+
+Flow:
+
+```text
+Current User
+      ↓
+Verify current password
+      ↓
+Validate new password
+      ↓
+Hash new password
+      ↓
+Update password_hash
+      ↓
+Update password_changed_at
+      ↓
+Invalidate existing sessions if appropriate
+```
+
+After password change, strongly consider revoking existing refresh sessions.
+
+---
+
+# PART N — PASSWORD RESET
+
+# 30. Forgot password
+
+Implement:
+
+```http
+POST /api/v1/auth/forgot-password
+```
+
+Expected flow:
+
+```text
+Email
+  ↓
+Generate secure random reset token
+  ↓
+Store hashed token
+  ↓
+Set expiration
+  ↓
+Send reset email
+```
+
+Do not return the reset token through the API.
+
+Do not log reset tokens.
+
+---
+
+# 31. Password reset token
+
+Reset tokens should:
+
+* Be cryptographically random.
+* Be single-use.
+* Have a short expiration.
+* Be stored securely.
+* Be invalidated after successful password reset.
+
+Example configuration:
+
+```text
+PASSWORD_RESET_TOKEN_EXPIRE_MINUTES=30
+```
+
+---
+
+# 32. Reset password
+
+Implement:
+
+```http
+POST /api/v1/auth/reset-password
+```
+
+Expected request:
+
+```text
+token
+new_password
+```
+
+Flow:
+
+```text
+Token
+ ↓
+Validate token
+ ↓
+Check expiry
+ ↓
+Check used/revoked state
+ ↓
+Find user
+ ↓
+Hash new password
+ ↓
+Update password
+ ↓
+Invalidate token
+ ↓
+Revoke sessions
+```
+
+---
+
+# PART O — EMAIL VERIFICATION
+
+# 33. Email verification
+
+Implement:
+
+```http
+POST /api/v1/auth/verify-email
+```
+
+Registration flow:
+
+```text
+Register
+   ↓
+User created
+   ↓
+is_verified = false
+   ↓
+Verification token
+   ↓
+Email
+   ↓
+User verifies
+   ↓
+is_verified = true
+```
+
+---
+
+# 34. Verification token
+
+Verification tokens must:
+
+* Be cryptographically secure.
+* Have expiration.
+* Be single-use.
+* Not be logged.
+* Be stored securely.
+* Be invalidated after successful verification.
+
+---
+
+# 35. Resend verification
+
+Implement:
+
+```http
+POST /api/v1/auth/resend-verification
+```
+
+Protect it against abuse.
+
+Consider:
+
+```text
+Rate limiting
+Token expiration
+Cooldown
+```
+
+Do not allow unlimited email generation.
+
+---
+
+# PART P — EMAIL SERVICE
+
+# 36. Email architecture
+
+Do not place email delivery logic directly inside authentication routes.
+
+Use a service abstraction.
+
+Example:
+
+```text
+EmailService
+     │
+     ├── send_verification_email()
+     ├── send_password_reset_email()
+     └── send_welcome_email()
+```
+
+Future implementation could support:
+
+```text
+SMTP
+SendGrid
+Amazon SES
+Mailgun
+Resend
+```
+
+Phase 2 should create the abstraction.
+
+Use a development email provider or console/email backend for local testing.
+
+Do not require a paid email service just to run the project locally.
+
+---
+
+# PART Q — REDIS AUTHENTICATION USE
+
+# 37. Redis usage
+
+Use Redis where appropriate for:
+
+```text
+Refresh sessions
+Token revocation
+Rate limiting
+Password reset state
+Email verification state
+Temporary authentication data
+```
+
+Do not blindly store everything in Redis.
+
+Persistent security-critical records that need long-term auditability may belong in PostgreSQL.
+
+---
+
+# PART R — SESSION MANAGEMENT
+
+# 38. Authentication sessions
+
+Create an appropriate session/token model if required.
+
+Possible information:
+
+```text
+id
+user_id
+token_identifier
+refresh_token_hash
+created_at
+expires_at
+revoked_at
+last_used_at
+ip_address
+user_agent
+```
+
+Be careful with privacy and data retention.
+
+Do not store raw refresh tokens unnecessarily.
+
+---
+
+# 39. Multiple devices
+
+The authentication architecture should support:
+
+```text
+Laptop
+Mobile
+Tablet
+Browser 1
+Browser 2
+```
+
+for the same user.
+
+Example:
+
+```text
+User
+ ├── Session A
+ ├── Session B
+ └── Session C
+```
+
+Logging out one session should not necessarily destroy all other sessions unless the product explicitly chooses that behavior.
+
+Provide architecture for:
+
+```text
+logout current session
+logout all sessions
+```
+
+Even if `logout-all` is deferred.
+
+---
+
+# PART S — SECURITY
+
+# 40. Authentication security requirements
+
+Treat security as a first-class requirement.
+
+Never:
+
+* Store plaintext passwords.
+* Log passwords.
+* Log JWTs.
+* Log refresh tokens.
+* Return password hashes.
+* Hard-code JWT secrets.
+* Commit `.env`.
+* Return stack traces.
+* Trust frontend authentication state.
+* Store sensitive authentication information in localStorage unnecessarily.
+
+---
+
+# 41. Token storage
+
+For a browser-based production SaaS application, carefully evaluate token storage.
+
+Prefer secure architecture using:
+
+```text
+HttpOnly
+Secure
+SameSite
+```
+
+cookies for refresh/session tokens where appropriate.
+
+Avoid exposing long-lived refresh tokens to JavaScript unnecessarily.
+
+If access tokens are kept client-side, minimize their lifetime and exposure.
+
+Document the selected strategy and why.
+
+---
+
+# 42. CSRF protection
+
+If authentication uses cookies, consider CSRF protection.
+
+Document:
+
+```text
+SameSite policy
+CSRF token strategy
+Origin validation
+CORS configuration
+```
+
+Do not assume CORS alone is CSRF protection.
+
+---
+
+# 43. CORS
+
+Use environment-based allowed origins.
+
+Example:
+
+```text
+CORS_ALLOWED_ORIGINS=
+```
+
+Development:
+
+```text
+http://localhost:5173
+```
+
+Production should use the actual frontend domain.
+
+Do not permanently use:
+
+```python
+allow_origins=["*"]
+```
+
+with credentialed authentication.
+
+---
+
+# 44. Rate limiting
+
+Authentication endpoints should eventually have rate limiting.
+
+At minimum design the architecture for:
+
+```text
+login
+forgot-password
+resend-verification
+refresh
+```
+
+to be rate-limited.
+
+Redis can be used for this.
+
+If full rate limiting is implemented in Phase 2, ensure it is reusable.
+
+---
+
+# 45. Account lockout
+
+Implement configurable failed-login protection.
+
+Example:
+
+```text
+MAX_LOGIN_ATTEMPTS
+LOCKOUT_DURATION_MINUTES
+```
+
+Avoid permanent account lockout from a small number of mistakes.
+
+Provide a controlled mechanism for recovery.
+
+---
+
+# 46. Security headers
+
+Review the existing NGINX/security configuration and prepare appropriate headers such as:
+
+```text
+X-Content-Type-Options
+X-Frame-Options
+Referrer-Policy
+Content-Security-Policy
+Strict-Transport-Security
+```
+
+HSTS should only be enabled appropriately when HTTPS is actually configured.
+
+Do not introduce headers blindly without considering the frontend.
+
+---
+
+# PART T — API SCHEMAS
+
+# 47. Authentication schemas
+
+Create separate Pydantic schemas.
+
+For example:
+
+```text
+AuthRegisterRequest
+AuthLoginRequest
+TokenResponse
+RefreshTokenRequest
+UserResponse
+ChangePasswordRequest
+ForgotPasswordRequest
+ResetPasswordRequest
+VerifyEmailRequest
+ResendVerificationRequest
+```
+
+Do not reuse database models directly as API request/response schemas.
+
+---
+
+# 48. Response architecture
+
+Continue the Phase 1 response format.
+
+For example:
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "data": {}
+}
+```
+
+Errors should follow the existing structured error architecture.
+
+Maintain consistency throughout the API.
+
+---
+
+# PART U — SERVICE / REPOSITORY ARCHITECTURE
+
+# 49. Backend separation of concerns
+
+Maintain:
+
+```text
+Router
+   ↓
+Schema
+   ↓
+Service
+   ↓
+Repository
+   ↓
+Database
+```
+
+Authentication example:
+
+```text
+auth_router
+     ↓
+auth_service
+     ↓
+user_repository
+     ↓
+SQLAlchemy
+     ↓
+PostgreSQL
+```
+
+Token handling should be separated into dedicated components.
+
+For example:
+
+```text
+security.py
+token_service.py
+password_service.py
+```
+
+Use names appropriate to the existing project architecture.
+
+---
+
+# 50. Do not put authentication logic in main.py
+
+Do NOT create a large:
+
+```text
+main.py
+```
+
+containing:
+
+```text
+registration
+login
+JWT generation
+password hashing
+database queries
+email sending
+```
+
+Keep these components modular.
+
+---
+
+# PART V — FRONTEND AUTHENTICATION
+
+# 51. Frontend authentication architecture
+
+Extend the Phase 1 React architecture.
+
+Conceptually:
+
+```text
+Page
+ ↓
+Auth Hook
+ ↓
+Auth Service
+ ↓
+API Client
+ ↓
+FastAPI
+```
+
+Create appropriate components such as:
+
+```text
+auth/
+  api
+  hooks
+  types
+  context/store
+  components
+```
+
+Adapt the exact structure to the existing frontend.
+
+---
+
+# 52. Login page
+
+Create:
+
+```text
+/login
+```
+
+The page should contain:
+
+```text
+Email
+Password
+Remember me (if supported)
+Login button
+Forgot password
+Register
+```
+
+Do not make it look like a simple demo.
+
+Use a professional SaaS authentication UI.
+
+---
+
+# 53. Registration page
+
+Create:
+
+```text
+/register
+```
+
+Fields:
+
+```text
+First Name
+Last Name
+Email
+Password
+Confirm Password
+```
+
+Include:
+
+```text
+validation
+loading state
+error state
+success state
+```
+
+Do not submit invalid forms.
+
+---
+
+# 54. Forgot password page
+
+Create:
+
+```text
+/forgot-password
+```
+
+User enters:
+
+```text
+Email
+```
+
+Display a safe confirmation message.
+
+Avoid exposing whether an account exists.
+
+---
+
+# 55. Reset password page
+
+Create:
+
+```text
+/reset-password
+```
+
+The page should read the reset token appropriately.
+
+Fields:
+
+```text
+New Password
+Confirm Password
+```
+
+Handle:
+
+```text
+expired token
+invalid token
+successful reset
+```
+
+---
+
+# 56. Email verification UI
+
+Create an appropriate page such as:
+
+```text
+/verify-email
+```
+
+Handle:
+
+```text
+verification success
+verification failure
+expired token
+resend verification
+```
+
+---
+
+# PART W — PROTECTED ROUTES
+
+# 57. Route protection
+
+Create a reusable protected-route mechanism.
+
+Conceptually:
+
+```text
+User opens /dashboard
+        ↓
+Is authenticated?
+   ┌────┴────┐
+   │         │
+  Yes        No
+   │         │
+Dashboard   /login
+```
+
+Do not rely only on frontend route protection.
+
+The backend must always validate authentication.
+
+---
+
+# 58. Authentication state
+
+Create centralized authentication state.
+
+Possible state:
+
+```text
+user
+isAuthenticated
+isLoading
+```
+
+Avoid duplicating authentication state across multiple components.
+
+---
+
+# 59. API client
+
+Create a centralized HTTP client.
+
+For example:
+
+```text
+apiClient
+```
+
+It should handle:
+
+```text
+base URL
+headers
+authentication
+errors
+timeouts
+```
+
+Future modules can reuse it.
+
+---
+
+# 60. Unauthorized response handling
+
+When the backend returns:
+
+```text
+401 Unauthorized
+```
+
+the frontend should handle it consistently.
+
+Possible flow:
+
+```text
+API request
+    ↓
+401
+    ↓
+Try refresh token
+    ↓
+Success → retry request
+    ↓
+Failure → logout → /login
+```
+
+Be careful to avoid infinite refresh loops.
+
+---
+
+# 61. Concurrent refresh requests
+
+Design the frontend refresh mechanism so that multiple simultaneous API calls do not trigger multiple refresh operations unnecessarily.
+
+For example:
+
+```text
+Request A ─┐
+Request B ─┼──→ Token expired
+Request C ─┘
+             ↓
+       One refresh request
+             ↓
+       New access token
+             ↓
+       Retry pending requests
+```
+
+This is important for production SPA behavior.
+
+---
+
+# PART X — DATABASE MIGRATIONS
+
+# 62. Alembic migration
+
+Create a migration for authentication tables.
+
+For example:
+
+```text
+users
+```
+
+and, if selected:
+
+```text
+auth_sessions
+password_reset_tokens
+email_verification_tokens
+```
+
+Do not manually alter PostgreSQL tables.
+
+Use:
+
+```bash
+alembic revision --autogenerate -m "add authentication tables"
+```
+
+and:
+
+```bash
+alembic upgrade head
+```
+
+Verify migration correctness.
+
+---
+
+# 63. Database indexes
+
+Add appropriate indexes.
+
+For example:
+
+```text
+users.email
+session.user_id
+session.token_identifier
+```
+
+Do not add indexes unnecessarily.
+
+Consider expected query patterns.
+
+---
+
+# PART Y — TESTING
+
+# 64. Backend testing
+
+Expand:
+
+```text
+backend/tests/
+```
+
+Maintain:
+
+```text
+unit/
+integration/
+api/
+```
+
+Create meaningful authentication tests.
+
+---
+
+# 65. Registration tests
+
+Test:
+
+```text
+successful registration
+duplicate email
+invalid email
+invalid password
+missing required fields
+email normalization
+password hashing
+```
+
+Verify that the password is never stored directly.
+
+---
+
+# 66. Login tests
+
+Test:
+
+```text
+valid credentials
+invalid email
+invalid password
+inactive user
+locked user
+failed attempt counting
+successful login reset of failed attempts
+token generation
+```
+
+---
+
+# 67. JWT tests
+
+Test:
+
+```text
+valid access token
+expired token
+invalid signature
+missing token
+malformed token
+wrong token type
+missing subject
+```
+
+---
+
+# 68. Refresh token tests
+
+Test:
+
+```text
+valid refresh
+expired refresh
+revoked refresh
+rotated refresh
+refresh token reuse
+invalid token
+access token passed as refresh token
+```
+
+---
+
+# 69. Logout tests
+
+Test:
+
+```text
+logout successful
+refresh token revoked
+revoked token cannot refresh
+```
+
+---
+
+# 70. Password tests
+
+Test:
+
+```text
+successful password change
+wrong current password
+weak password
+same password if policy disallows it
+successful reset
+expired reset token
+invalid reset token
+used reset token
+```
+
+---
+
+# 71. Email verification tests
+
+Test:
+
+```text
+successful verification
+invalid token
+expired token
+already verified
+resend verification
+```
+
+---
+
+# 72. Protected endpoint tests
+
+Use:
+
+```text
+/api/v1/auth/me
+```
+
+Test:
+
+```text
+authenticated request
+missing token
+invalid token
+expired token
+inactive user
+```
+
+---
+
+# 73. Security tests
+
+Include tests for:
+
+```text
+password not exposed
+password hash not exposed
+JWT secret not exposed
+refresh token not logged
+stack trace not returned
+```
+
+---
+
+# PART Z — FRONTEND TESTING
+
+# 74. Frontend authentication tests
+
+Create meaningful tests for:
+
+```text
+login rendering
+form validation
+successful login
+login error
+registration
+forgot password
+protected route
+logout
+authentication state
+401 handling
+```
+
+Do not create meaningless tests such as:
+
+```text
+expect(true).toBe(true)
+```
+
+---
+
+# PART AA — LOGGING
+
+# 75. Authentication logging
+
+Authentication events should be logged appropriately.
+
+Examples:
+
+```text
+login_success
+login_failure
+logout
+password_changed
+password_reset_requested
+password_reset_completed
+email_verified
+refresh_token_reuse_detected
+account_locked
+```
+
+Logs should contain useful metadata where appropriate:
+
+```text
+timestamp
+request_id
+user_id
+IP
+endpoint
+event
+```
+
+Do not log:
+
+```text
+password
+password_hash
+access_token
+refresh_token
+reset_token
+verification_token
+JWT secret
+```
+
+---
+
+# PART AB — AUDIT ARCHITECTURE
+
+# 76. Future audit logs
+
+Phase 3+ may introduce a full:
+
+```text
+audit_logs
+```
+
+system.
+
+Phase 2 should expose authentication events through a clean service/event abstraction so they can later feed the audit system.
+
+Do not build the complete audit module unless required by the existing architecture.
+
+---
+
+# PART AC — MULTI-TENANCY PREPARATION
+
+# 77. Important future requirement
+
+Phase 3 will introduce:
+
+```text
+Tenant
+Company
+```
+
+Do NOT implement multi-tenancy in Phase 2.
+
+However, avoid designing authentication in a way that prevents it.
+
+Future relationship:
+
+```text
+Tenant
+  │
+  ├── Users
+  │
+  ├── Employees
+  │
+  └── Roles
+```
+
+Authentication should later be able to resolve:
+
+```text
+current_user
+current_tenant
+```
+
+without replacing the authentication mechanism.
+
+---
+
+# 78. Do not trust tenant IDs
+
+Future APIs must never trust:
+
+```text
+tenant_id
+```
+
+sent directly from the frontend.
+
+Phase 3 should derive tenant context from authenticated identity/session/domain membership.
+
+Phase 2 should leave room for this.
+
+---
+
+# PART AD — RBAC PREPARATION
+
+# 79. Future authorization
+
+Phase 3 will implement:
+
+```text
+roles
+permissions
+user_roles
+role_permissions
+```
+
+Phase 2 should not implement these.
+
+However, authentication dependencies should be designed so that future authorization can look conceptually like:
+
+```text
+get_current_user()
+        ↓
+require_permission(...)
+        ↓
+Endpoint
+```
+
+Do not hard-code roles into Phase 2.
+
+---
+
+# PART AE — SECURITY CONFIGURATION
+
+# 80. Environment variables
+
+Extend `.env.example`.
+
+Potential configuration:
+
+```text
+APP_NAME=
+APP_ENV=
+APP_DEBUG=
+
+DATABASE_URL=
+
+REDIS_URL=
+
+JWT_SECRET=
+JWT_ALGORITHM=
+ACCESS_TOKEN_EXPIRE_MINUTES=
+REFRESH_TOKEN_EXPIRE_DAYS=
+
+PASSWORD_RESET_TOKEN_EXPIRE_MINUTES=
+EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES=
+
+MAX_LOGIN_ATTEMPTS=
+LOCKOUT_DURATION_MINUTES=
+
+CORS_ALLOWED_ORIGINS=
+
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=
+```
+
+Only include variables actually used.
+
+Never commit real values.
+
+---
+
+# PART AF — PASSWORD POLICY
+
+# 81. Password configuration
+
+Make password requirements configurable where practical.
+
+Example:
+
+```text
+PASSWORD_MIN_LENGTH=12
+```
+
+Do not store the plaintext password anywhere.
+
+Do not include passwords in:
+
+```text
+logs
+exceptions
+analytics
+metrics
+database records
+```
+
+---
+
+# PART AG — ERROR HANDLING
+
+# 82. Authentication errors
+
+Use appropriate HTTP status codes.
+
+Examples:
+
+```text
+400 Bad Request
+401 Unauthorized
+403 Forbidden
+404 Not Found
+409 Conflict
+422 Validation Error
+429 Too Many Requests
+500 Internal Server Error
+```
+
+Do not use `200 OK` for every authentication failure.
+
+---
+
+# 83. Error messages
+
+Authentication errors should be useful without exposing sensitive information.
+
+Example:
+
+```text
+Invalid email or password
+```
+
+rather than:
+
+```text
+Email exists but password is incorrect
+```
+
+when enumeration protection is required.
+
+---
+
+# PART AH — API DOCUMENTATION
+
+# 84. OpenAPI
+
+FastAPI should automatically expose API documentation.
+
+Verify:
+
+```text
+/docs
+/redoc
+```
+
+Authentication endpoints should have:
+
+```text
+request schemas
+response schemas
+status codes
+authentication requirements
+```
+
+appropriately documented.
+
+Do not expose secrets through documentation.
+
+---
+
+# PART AI — DOCKER
+
+# 85. Docker integration
+
+Authentication must work inside the existing Docker environment.
+
+Verify:
+
+```text
+frontend
+backend
+postgres
+redis
+celery
+```
+
+continue working.
+
+Do not break Phase 1 services.
+
+---
+
+# 86. Docker environment
+
+Verify:
+
+```text
+backend → PostgreSQL
+backend → Redis
+frontend → backend
+```
+
+Authentication should work using Docker service names.
+
+Do not use:
+
+```text
+localhost
+```
+
+inside containers when referring to another service.
+
+For example:
+
+```text
+postgres
+redis
+backend
+```
+
+should be used appropriately.
+
+---
+
+# PART AJ — CELERY / EMAIL
+
+# 87. Background email delivery
+
+Where appropriate, use Celery for:
+
+```text
+verification emails
+password reset emails
+```
+
+Architecture:
+
+```text
+Authentication Service
+        ↓
+Celery Task
+        ↓
+Email Service
+        ↓
+SMTP/provider
+```
+
+Do not block API requests unnecessarily on slow email delivery.
+
+For local development, provide a simple development email backend/logging mechanism.
+
+---
+
+# PART AK — PERFORMANCE
+
+# 88. Authentication performance
+
+Avoid unnecessary database queries.
+
+For example:
+
+```text
+Login
+ ↓
+One efficient user lookup
+ ↓
+Password verification
+ ↓
+Token/session operation
+```
+
+Use appropriate indexes.
+
+Do not perform expensive work unnecessarily.
+
+---
+
+# 89. Password hashing cost
+
+Password hashing is intentionally computationally expensive.
+
+Configure it appropriately for the environment.
+
+Do not optimize password hashing by making it dangerously weak.
+
+Document the selected parameters.
+
+---
+
+# PART AL — FRONTEND UX
+
+# 90. Authentication UX
+
+The authentication UI should include:
+
+```text
+Loading indicators
+Validation messages
+API error messages
+Disabled submit during request
+Password visibility toggle
+Password strength guidance
+Success messages
+Redirect handling
+```
+
+Avoid exposing backend stack traces.
+
+---
+
+# 91. Responsive authentication
+
+Authentication pages should work on:
+
+```text
+Desktop
+Tablet
+Mobile
+```
+
+Use the Phase 1 Tailwind setup.
+
+---
+
+# PART AM — ACCESSIBILITY
+
+# 92. Authentication accessibility
+
+Ensure:
+
+```text
+Labels
+Keyboard navigation
+Focus states
+ARIA where appropriate
+Readable error messages
+Accessible buttons
+```
+
+Authentication forms should be usable without a mouse.
+
+---
+
+# PART AN — DOCUMENTATION
+
+# 93. Update README
+
+Document:
+
+```text
+Authentication architecture
+Authentication endpoints
+Environment variables
+Running authentication locally
+Database migrations
+Email configuration
+Running tests
+```
+
+---
+
+# 94. Create authentication documentation
+
+Add something such as:
+
+```text
+docs/AUTHENTICATION.md
+```
+
+Explain:
+
+```text
+Authentication flow
+JWT architecture
+Access tokens
+Refresh tokens
+Token rotation
+Password hashing
+Password reset
+Email verification
+Session management
+Security considerations
+Frontend authentication
+```
+
+---
+
+# 95. Update ARCHITECTURE.md
+
+Clearly document:
+
+```text
+Phase 1 foundation
+        ↓
+Phase 2 authentication
+        ↓
+Future Phase 3 authorization
+```
+
+Clearly distinguish:
+
+```text
+IMPLEMENTED
+PLANNED
+FUTURE
+```
+
+---
+
+# PART AO — DO NOT IMPLEMENT
+
+# 96. Strict Phase 2 boundaries
+
+Do NOT implement:
+
+```text
+Employee CRUD
+Department CRUD
+Designation CRUD
+Attendance
+Check-in
+Check-out
+GPS
+Geofencing
+Selfie attendance
+Shift management
+Leave
+Holiday
+Overtime
+Payroll
+Reports
+Notifications
+Subscriptions
+AI assistant
+AI analytics
+Advanced attendance analytics
+```
+
+Do not create fake versions of these features.
+
+---
+
+# PART AP — QUALITY REQUIREMENTS
+
+# 97. Code quality
+
+Backend:
+
+```text
+Ruff
+Black
+MyPy
+Pytest
+```
+
+Frontend:
+
+```text
+ESLint
+Prettier
+TypeScript
+```
+
+Run these after implementation.
+
+Fix errors introduced by Phase 2.
+
+---
+
+# 98. Architecture quality
+
+Maintain:
+
+```text
+Router
+ ↓
+Schema
+ ↓
+Service
+ ↓
+Repository
+ ↓
+Database
+```
+
+and:
+
+```text
+React Page
+ ↓
+Hook
+ ↓
+API Service
+ ↓
+Backend
+```
+
+Do not introduce architectural shortcuts that will create technical debt in later phases.
+
+---
+
+# PART AQ — COMPLETE AUTHENTICATION FLOW
+
+# 99. Registration flow
+
+The final flow should conceptually be:
+
+```text
+              REGISTER
+                  │
+                  ▼
+            Validate Input
+                  │
+                  ▼
+           Normalize Email
+                  │
+                  ▼
+          Check Existing User
+                  │
+                  ▼
+          Hash Password
+                  │
+                  ▼
+             Create User
+                  │
+                  ▼
+       Create Verification Token
+                  │
+                  ▼
+          Queue Email Task
+                  │
+                  ▼
+          Registration Done
+                  │
+                  ▼
+        Verify Email Later
+```
+
+---
+
+# 100. Login flow
+
+```text
+               LOGIN
+                 │
+                 ▼
+          Validate Request
+                 │
+                 ▼
+         Normalize Email
+                 │
+                 ▼
+           Find User
+                 │
+                 ▼
+        Verify Password
+                 │
+          ┌──────┴──────┐
+          │             │
+        Invalid        Valid
+          │             │
+       Reject      Check Status
+                        │
+                        ▼
+                 Create Session
+                        │
+              ┌─────────┴─────────┐
+              ▼                   ▼
+        Access Token        Refresh Token
+              │                   │
+              └─────────┬─────────┘
+                        ▼
+                  Login Response
+```
+
+---
+
+# 101. Refresh flow
+
+```text
+Refresh Token
+      │
+      ▼
+Validate JWT
+      │
+      ▼
+Check Token Type
+      │
+      ▼
+Check Session
+      │
+      ▼
+Check Revocation
+      │
+      ▼
+Rotate Token
+      │
+      ├── Old token revoked
+      │
+      └── New token generated
+                 │
+                 ▼
+        Access + Refresh Token
+```
+
+---
+
+# 102. Logout flow
+
+```text
+Logout
+  │
+  ▼
+Identify Session
+  │
+  ▼
+Revoke Refresh Token
+  │
+  ▼
+Session marked revoked
+  │
+  ▼
+Client clears authentication state
+```
+
+---
+
+# 103. Password reset flow
+
+```text
+Forgot Password
+       │
+       ▼
+Enter Email
+       │
+       ▼
+Generate Secure Token
+       │
+       ▼
+Hash + Store Token
+       │
+       ▼
+Send Email
+       │
+       ▼
+User Opens Link
+       │
+       ▼
+Reset Password
+       │
+       ▼
+Invalidate Token
+       │
+       ▼
+Revoke Sessions
+```
+
+---
+
+# 104. Email verification flow
+
+```text
+Register
+   │
+   ▼
+Verification Token
+   │
+   ▼
+Email
+   │
+   ▼
+User Clicks Link
+   │
+   ▼
+Validate Token
+   │
+   ▼
+Mark User Verified
+   │
+   ▼
+Token Invalidated
+```
+
+---
+
+# PART AR — PHASE 2 COMPLETION CRITERIA
+
+Phase 2 is complete only when all of the following are satisfied.
+
+## Backend
+
+* FastAPI authentication module implemented.
+* User model implemented.
+* Password hashing implemented.
+* Registration implemented.
+* Login implemented.
+* Access tokens implemented.
+* Refresh tokens implemented.
+* Refresh-token rotation implemented.
+* Logout implemented.
+* Current-user endpoint implemented.
+* Change-password implemented.
+* Forgot-password implemented.
+* Reset-password implemented.
+* Email verification implemented.
+* Resend verification implemented.
+* Authentication dependencies implemented.
+* Session management implemented where appropriate.
+* Rate limiting architecture implemented or documented.
+* Account lockout protection implemented.
+* Authentication error handling implemented.
+* Authentication logging implemented.
+* Security-sensitive data is not logged.
+
+---
+
+# 105. Database
+
+Verify:
+
+```text
+users
+auth sessions/tokens
+password reset tokens
+email verification tokens
+```
+
+only where actually required.
+
+Verify:
+
+```bash
+alembic upgrade head
+```
+
+works from a clean database.
+
+---
+
+# 106. Frontend
+
+Verify:
+
+```text
+/login
+/register
+/forgot-password
+/reset-password
+/verify-email
+```
+
+work correctly.
+
+Verify:
+
+```text
+authentication state
+protected routes
+logout
+token refresh
+401 handling
+```
+
+work correctly.
+
+---
+
+# 107. Redis
+
+Verify Redis can support the authentication functionality that depends on it.
+
+Test:
+
+```text
+Redis connectivity
+session/token state
+rate limiting if implemented
+```
+
+---
+
+# 108. Celery
+
+Verify:
+
+```text
+Celery worker starts
+Redis broker works
+email task can execute
+```
+
+Do not implement unrelated background jobs.
+
+---
+
+# 109. Docker
+
+Verify:
+
+```text
+docker compose build
+docker compose up
+```
+
+works.
+
+Verify:
+
+```text
+frontend
+backend
+postgres
+redis
+celery
+```
+
+start successfully.
+
+---
+
+# 110. Testing
+
+Run:
+
+```text
+Backend unit tests
+Backend integration tests
+Authentication API tests
+Security tests
+Frontend authentication tests
+```
+
+All Phase 2 tests should pass.
+
+---
+
+# 111. Code quality
+
+Run:
+
+```text
+Ruff
+Black
+MyPy
+Pytest
+ESLint
+Prettier
+TypeScript
+```
+
+Fix all errors introduced by Phase 2.
+
+---
+
+# 112. Documentation
+
+Update:
+
+```text
+README.md
+ARCHITECTURE.md
+docs/DEVELOPMENT.md
+docs/TESTING.md
+docs/AUTHENTICATION.md
+```
+
+---
+
+# PART AS — SECURITY VERIFICATION
+
+# 113. Before completion, explicitly verify
+
+### Password security
+
+```text
+No plaintext passwords
+No password logging
+Modern password hashing
+```
+
+### JWT security
+
+```text
+Secret from environment
+Short access-token lifetime
+Refresh-token expiration
+Refresh-token rotation
+Revocation support
+```
+
+### API security
+
+```text
+Protected endpoints
+Correct HTTP status codes
+No stack traces
+No sensitive response data
+```
+
+### Frontend security
+
+```text
+No hard-coded credentials
+No secrets in source code
+Safe authentication state
+No unnecessary long-lived tokens in localStorage
+```
+
+### Infrastructure
+
+```text
+No secrets committed
+CORS configured
+Redis protected appropriately
+Database credentials from environment
+```
+
+---
+
+# PART AT — FINAL VERIFICATION COMMANDS
+
+Before finishing Phase 2, execute the equivalent of:
+
+```bash
+# Backend tests
+pytest
+
+# Backend lint
+ruff check .
+
+# Backend formatting
+black --check .
+
+# Backend type checking
+mypy .
+
+# Frontend tests
+npm test
+
+# Frontend lint
+npm run lint
+
+# Frontend build
+npm run build
+
+# Docker
+docker compose build
+
+docker compose up -d
+
+# Migration
+alembic upgrade head
+```
+
+Use the actual project commands if they differ from these.
+
+---
+
+# PART AU — MANUAL AUTHENTICATION VERIFICATION
+
+Manually verify:
+
+```text
+1. Register user
+2. Verify email
+3. Login
+4. Receive authentication tokens
+5. Open dashboard
+6. Call /api/v1/auth/me
+7. Refresh token
+8. Verify old refresh token cannot be reused
+9. Logout
+10. Verify revoked session cannot refresh
+11. Change password
+12. Login with new password
+13. Request password reset
+14. Reset password
+15. Verify old password no longer works
+16. Login with new password
+17. Test invalid credentials
+18. Test account lockout
+19. Test protected route without authentication
+20. Test expired/invalid token
+```
+
+---
+
+# PART AV — FINAL REPORT
+
+After completing Phase 2, provide exactly this report:
+
+```text
+========================================
+PHASE 2 COMPLETION REPORT
+========================================
+
+Project status:
+
+Phase 1 status:
+
+Phase 2 status:
+
+Authentication architecture:
+
+User model:
+
+Password security:
+
+JWT implementation:
+
+Access token:
+
+Refresh token:
+
+Refresh token rotation:
+
+Session management:
+
+Registration:
+
+Login:
+
+Logout:
+
+Current user:
+
+Password change:
+
+Password reset:
+
+Email verification:
+
+Rate limiting:
+
+Account lockout:
+
+Redis:
+
+Celery:
+
+Email service:
+
+Backend:
+
+Frontend:
+
+Protected routes:
+
+API client:
+
+Database migrations:
+
+Docker:
+
+Testing:
+
+Security verification:
+
+Documentation:
+
+Files created:
+
+Files modified:
+
+Commands executed:
+
+Tests executed:
+
+Tests passed:
+
+Known issues:
+
+Technical decisions:
+
+Security decisions:
+
+Future considerations:
+
+Phase 3 preparation:
+
+Recommended Phase 3:
+Multi-tenancy + RBAC
+
+========================================
+```
+
+---
+
+# PART AW — IMPORTANT FINAL INSTRUCTION
+
+You are currently authorized to implement:
+
+# **PHASE 2 — AUTHENTICATION ONLY**
+
+Do not automatically proceed to Phase 3.
+
+Do not implement:
+
+```text
+Multi-tenancy
+RBAC
+Employee Management
+Attendance
+Leave
+Payroll
+GPS
+Geofencing
+Selfie Verification
+AI
+Analytics
+Subscriptions
+```
+
+After Phase 2 is fully implemented, tested, documented, and verified:
+
+**STOP.**
+
+Provide the Phase 2 completion report.
+
+Wait for explicit authorization before beginning:
+
+# **PHASE 3 — MULTI-TENANCY + RBAC**
+
+---
+
+# FINAL ARCHITECTURAL PRINCIPLE
+
+The authentication system must be built with this future architecture in mind:
+
+```text
+                    USER
+                     │
+                     ▼
+               AUTHENTICATION
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+          ▼                     ▼
+       SESSION                IDENTITY
+          │                     │
+          └──────────┬──────────┘
+                     ▼
+                 TENANT
+                     │
+                     ▼
+                   RBAC
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+       Employee   Manager      Admin
+          │          │          │
+          └──────────┼──────────┘
+                     ▼
+               HRMS FEATURES
+                     │
+      ┌──────────────┼──────────────┐
+      ▼              ▼              ▼
+ Attendance        Leave         Payroll
+      │              │              │
+      └──────────────┼──────────────┘
+                     ▼
+                 Reporting
+                     │
+                     ▼
+                 Analytics
+                     │
+                     ▼
+                    AI
+```
+
+**The key rule is:** Phase 2 should establish **identity and secure authentication**, while Phase 3 will establish **tenant identity and authorization**. This separation will make the later HRMS modules much easier to scale and secure.

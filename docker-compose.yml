@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: axontimehr-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-axontimehr}
+      POSTGRES_USER: ${POSTGRES_USER:-axontimehr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-axontimehr_secure_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - axontimehr-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-axontimehr} -d ${POSTGRES_DB:-axontimehr}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: axontimehr-redis
+    restart: unless-stopped
+    networks:
+      - axontimehr-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: axontimehr-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-axontimehr}:${POSTGRES_PASSWORD:-axontimehr_secure_pass}@postgres:5432/${POSTGRES_DB:-axontimehr}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-axontimehr_jwt_secret_dev_key_32bytes_min}
+      APP_ENV: ${APP_ENV:-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - axontimehr-network
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: axontimehr-celery-worker
+    restart: unless-stopped
+    command: python -m celery -A app.worker worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-axontimehr}:${POSTGRES_PASSWORD:-axontimehr_secure_pass}@postgres:5432/${POSTGRES_DB:-axontimehr}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-axontimehr_jwt_secret_dev_key_32bytes_min}
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - axontimehr-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: axontimehr-frontend
+    restart: unless-stopped
+    networks:
+      - axontimehr-network
+
+  proxy:
+    image: nginx:alpine
+    container_name: axontimehr-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - axontimehr-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  axontimehr-network:
+    driver: bridge

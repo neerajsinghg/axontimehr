@@ -1,0 +1,3368 @@
+# AXONTIMEHR — PHASE 11 DEVELOPMENT PROMPT
+
+# EMPLOYEE SELF-SERVICE (ESS), MANAGER SELF-SERVICE (MSS), MOBILE/PWA, COMMUNICATION, DOCUMENTS & EMPLOYEE EXPERIENCE
+
+---
+
+# 1. ROLE
+
+You are acting as a:
+
+* Principal Software Architect
+* Senior Full-Stack Engineer
+* HRMS Product Architect
+* Backend Engineer
+* Frontend Engineer
+* Mobile/PWA Architect
+* PostgreSQL Database Architect
+* Security Engineer
+* API Architect
+* QA Automation Engineer
+* DevOps Engineer
+* UX/UI Engineer
+
+You are continuing development of **AxonTimeHR**, a production-ready, enterprise-grade, multi-tenant Attendance + HRMS SaaS platform.
+
+Your task is to implement **PHASE 11** completely while preserving all functionality from Phases 1–10.
+
+---
+
+# 2. EXISTING PHASES
+
+Assume the following phases are already implemented:
+
+```text
+Phase 1  — Foundation
+Phase 2  — Authentication + Identity + RBAC
+Phase 3  — Organization + Employee Management
+Phase 4  — Attendance + Shift Management
+Phase 5  — GPS + Geofencing + Verified Attendance
+Phase 6  — Leave + Holiday + Regularization + Approval Workflow
+Phase 7  — Payroll + Salary + Compensation
+Phase 8  — Expense + Reimbursement + Loan + Salary Advance
+Phase 9  — Performance + Goals/KPIs + Appraisal + 360 Feedback
+           + Training + Learning + Employee Engagement
+Phase 10 — Recruitment / ATS + Workforce Planning
+           + Advanced HR Analytics + AI HR Intelligence
+```
+
+---
+
+# 3. CRITICAL RULE
+
+## DO NOT REBUILD EXISTING FUNCTIONALITY
+
+Before writing code:
+
+1. Inspect the complete repository.
+2. Understand the existing architecture.
+3. Understand database conventions.
+4. Understand authentication.
+5. Understand RBAC.
+6. Understand tenant isolation.
+7. Understand employee relationships.
+8. Understand attendance.
+9. Understand leave.
+10. Understand payroll.
+11. Understand expenses.
+12. Understand performance.
+13. Understand recruitment.
+14. Understand analytics.
+15. Understand notifications.
+16. Understand file storage.
+17. Understand audit logging.
+18. Understand background jobs.
+19. Understand frontend architecture.
+20. Understand existing responsive/mobile behavior.
+21. Understand existing API conventions.
+22. Understand existing testing.
+
+Then extend the system.
+
+---
+
+# 4. PHASE 11 OBJECTIVE
+
+Build a comprehensive:
+
+# EMPLOYEE EXPERIENCE PLATFORM
+
+including:
+
+```text
+Employee Self-Service
+Manager Self-Service
+Employee Dashboard
+Mobile/PWA Experience
+Attendance Self-Service
+Leave Self-Service
+Payroll Self-Service
+Expense Self-Service
+Loan/Advance Self-Service
+Performance Self-Service
+Training Self-Service
+Recruitment/Onboarding Self-Service
+Employee Documents
+Digital HR Letters
+HR Requests
+Helpdesk
+Announcements
+Internal Communication
+Employee Directory
+Organization Directory
+Employee Profile
+Emergency Contacts
+Asset Visibility
+Notifications Center
+Approvals Center
+Tasks
+Calendar
+Employee Timeline
+Mobile Notifications
+Offline-capable PWA Foundation
+```
+
+The objective is to reduce HR dependency for routine employee operations.
+
+---
+
+# 5. TARGET EMPLOYEE EXPERIENCE
+
+The employee should be able to access most common HR functions from one place.
+
+Example:
+
+```text
+Employee Login
+      ↓
+Employee Home
+      |
+      +── Attendance
+      |
+      +── Leave
+      |
+      +── Payroll
+      |
+      +── Expenses
+      |
+      +── Loans
+      |
+      +── Performance
+      |
+      +── Training
+      |
+      +── Documents
+      |
+      +── Requests
+      |
+      +── Announcements
+      |
+      +── Directory
+      |
+      +── Profile
+      |
+      +── Notifications
+```
+
+---
+
+# 6. EMPLOYEE HOME DASHBOARD
+
+Create a modern employee dashboard.
+
+Display:
+
+```text
+Today's Attendance
+Check-in Status
+Working Hours
+Shift
+Location Status
+
+Leave Balance
+Upcoming Leave
+
+Payroll Summary
+Latest Payslip
+
+Pending Approvals
+Pending Requests
+
+Goal Progress
+Performance Cycle
+
+Training
+Upcoming Training
+
+Documents
+Recent Documents
+
+Announcements
+Notifications
+
+Birthdays / Work Anniversaries where supported
+```
+
+Dashboard must be personalized according to the logged-in employee.
+
+---
+
+# 7. MANAGER DASHBOARD
+
+Create a Manager Self-Service dashboard.
+
+Display:
+
+```text
+Team Headcount
+Today's Team Attendance
+Absent Employees
+Late Employees
+On Leave
+Pending Approvals
+Pending Regularizations
+Pending Leave Requests
+Pending Expense Requests
+Pending Performance Reviews
+Team Goals
+Team Performance
+Upcoming Birthdays
+Announcements
+```
+
+Manager scope must be enforced by RBAC and organizational hierarchy.
+
+---
+
+# 8. HR DASHBOARD SHORTCUTS
+
+HR users should have quick access to:
+
+```text
+Employee Requests
+Documents
+Announcements
+Employee Directory
+Pending Cases
+HR Helpdesk
+Employee Changes
+Onboarding
+Offboarding
+Reports
+Analytics
+```
+
+Reuse Phase 10 analytics.
+
+---
+
+# 9. EMPLOYEE PROFILE
+
+Create a comprehensive employee profile.
+
+Sections:
+
+```text
+Personal Information
+Employment Information
+Contact Information
+Emergency Contacts
+Organization
+Manager
+Department
+Designation
+Location
+Attendance
+Leave
+Payroll
+Performance
+Training
+Skills
+Certifications
+Documents
+Assets
+Requests
+Timeline
+```
+
+Do not expose fields according to role.
+
+---
+
+# 10. PROFILE EDITING
+
+Employees may update permitted information.
+
+Examples:
+
+```text
+Phone
+Personal Email
+Address
+Emergency Contact
+Profile Photo
+Bank information where permitted
+Personal details where permitted
+```
+
+Sensitive changes should require verification or approval if existing architecture supports it.
+
+Do not allow employees to directly change:
+
+```text
+Employee ID
+Salary
+Department
+Designation
+Manager
+Employment Status
+Joining Date
+Payroll configuration
+```
+
+unless explicitly authorized.
+
+---
+
+# 11. PROFILE CHANGE REQUEST
+
+For controlled fields, implement:
+
+```text
+Employee
+ ↓
+Change Request
+ ↓
+HR/Manager Review
+ ↓
+Approved / Rejected
+ ↓
+Employee Record Updated
+```
+
+Store:
+
+```text
+Old Value
+New Value
+Reason
+Requested By
+Reviewed By
+Status
+Timestamp
+```
+
+Maintain audit history.
+
+---
+
+# 12. EMPLOYEE DIRECTORY
+
+Create searchable employee directory.
+
+Display permitted information:
+
+```text
+Name
+Profile Photo
+Designation
+Department
+Location
+Manager
+Work Email
+Work Phone
+Skills
+```
+
+Do not expose private information.
+
+---
+
+# 13. DIRECTORY SEARCH
+
+Support:
+
+```text
+Name
+Employee ID
+Department
+Designation
+Location
+Skill
+Manager
+```
+
+Use backend pagination.
+
+Do not load the entire employee database into the frontend.
+
+---
+
+# 14. ORGANIZATION DIRECTORY
+
+Provide organizational hierarchy.
+
+Example:
+
+```text
+CEO
+ |
+ +── Engineering
+ |     |
+ |     +── Engineering Manager
+ |     |       |
+ |     |       +── Employees
+ |
+ +── Sales
+ |
+ +── HR
+ |
+ +── Finance
+```
+
+Reuse existing organization/department/employee relationships.
+
+---
+
+# 15. EMPLOYEE TIMELINE
+
+Create employee lifecycle timeline.
+
+Example:
+
+```text
+Joined Organization
+       ↓
+Department Change
+       ↓
+Promotion
+       ↓
+Training
+       ↓
+Performance Review
+       ↓
+Recognition
+       ↓
+Leave
+       ↓
+Other HR Events
+```
+
+Only display events the current user is authorized to view.
+
+---
+
+# 16. ATTENDANCE SELF-SERVICE
+
+Integrate Phase 4/5.
+
+Employee dashboard should provide:
+
+```text
+Check In
+Check Out
+Current Status
+Working Hours
+Shift
+Location
+Attendance History
+```
+
+Use existing attendance APIs.
+
+Do NOT create a second attendance engine.
+
+---
+
+# 17. MOBILE ATTENDANCE
+
+The mobile/PWA experience should support:
+
+```text
+Check In
+Check Out
+Location Capture
+Geofence Validation
+Selfie Verification where enabled
+Attendance Status
+```
+
+Reuse Phase 5 verification mechanisms.
+
+---
+
+# 18. MOBILE LOCATION SECURITY
+
+When location is required:
+
+* Request permission appropriately.
+* Explain why location is needed.
+* Do not continuously track employees unnecessarily.
+* Capture only required location data.
+* Enforce geofence rules on the backend.
+* Never trust frontend GPS values.
+
+The backend must validate attendance.
+
+---
+
+# 19. LEAVE SELF-SERVICE
+
+Integrate Phase 6.
+
+Employee should be able to:
+
+```text
+View Leave Balance
+Apply Leave
+View Leave History
+Cancel Eligible Leave
+View Holiday Calendar
+View Approval Status
+```
+
+Manager should be able to:
+
+```text
+Approve
+Reject
+Request Clarification
+```
+
+Reuse existing approval workflow.
+
+---
+
+# 20. LEAVE CALENDAR
+
+Create calendar views:
+
+```text
+My Leave
+Team Leave
+Organization Holidays
+```
+
+Employees should only see team information permitted by their role.
+
+---
+
+# 21. PAYROLL SELF-SERVICE
+
+Integrate Phase 7.
+
+Employee should be able to view:
+
+```text
+Current Salary Summary
+Payslips
+Salary History where permitted
+Tax Information
+Deductions
+Benefits
+Compensation Documents
+```
+
+Do not expose other employees' salary information.
+
+---
+
+# 22. PAYSLIP VIEWER
+
+Create a secure payslip viewer.
+
+Support:
+
+```text
+Month
+Year
+Gross Salary
+Deductions
+Taxes
+Net Salary
+Employer Contributions
+```
+
+Reuse existing payroll calculations.
+
+Do not duplicate payroll calculation logic.
+
+---
+
+# 23. PAYSLIP DOWNLOAD
+
+Allow authorized employees to download their own payslips.
+
+Security requirements:
+
+* Authorization check
+* Tenant check
+* Employee ownership check
+* Secure file handling
+* Audit logging
+
+---
+
+# 24. EXPENSE SELF-SERVICE
+
+Integrate Phase 8.
+
+Employee should be able to:
+
+```text
+Create Expense
+Upload Receipt
+Submit Claim
+Track Claim
+View Reimbursement
+View Expense History
+```
+
+Manager/HR should see only authorized scope.
+
+---
+
+# 25. LOAN AND ADVANCE SELF-SERVICE
+
+Employees should be able to:
+
+```text
+View Loan Eligibility
+Apply for Loan
+Apply for Salary Advance
+View Loan Status
+View Outstanding Balance
+View Repayment Schedule
+View Deductions
+```
+
+Reuse Phase 8 business logic.
+
+Do not create duplicate loan calculations.
+
+---
+
+# 26. PERFORMANCE SELF-SERVICE
+
+Integrate Phase 9.
+
+Employee should see:
+
+```text
+Performance Cycle
+Goals
+Goal Progress
+KPIs
+Competencies
+Self Assessment
+Manager Feedback
+360 Feedback where configured
+Final Review
+Development Plan
+PIP where applicable
+```
+
+Respect visibility rules.
+
+---
+
+# 27. GOAL UPDATE
+
+Employee should be able to:
+
+```text
+Update Progress
+Add Comments
+Add Evidence
+Update Milestones
+Submit for Review
+```
+
+Do not permit editing finalized goals/reviews.
+
+---
+
+# 28. TRAINING SELF-SERVICE
+
+Employee should see:
+
+```text
+Training Catalog
+Assigned Training
+Upcoming Training
+In Progress
+Completed
+Certificates
+Skill Development
+```
+
+Support training registration where enabled.
+
+---
+
+# 29. CERTIFICATION SELF-SERVICE
+
+Employee should be able to:
+
+```text
+Add Certification
+Upload Certificate
+Update Expiry
+View Status
+```
+
+HR may approve or verify certifications.
+
+---
+
+# 30. RECRUITMENT / ONBOARDING SELF-SERVICE
+
+Integrate Phase 10 recruitment.
+
+For newly hired employees, create onboarding self-service.
+
+Example:
+
+```text
+Offer Accepted
+      ↓
+Onboarding Portal
+      ↓
+Personal Details
+      ↓
+Required Documents
+      ↓
+Bank Details where applicable
+      ↓
+Emergency Contact
+      ↓
+Policy Acknowledgement
+      ↓
+Onboarding Tasks
+      ↓
+Ready for Joining
+```
+
+Do not duplicate employee records.
+
+---
+
+# 31. ONBOARDING TASKS
+
+Create configurable onboarding tasks.
+
+Examples:
+
+```text
+Complete Profile
+Upload Required Document
+Read Employee Handbook
+Accept Policy
+Complete Training
+Meet Manager
+Collect Asset
+Complete Compliance Form
+```
+
+Track:
+
+```text
+Task
+Assigned To
+Due Date
+Status
+Completed At
+```
+
+---
+
+# 32. DOCUMENT MANAGEMENT
+
+Create Employee Document Center.
+
+Categories:
+
+```text
+Employment
+Identity
+Payroll
+Tax
+Policy
+Performance
+Training
+Certification
+Offer
+Promotion
+Appraisal
+Other
+```
+
+Reuse existing file storage.
+
+---
+
+# 33. DIGITAL HR LETTERS
+
+Support HR-generated documents:
+
+```text
+Offer Letter
+Appointment Letter
+Experience Letter
+Promotion Letter
+Salary Revision Letter
+Warning Letter where applicable
+Transfer Letter
+Relieving Letter
+Other HR Letters
+```
+
+Use configurable templates.
+
+---
+
+# 34. DOCUMENT TEMPLATE ENGINE
+
+Create reusable document templates.
+
+Templates may contain variables:
+
+```text
+{{employee_name}}
+{{employee_id}}
+{{designation}}
+{{department}}
+{{joining_date}}
+{{salary}}
+{{manager_name}}
+{{organization_name}}
+```
+
+Do not expose template internals to unauthorized employees.
+
+---
+
+# 35. DOCUMENT GENERATION
+
+Document workflow:
+
+```text
+Template
+ ↓
+Employee Data
+ ↓
+Generate Document
+ ↓
+Review
+ ↓
+Approve if required
+ ↓
+Store
+ ↓
+Employee Access
+```
+
+Store a generated-document snapshot.
+
+If employee data changes later, previously issued documents must not silently change.
+
+---
+
+# 36. DOCUMENT VERSIONING
+
+Maintain:
+
+```text
+Document Version
+Generated At
+Generated By
+Template Version
+Status
+```
+
+Issued documents should be immutable.
+
+---
+
+# 37. ELECTRONIC ACKNOWLEDGEMENT
+
+Allow employees to acknowledge documents.
+
+Store:
+
+```text
+Employee
+Document
+Acknowledged
+Acknowledged At
+Comment
+```
+
+Where legally appropriate, support an extensible signature/acknowledgement architecture.
+
+Do not claim legally binding e-signature functionality unless a compliant signature provider is integrated.
+
+---
+
+# 38. POLICY MANAGEMENT
+
+Create employee policy center.
+
+Display:
+
+```text
+Company Policies
+HR Policies
+Attendance Policy
+Leave Policy
+Remote Work Policy
+Security Policy
+Code of Conduct
+```
+
+Employees can:
+
+```text
+View
+Acknowledge
+Download
+```
+
+Track acknowledgements.
+
+---
+
+# 39. POLICY VERSIONING
+
+When policy changes:
+
+```text
+Policy V1
+ ↓
+Policy V2
+```
+
+Employees must acknowledge the latest required version.
+
+Historical acknowledgements must remain available.
+
+---
+
+# 40. HR REQUEST CENTER
+
+Create centralized HR requests.
+
+Request types:
+
+```text
+Profile Change
+Employment Certificate
+Experience Letter
+Salary Certificate
+Document Request
+Bank Information Change
+Transfer Request
+Department Change
+Designation Change
+Other HR Request
+```
+
+---
+
+# 41. REQUEST LIFECYCLE
+
+Use existing workflow architecture.
+
+Example:
+
+```text
+DRAFT
+ ↓
+SUBMITTED
+ ↓
+UNDER_REVIEW
+ ↓
+APPROVED
+ ↓
+PROCESSING
+ ↓
+COMPLETED
+```
+
+Alternative:
+
+```text
+REJECTED
+CANCELLED
+```
+
+---
+
+# 42. REQUEST TRACKING
+
+Employee should see:
+
+```text
+Request Number
+Request Type
+Created Date
+Status
+Current Approver
+Comments
+Expected Completion
+History
+```
+
+Do not expose internal notes unnecessarily.
+
+---
+
+# 43. HR HELPDESK
+
+Create HR helpdesk/ticketing foundation.
+
+Support:
+
+```text
+Ticket
+Category
+Priority
+Description
+Attachment
+Status
+Assigned HR
+Comments
+Resolution
+```
+
+Statuses:
+
+```text
+OPEN
+ASSIGNED
+IN_PROGRESS
+WAITING_FOR_EMPLOYEE
+RESOLVED
+CLOSED
+REOPENED
+```
+
+---
+
+# 44. HELPDESK CATEGORIES
+
+Examples:
+
+```text
+Payroll
+Leave
+Attendance
+Benefits
+Documents
+Profile
+IT/HR
+Policy
+Recruitment
+Training
+Other
+```
+
+Allow tenant configuration.
+
+---
+
+# 45. TICKET COMMENTS
+
+Support conversation between:
+
+```text
+Employee
+HR
+Assigned Agent
+```
+
+Maintain complete history.
+
+---
+
+# 46. INTERNAL COMMUNICATION
+
+Create communication center.
+
+Support:
+
+```text
+Announcements
+News
+Company Updates
+HR Notices
+Policy Updates
+Events
+Emergency Notices
+```
+
+---
+
+# 47. ANNOUNCEMENTS
+
+Fields:
+
+```text
+Title
+Content
+Category
+Audience
+Priority
+Publish Date
+Expiry Date
+Created By
+Status
+```
+
+Audience can be:
+
+```text
+Entire Organization
+Department
+Branch
+Location
+Designation
+Specific Employees
+```
+
+---
+
+# 48. ANNOUNCEMENT TARGETING
+
+Do not broadcast every announcement to every user.
+
+Evaluate audience server-side.
+
+Example:
+
+```text
+Announcement
+ ↓
+Audience Rules
+ ↓
+Authorized Employees
+ ↓
+Notification
+```
+
+---
+
+# 49. ANNOUNCEMENT ACKNOWLEDGEMENT
+
+For mandatory notices:
+
+```text
+Employee
+ ↓
+Read
+ ↓
+Acknowledge
+```
+
+Track:
+
+```text
+Read At
+Acknowledged At
+```
+
+---
+
+# 50. INTERNAL NEWS FEED
+
+Create optional company feed.
+
+Support:
+
+```text
+Posts
+Announcements
+Images
+Attachments
+Events
+Recognition
+```
+
+Keep the initial implementation controlled and enterprise-oriented.
+
+Do not turn it into an uncontrolled social-media platform.
+
+---
+
+# 51. EMPLOYEE RECOGNITION
+
+Create basic employee recognition.
+
+Employees/managers can give recognition where permitted.
+
+Examples:
+
+```text
+Great Work
+Team Player
+Customer Champion
+Innovation
+Leadership
+Above & Beyond
+```
+
+Store:
+
+```text
+Recipient
+Sender
+Message
+Recognition Type
+Date
+```
+
+HR can moderate/configure the feature.
+
+---
+
+# 52. BIRTHDAY / ANNIVERSARY
+
+Where employee profile data permits, provide:
+
+```text
+Birthdays
+Work Anniversaries
+New Joiners
+```
+
+Respect privacy settings.
+
+Employees should not be forced to expose personal dates publicly.
+
+---
+
+# 53. CALENDAR
+
+Create employee calendar.
+
+Include:
+
+```text
+Shift
+Leave
+Holidays
+Training
+Performance Deadlines
+Interviews where authorized
+HR Events
+Company Events
+```
+
+Use existing scheduling data.
+
+---
+
+# 54. MY TASKS
+
+Create a unified task center.
+
+Aggregate tasks from:
+
+```text
+Leave Approval
+Expense Approval
+Performance Review
+Training
+Onboarding
+HR Requests
+Documents
+Policy Acknowledgement
+```
+
+Do not create duplicate workflows.
+
+The task center should be a unified presentation layer over existing workflows.
+
+---
+
+# 55. MY APPROVALS
+
+Managers/HR should have a centralized approval inbox.
+
+Example:
+
+```text
+Pending Leave
+Pending Expense
+Pending Regularization
+Pending Goal
+Pending Review
+Pending HR Request
+Pending Profile Change
+```
+
+Clicking a task should open the relevant module.
+
+---
+
+# 56. NOTIFICATION CENTER
+
+Create unified notifications.
+
+Categories:
+
+```text
+Attendance
+Leave
+Payroll
+Expense
+Performance
+Training
+Recruitment
+Documents
+HR Requests
+Announcements
+System
+```
+
+Support:
+
+```text
+Unread
+Read
+Mark All Read
+Delete/Archive where appropriate
+```
+
+---
+
+# 57. NOTIFICATION DEEP LINKS
+
+Notifications should navigate users to the correct page.
+
+Example:
+
+```text
+"Leave request approved"
+       ↓
+/leave/requests/123
+```
+
+Deep links must still perform authorization.
+
+Never assume notification ownership grants access.
+
+---
+
+# 58. NOTIFICATION PREFERENCES
+
+Allow users to configure supported notification channels.
+
+Examples:
+
+```text
+Email
+In-App
+Push
+```
+
+Categories:
+
+```text
+Mandatory
+Operational
+Optional
+Marketing only if applicable
+```
+
+Mandatory HR notifications should not be silently disabled if business rules require them.
+
+---
+
+# 59. MOBILE / PWA
+
+Build a Progressive Web App layer if compatible with the existing React architecture.
+
+Requirements:
+
+```text
+Installable
+Responsive
+Mobile-friendly
+Secure
+Fast
+Offline-aware
+```
+
+Do not create a separate mobile codebase unless there is a strong reason.
+
+---
+
+# 60. PWA MANIFEST
+
+Configure:
+
+```text
+App Name
+Short Name
+Icons
+Theme
+Start URL
+Display Mode
+```
+
+Use the existing frontend build system.
+
+---
+
+# 61. SERVICE WORKER
+
+If implementing service workers:
+
+Use them carefully.
+
+Cache:
+
+```text
+Static Assets
+Application Shell
+Safe Read-Only Resources
+```
+
+Do NOT cache sensitive responses indiscriminately.
+
+Avoid storing:
+
+```text
+Payslips
+Salary Data
+Private HR Documents
+Sensitive Employee Data
+```
+
+in insecure client caches.
+
+---
+
+# 62. OFFLINE MODE
+
+Provide limited offline capability.
+
+Potentially support:
+
+```text
+View basic cached shell
+View non-sensitive previously loaded information
+Queue safe actions where appropriate
+```
+
+Do NOT blindly queue sensitive transactions.
+
+For attendance:
+
+```text
+Offline Check-In
+```
+
+should only be implemented if the backend has a secure reconciliation mechanism.
+
+Never fabricate timestamps or GPS data.
+
+---
+
+# 63. MOBILE SECURITY
+
+Protect:
+
+* Authentication tokens
+* Cached data
+* Documents
+* Payslips
+* Personal information
+* Location information
+
+Use secure browser storage patterns.
+
+Do not store sensitive authentication material in insecure local storage if the architecture can avoid it.
+
+---
+
+# 64. SESSION MANAGEMENT
+
+Support:
+
+```text
+Active Sessions
+Device Information
+Last Active
+Logout Session
+Logout All Sessions
+```
+
+Use the existing authentication infrastructure.
+
+Do not create a second identity system.
+
+---
+
+# 65. DEVICE MANAGEMENT
+
+Where supported, show:
+
+```text
+Browser
+Device
+Last Active
+Approximate Location where legally/technically appropriate
+Session Status
+```
+
+Allow user to revoke sessions.
+
+---
+
+# 66. PROFILE PHOTO
+
+Support profile image upload.
+
+Requirements:
+
+* Validate MIME
+* Validate file size
+* Resize/optimize
+* Secure storage
+* Authorization
+* Tenant isolation
+
+Do not allow arbitrary executable uploads.
+
+---
+
+# 67. EMERGENCY CONTACTS
+
+Employees should manage permitted emergency contacts.
+
+Fields:
+
+```text
+Name
+Relationship
+Phone
+Email
+Address
+Primary Contact
+```
+
+Protect this information with strict authorization.
+
+---
+
+# 68. EMPLOYEE ASSETS
+
+Provide employee visibility into assigned company assets where Phase 3 or future asset management supports them.
+
+Display:
+
+```text
+Asset
+Asset ID
+Assigned Date
+Condition
+Status
+```
+
+If asset-management functionality does not yet exist, create only the integration contract rather than duplicating an asset system.
+
+---
+
+# 69. COMPANY DIRECTORY PRIVACY
+
+Implement employee privacy settings.
+
+Examples:
+
+```text
+Show Phone
+Show Email
+Show Birthday
+Show Location
+Show Profile
+```
+
+Company policy may override certain fields.
+
+---
+
+# 70. SEARCH
+
+Provide global employee-facing search.
+
+Search permitted resources:
+
+```text
+Employees
+Policies
+Announcements
+Documents
+Training
+HR Requests
+```
+
+Every search result must be permission-filtered.
+
+---
+
+# 71. GLOBAL SEARCH SECURITY
+
+Never search the database globally and filter only in the frontend.
+
+Incorrect:
+
+```text
+Database
+ ↓
+All Records
+ ↓
+Frontend Filter
+```
+
+Correct:
+
+```text
+User
+ ↓
+Permissions
+ ↓
+Tenant Scope
+ ↓
+Authorized Query
+ ↓
+Results
+```
+
+---
+
+# 72. FRONTEND NAVIGATION
+
+Create a role-aware navigation system.
+
+Employee:
+
+```text
+Home
+Attendance
+Leave
+Payroll
+Expenses
+Loans
+Performance
+Training
+Documents
+Requests
+Helpdesk
+Announcements
+Directory
+Profile
+Notifications
+```
+
+Manager:
+
+```text
+Home
+My Team
+Approvals
+Attendance
+Leave
+Expenses
+Performance
+Training
+Requests
+Directory
+```
+
+HR/Admin:
+
+Use existing administrative navigation.
+
+Do not duplicate the entire admin portal.
+
+---
+
+# 73. MOBILE NAVIGATION
+
+Use mobile-friendly navigation such as:
+
+```text
+Home
+Tasks
+Notifications
+Profile
+More
+```
+
+Avoid overcrowding.
+
+---
+
+# 74. UI/UX
+
+The employee portal must feel like one unified product.
+
+Use:
+
+* Consistent cards
+* Tables
+* Forms
+* Modals
+* Drawers
+* Notifications
+* Empty states
+* Skeleton loaders
+* Error states
+* Confirmation dialogs
+
+Reuse existing design system.
+
+---
+
+# 75. ACCESSIBILITY
+
+Implement:
+
+* Keyboard support
+* Accessible labels
+* Focus handling
+* Screen-reader support
+* Color-independent status indicators
+* Proper form errors
+* Accessible dialogs
+
+---
+
+# 76. API ARCHITECTURE
+
+Follow the existing FastAPI architecture.
+
+Potential endpoints:
+
+```text
+/api/v1/me
+/api/v1/me/profile
+/api/v1/me/profile/change-requests
+/api/v1/me/attendance
+/api/v1/me/leave
+/api/v1/me/payroll
+/api/v1/me/payslips
+/api/v1/me/expenses
+/api/v1/me/loans
+/api/v1/me/performance
+/api/v1/me/training
+/api/v1/me/certifications
+/api/v1/me/documents
+/api/v1/me/requests
+/api/v1/me/tasks
+/api/v1/me/notifications
+/api/v1/me/calendar
+
+/api/v1/team
+/api/v1/team/attendance
+/api/v1/team/leave
+/api/v1/team/approvals
+/api/v1/team/performance
+
+/api/v1/directory
+/api/v1/announcements
+/api/v1/policies
+/api/v1/helpdesk
+/api/v1/recognition
+```
+
+Adapt routes to existing conventions.
+
+---
+
+# 77. "ME" API SECURITY
+
+The `/me` API must determine the employee from the authenticated identity.
+
+Do not trust:
+
+```text
+employee_id
+```
+
+sent by the frontend to access another employee's information.
+
+Correct:
+
+```text
+JWT/session
+ ↓
+Authenticated User
+ ↓
+Linked Employee
+ ↓
+Employee Data
+```
+
+---
+
+# 78. API PAGINATION
+
+Paginate:
+
+```text
+Notifications
+Documents
+Requests
+Tickets
+Announcements
+Directory
+Tasks
+History
+```
+
+Never return unbounded datasets.
+
+---
+
+# 79. API FILTERING
+
+Support appropriate:
+
+```text
+Date Range
+Status
+Category
+Department
+Location
+Priority
+```
+
+But enforce authorization before filtering.
+
+---
+
+# 80. DATABASE DESIGN
+
+Inspect existing models first.
+
+Potential Phase 11 tables:
+
+```text
+employee_profile_change_requests
+
+employee_documents
+document_templates
+document_versions
+document_acknowledgements
+
+hr_policies
+policy_versions
+policy_acknowledgements
+
+hr_requests
+hr_request_comments
+
+helpdesk_tickets
+helpdesk_comments
+helpdesk_attachments
+
+announcements
+announcement_audiences
+announcement_reads
+announcement_acknowledgements
+
+employee_recognitions
+
+employee_privacy_settings
+
+onboarding_tasks
+onboarding_task_assignments
+
+employee_sessions
+
+notification_preferences
+```
+
+Do not create duplicates of existing notification, document, workflow, or employee tables.
+
+---
+
+# 81. DATABASE CONSTRAINTS
+
+Use:
+
+* Foreign keys
+* Unique constraints
+* Check constraints
+* Tenant constraints
+* Appropriate indexes
+
+Maintain historical data.
+
+---
+
+# 82. TENANT ISOLATION
+
+Every tenant-owned resource must enforce tenant isolation.
+
+Never allow:
+
+```text
+Tenant A Employee
+ ↓
+Tenant B Document
+```
+
+or:
+
+```text
+Tenant A User
+ ↓
+Tenant B Announcement
+```
+
+---
+
+# 83. RBAC
+
+Reuse the existing authorization system.
+
+Potential permissions:
+
+```text
+self.profile.view
+self.profile.update
+self.documents.view
+self.documents.download
+self.requests.create
+self.requests.view
+self.helpdesk.create
+self.helpdesk.view
+self.announcements.view
+
+team.view
+team.approvals
+team.attendance.view
+team.leave.view
+team.performance.view
+
+documents.manage
+announcements.manage
+policies.manage
+helpdesk.manage
+```
+
+Use existing naming conventions.
+
+---
+
+# 84. MANAGER SCOPE
+
+A manager may access only employees within their authorized hierarchy.
+
+Do not rely solely on:
+
+```text
+manager_id == current_user.employee_id
+```
+
+if the organization supports:
+
+* Multiple levels
+* Matrix reporting
+* Delegation
+* Temporary managers
+* Department scopes
+
+Use the existing organizational authorization model.
+
+---
+
+# 85. APPROVAL DELEGATION
+
+If the existing approval system supports delegation, integrate it.
+
+Example:
+
+```text
+Manager unavailable
+ ↓
+Delegated Approver
+ ↓
+Approval
+```
+
+Do not create a separate delegation system unless necessary.
+
+---
+
+# 86. DOCUMENT SECURITY
+
+Document downloads must validate:
+
+```text
+Authenticated User
+Tenant
+Document Ownership
+Permission
+Document Status
+```
+
+Do not expose storage URLs directly if that bypasses authorization.
+
+Use secure access mechanisms.
+
+---
+
+# 87. AUDIT LOGGING
+
+Audit:
+
+```text
+Profile Change Request
+Profile Update
+Document Upload
+Document Download where required
+Document Acknowledgement
+Policy Acknowledgement
+HR Request
+Ticket
+Announcement
+Recognition
+Session Revocation
+Notification Preference Changes
+```
+
+---
+
+# 88. SENSITIVE DATA AUDIT
+
+Pay special attention to:
+
+```text
+Salary
+Payslips
+Bank Information
+Emergency Contacts
+Personal Address
+Identity Documents
+HR Documents
+Performance Records
+Private HR Tickets
+```
+
+Do not expose them through generic employee APIs.
+
+---
+
+# 89. BACKGROUND JOBS
+
+Reuse Celery/Redis.
+
+Possible jobs:
+
+```text
+Document expiry reminders
+Policy acknowledgement reminders
+Announcement notifications
+HR request reminders
+Helpdesk SLA reminders
+Training reminders
+Onboarding reminders
+Birthday/anniversary notifications where enabled
+```
+
+Jobs must be:
+
+* Idempotent
+* Retry-safe
+* Logged
+* Tenant-aware
+
+---
+
+# 90. NOTIFICATIONS
+
+Integrate existing notification service.
+
+Examples:
+
+```text
+Leave Approved
+Expense Approved
+Payslip Available
+Document Uploaded
+Policy Requires Acknowledgement
+HR Request Updated
+Ticket Updated
+Training Assigned
+Performance Review Opened
+Announcement Published
+```
+
+---
+
+# 91. EMAIL
+
+Reuse existing email infrastructure.
+
+Add templates where required:
+
+```text
+HR Request Created
+HR Request Updated
+Ticket Created
+Ticket Updated
+Document Available
+Policy Acknowledgement Required
+Announcement
+Onboarding Reminder
+```
+
+---
+
+# 92. PUSH NOTIFICATIONS
+
+If the existing architecture supports push notifications, integrate it.
+
+Do not make push notifications mandatory for core web functionality.
+
+---
+
+# 93. OFFLINE SYNCHRONIZATION
+
+If offline actions are supported:
+
+Use a controlled queue:
+
+```text
+Local Action
+ ↓
+Action ID
+ ↓
+Sync Queue
+ ↓
+Server
+ ↓
+Idempotency Check
+ ↓
+Validation
+ ↓
+Commit
+ ↓
+Sync Result
+```
+
+Never blindly replay actions.
+
+---
+
+# 94. IDEMPOTENCY
+
+Protect against duplicate requests.
+
+Especially:
+
+```text
+Leave Submission
+Expense Submission
+HR Request
+Ticket Creation
+Document Upload
+Attendance Check-In
+Attendance Check-Out
+Profile Change
+```
+
+Use existing idempotency architecture if present.
+
+---
+
+# 95. CONCURRENCY
+
+Protect:
+
+```text
+Duplicate approvals
+Duplicate submissions
+Duplicate attendance events
+Duplicate document generation
+Duplicate employee onboarding completion
+```
+
+Use:
+
+* Transactions
+* Unique constraints
+* Locking where appropriate
+* Idempotency
+
+---
+
+# 96. PERFORMANCE
+
+Optimize:
+
+* Employee dashboard
+* Notification center
+* Directory
+* Document center
+* Manager dashboard
+* Approval inbox
+* Mobile API
+
+Avoid N+1 queries.
+
+Use optimized backend aggregation.
+
+---
+
+# 97. MOBILE API OPTIMIZATION
+
+Mobile clients should receive compact payloads.
+
+Avoid returning huge objects.
+
+Provide dashboard aggregation endpoints where useful.
+
+Example:
+
+```text
+GET /api/v1/me/dashboard
+```
+
+can return a controlled summary.
+
+---
+
+# 98. SECURITY HEADERS
+
+Ensure frontend/backend use appropriate security controls.
+
+Examples:
+
+```text
+HTTPS
+Secure Cookies where applicable
+HttpOnly Cookies where applicable
+Content Security Policy
+X-Content-Type-Options
+Frame protection
+Referrer policy
+```
+
+Adapt to existing infrastructure.
+
+---
+
+# 99. RATE LIMITING
+
+Protect:
+
+```text
+Login
+OTP if used
+Public recruitment
+HR requests
+Ticket creation
+Document operations
+Notification APIs
+Search
+```
+
+Reuse existing rate-limiting infrastructure.
+
+---
+
+# 100. FILE UPLOAD SECURITY
+
+For employee documents:
+
+Validate:
+
+```text
+Extension
+MIME
+File Size
+Content Type
+Filename
+```
+
+Prevent:
+
+```text
+Executable uploads
+Path traversal
+Malicious filenames
+Cross-tenant access
+Unauthorized download
+```
+
+---
+
+# 101. DATA VALIDATION
+
+Use Pydantic/backend validation.
+
+Never trust frontend validation alone.
+
+Validate:
+
+```text
+Dates
+Phone
+Email
+File metadata
+Request type
+Status transitions
+Employee ownership
+Document ownership
+```
+
+---
+
+# 102. HR REQUEST WORKFLOW
+
+Use existing workflow engine where possible.
+
+Do not implement hard-coded approval chains inside frontend components.
+
+---
+
+# 103. HELP DESK SLA
+
+Create an extensible SLA structure.
+
+Potential configuration:
+
+```text
+Priority
+Response Time
+Resolution Time
+Escalation
+```
+
+If full SLA automation is too large for this phase, implement the data model and service architecture for future expansion.
+
+---
+
+# 104. ANNOUNCEMENT SCHEDULING
+
+Allow HR to schedule announcements.
+
+Example:
+
+```text
+Draft
+ ↓
+Scheduled
+ ↓
+Published
+ ↓
+Expired
+```
+
+Background jobs should publish/expire them.
+
+---
+
+# 105. ANNOUNCEMENT PRIORITY
+
+Support:
+
+```text
+NORMAL
+IMPORTANT
+URGENT
+```
+
+Urgent notifications should be carefully controlled.
+
+Do not spam employees.
+
+---
+
+# 106. EMPLOYEE SEARCH PRIVACY
+
+Do not expose:
+
+* Personal phone unless allowed
+* Personal email unless allowed
+* Home address
+* Bank details
+* Salary
+* Performance details
+* Emergency contacts
+
+through directory APIs.
+
+---
+
+# 107. PROFILE DATA SEPARATION
+
+Separate:
+
+```text
+Public Work Profile
+Private Personal Profile
+Sensitive HR Profile
+Payroll Profile
+```
+
+Use different authorization boundaries.
+
+---
+
+# 108. API RESPONSE DESIGN
+
+Use existing response standards.
+
+Example:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Request submitted successfully"
+}
+```
+
+For errors:
+
+```json
+{
+  "success": false,
+  "message": "You are not authorized to access this document",
+  "error_code": "DOCUMENT_ACCESS_DENIED"
+}
+```
+
+Never expose stack traces.
+
+---
+
+# 109. FRONTEND STATE MANAGEMENT
+
+Reuse existing state-management patterns.
+
+Do not introduce a new state-management library unless necessary.
+
+---
+
+# 110. TYPESCRIPT
+
+Use strict types.
+
+Avoid unnecessary:
+
+```typescript
+any
+```
+
+Create types for:
+
+```text
+Employee
+Profile
+Document
+HRRequest
+Ticket
+Announcement
+Notification
+Task
+Approval
+Policy
+Recognition
+```
+
+---
+
+# 111. GLOBAL TASK CENTER
+
+Create a reusable task aggregation component.
+
+Example:
+
+```text
+My Tasks
+-------------------------
+Leave Approval        2
+Expense Approval      3
+Performance Review    1
+Policy Acknowledgement 2
+Training              1
+HR Request            1
+```
+
+Each item deep-links into the correct module.
+
+---
+
+# 112. EMPLOYEE DASHBOARD WIDGETS
+
+Widgets should be configurable.
+
+Possible widgets:
+
+```text
+Attendance
+Leave
+Payslip
+Tasks
+Notifications
+Goals
+Training
+Documents
+Announcements
+```
+
+Allow future tenant customization.
+
+---
+
+# 113. MOBILE DASHBOARD
+
+Prioritize:
+
+```text
+Attendance
+Leave
+Tasks
+Notifications
+Payslip
+Requests
+Profile
+```
+
+Keep mobile dashboard lightweight.
+
+---
+
+# 114. PWA INSTALLATION
+
+Provide install experience where browser/platform supports it.
+
+Do not block users who do not install the PWA.
+
+The normal browser application must continue working.
+
+---
+
+# 115. MOBILE ERROR HANDLING
+
+Handle:
+
+```text
+Offline
+Slow Network
+Expired Session
+Permission Denied
+Location Permission Denied
+Server Error
+Upload Failure
+```
+
+Provide clear recovery actions.
+
+---
+
+# 116. ACCESSIBILITY ON MOBILE
+
+Ensure:
+
+* Touch targets are usable
+* Forms are readable
+* Text scales appropriately
+* Keyboard does not hide important controls
+* Dialogs are accessible
+
+---
+
+# 117. TESTING — UNIT
+
+Create tests for:
+
+```text
+Profile permissions
+Change request workflow
+Document permissions
+Policy acknowledgement
+HR request lifecycle
+Announcement targeting
+Notification preferences
+Task aggregation
+Directory filtering
+Session revocation
+```
+
+---
+
+# 118. API TESTING
+
+Test:
+
+```text
+Authentication
+Authorization
+Tenant isolation
+Employee ownership
+Manager scope
+Pagination
+Filtering
+Validation
+Error handling
+Idempotency
+```
+
+---
+
+# 119. SECURITY TESTING
+
+Explicitly test:
+
+### IDOR
+
+Change document/request/employee IDs.
+
+Expected:
+
+```text
+403 / 404
+```
+
+### Cross-Tenant
+
+Attempt access to another tenant.
+
+Expected:
+
+```text
+403 / 404
+```
+
+### Employee → HR
+
+Employee must not access HR-only APIs.
+
+### Manager Scope
+
+Manager cannot access unauthorized employees.
+
+### Payslip Security
+
+Employee cannot access another employee's payslip.
+
+### Document Security
+
+Employee cannot access another employee's private document.
+
+---
+
+# 120. FILE SECURITY TESTS
+
+Attempt:
+
+```text
+Executable upload
+Invalid MIME
+Oversized file
+Path traversal
+Unauthorized download
+Cross-tenant download
+```
+
+All must be rejected or safely handled.
+
+---
+
+# 121. NOTIFICATION TESTS
+
+Verify:
+
+```text
+Notification creation
+Read/unread
+Mark all read
+Deep links
+Authorization
+Tenant isolation
+Preferences
+Duplicate prevention
+```
+
+---
+
+# 122. PWA TESTING
+
+Test:
+
+```text
+Installability
+Responsive layout
+Service worker
+Cache behavior
+Offline shell
+Session expiry
+Network recovery
+```
+
+Ensure sensitive data is not unintentionally cached.
+
+---
+
+# 123. MOBILE ATTENDANCE TESTING
+
+Test:
+
+```text
+Location allowed
+Location denied
+Inside geofence
+Outside geofence
+Selfie verification
+Network failure
+Duplicate check-in
+Duplicate check-out
+```
+
+---
+
+# 124. HR REQUEST INTEGRATION TEST
+
+Test:
+
+```text
+Employee
+ ↓
+Create Request
+ ↓
+Manager/HR Approval
+ ↓
+Processing
+ ↓
+Completion
+ ↓
+Notification
+```
+
+---
+
+# 125. DOCUMENT INTEGRATION TEST
+
+Test:
+
+```text
+HR generates document
+ ↓
+Document stored
+ ↓
+Employee notified
+ ↓
+Employee opens
+ ↓
+Employee downloads
+ ↓
+Employee acknowledges
+```
+
+---
+
+# 126. POLICY INTEGRATION TEST
+
+Test:
+
+```text
+HR publishes policy
+ ↓
+Targeted employees notified
+ ↓
+Employee reads
+ ↓
+Employee acknowledges
+ ↓
+Audit recorded
+```
+
+---
+
+# 127. HELP DESK INTEGRATION TEST
+
+Test:
+
+```text
+Employee creates ticket
+ ↓
+HR assigned
+ ↓
+HR responds
+ ↓
+Employee responds
+ ↓
+Resolved
+ ↓
+Closed
+```
+
+---
+
+# 128. REGRESSION TESTING
+
+Run the complete test suite:
+
+```text
+Phase 1
+Phase 2
+Phase 3
+Phase 4
+Phase 5
+Phase 6
+Phase 7
+Phase 8
+Phase 9
+Phase 10
+Phase 11
+```
+
+No regression is acceptable in completed modules.
+
+---
+
+# 129. DATABASE MIGRATIONS
+
+Create proper migrations.
+
+Requirements:
+
+```text
+Clean database migration
+Existing Phase 1–10 migration
+Migration validation
+Rollback where practical
+No destructive changes
+```
+
+---
+
+# 130. SEED DATA
+
+Create development seed data for:
+
+```text
+HR Request Types
+Announcement Categories
+Helpdesk Categories
+Policy Types
+Document Types
+Recognition Types
+Notification Preferences
+Onboarding Tasks
+```
+
+Do not insert fake production employees or sensitive records.
+
+---
+
+# 131. DOCUMENTATION
+
+Update:
+
+```text
+README
+Architecture
+Employee Self-Service
+Manager Self-Service
+Mobile/PWA
+Documents
+HR Requests
+Helpdesk
+Announcements
+Notifications
+RBAC
+API
+Database
+Testing
+Deployment
+```
+
+---
+
+# 132. API DOCUMENTATION
+
+Ensure OpenAPI documentation covers:
+
+* Request schemas
+* Response schemas
+* Authentication
+* Permissions
+* Error responses
+* Pagination
+* File upload requirements
+
+---
+
+# 133. DEPLOYMENT
+
+Ensure Phase 11 works with:
+
+```text
+FastAPI
+React
+PostgreSQL
+Redis
+Celery
+Docker
+Docker Compose
+Existing CI/CD
+```
+
+Do not introduce unnecessary infrastructure.
+
+---
+
+# 134. OBSERVABILITY
+
+Track:
+
+```text
+Dashboard latency
+API latency
+File upload failures
+Notification failures
+Background job failures
+PWA errors
+HR ticket errors
+Document generation errors
+```
+
+---
+
+# 135. SECURITY REVIEW
+
+Before declaring completion, perform a full review:
+
+```text
+Authentication
+Authorization
+RBAC
+Tenant isolation
+IDOR
+Document security
+Payslip security
+Employee privacy
+File uploads
+Public endpoints
+Session management
+Mobile security
+PWA caching
+Notification security
+```
+
+---
+
+# 136. PRODUCTION READINESS
+
+Verify:
+
+```text
+Backend
+Frontend
+Database
+Migrations
+Redis
+Celery
+Notifications
+File Storage
+PWA
+Security
+Testing
+Logging
+Monitoring
+Documentation
+CI/CD
+Docker
+```
+
+---
+
+# 137. FINAL DEFINITION OF DONE
+
+## Employee Self-Service
+
+* [ ] Employee dashboard
+* [ ] Employee profile
+* [ ] Profile change requests
+* [ ] Attendance self-service
+* [ ] Leave self-service
+* [ ] Payroll self-service
+* [ ] Payslip viewer
+* [ ] Expense self-service
+* [ ] Loan/advance self-service
+* [ ] Performance self-service
+* [ ] Training self-service
+* [ ] Certification management
+* [ ] Document center
+* [ ] HR requests
+* [ ] Helpdesk
+* [ ] Announcements
+* [ ] Employee directory
+* [ ] Organization directory
+* [ ] Employee timeline
+* [ ] Calendar
+* [ ] Tasks
+* [ ] Notifications
+* [ ] Recognition
+* [ ] Policy acknowledgement
+
+## Manager Self-Service
+
+* [ ] Manager dashboard
+* [ ] Team attendance
+* [ ] Team leave
+* [ ] Approvals
+* [ ] Team performance
+* [ ] Team directory
+* [ ] Team tasks
+* [ ] Team notifications
+
+## Documents
+
+* [ ] Document center
+* [ ] Document templates
+* [ ] Document versioning
+* [ ] HR letters
+* [ ] Secure downloads
+* [ ] Acknowledgement
+* [ ] Policy versioning
+
+## Communication
+
+* [ ] Announcements
+* [ ] Targeted announcements
+* [ ] Announcement scheduling
+* [ ] News/feed foundation
+* [ ] Recognition
+* [ ] Notifications
+* [ ] Notification preferences
+
+## Helpdesk
+
+* [ ] Ticket creation
+* [ ] Assignment
+* [ ] Comments
+* [ ] Attachments
+* [ ] Status lifecycle
+* [ ] Basic SLA architecture
+
+## Mobile/PWA
+
+* [ ] Responsive UI
+* [ ] PWA manifest
+* [ ] Service worker where appropriate
+* [ ] Mobile dashboard
+* [ ] Mobile attendance
+* [ ] Network handling
+* [ ] Secure caching
+* [ ] Session management
+
+## Security
+
+* [ ] RBAC
+* [ ] Tenant isolation
+* [ ] IDOR protection
+* [ ] Document protection
+* [ ] Payslip protection
+* [ ] Employee privacy
+* [ ] File validation
+* [ ] Session security
+* [ ] PWA security
+
+## Testing
+
+* [ ] Unit tests
+* [ ] API tests
+* [ ] Integration tests
+* [ ] Security tests
+* [ ] RBAC tests
+* [ ] Tenant tests
+* [ ] File security tests
+* [ ] Mobile tests
+* [ ] PWA tests
+* [ ] Regression tests
+
+---
+
+# 138. REQUIRED FINAL REPORT
+
+After implementation, provide a detailed report.
+
+## 1. Repository Analysis
+
+Explain:
+
+* Existing architecture
+* Existing services reused
+* Existing modules reused
+* Existing database entities reused
+
+## 2. Files Created
+
+List every new file.
+
+## 3. Files Modified
+
+List every modified file.
+
+## 4. Database Changes
+
+Report:
+
+```text
+Tables
+Columns
+Indexes
+Foreign Keys
+Constraints
+Migrations
+```
+
+## 5. API Changes
+
+Report:
+
+```text
+Endpoint
+Method
+Purpose
+Permission
+```
+
+## 6. Frontend Changes
+
+Report:
+
+```text
+Pages
+Components
+Hooks
+Services
+Routes
+PWA changes
+```
+
+## 7. Employee Experience
+
+Explain:
+
+* Employee dashboard
+* Self-service
+* Requests
+* Documents
+* Notifications
+
+## 8. Manager Experience
+
+Explain:
+
+* Team dashboard
+* Approvals
+* Team information
+
+## 9. Mobile/PWA
+
+Explain:
+
+* Responsive implementation
+* PWA
+* Offline behavior
+* Mobile security
+
+## 10. Security
+
+Explain:
+
+* Tenant isolation
+* RBAC
+* IDOR protection
+* Document security
+* Payslip security
+* Privacy
+
+## 11. Testing
+
+Report:
+
+```text
+Total Tests
+Passed
+Failed
+Skipped
+Coverage
+```
+
+## 12. Known Issues
+
+Clearly list anything incomplete.
+
+Never claim production readiness if critical functionality remains unfinished.
+
+---
+
+# 139. CRITICAL DEVELOPMENT SEQUENCE
+
+Follow this sequence exactly:
+
+```text
+STEP 1
+Inspect repository
+
+↓
+
+STEP 2
+Understand Phase 1–10 architecture
+
+↓
+
+STEP 3
+Map reusable services
+
+↓
+
+STEP 4
+Map existing employee/HR entities
+
+↓
+
+STEP 5
+Design Phase 11 extension
+
+↓
+
+STEP 6
+Implement database migrations
+
+↓
+
+STEP 7
+Implement Employee Self-Service
+
+↓
+
+STEP 8
+Implement Manager Self-Service
+
+↓
+
+STEP 9
+Implement Documents
+
+↓
+
+STEP 10
+Implement HR Requests
+
+↓
+
+STEP 11
+Implement Helpdesk
+
+↓
+
+STEP 12
+Implement Announcements/Communication
+
+↓
+
+STEP 13
+Implement Unified Tasks
+
+↓
+
+STEP 14
+Implement Notification Center
+
+↓
+
+STEP 15
+Implement Mobile/PWA layer
+
+↓
+
+STEP 16
+Implement security controls
+
+↓
+
+STEP 17
+Implement automated tests
+
+↓
+
+STEP 18
+Run complete Phase 1–11 regression suite
+
+↓
+
+STEP 19
+Fix failures
+
+↓
+
+STEP 20
+Perform security review
+
+↓
+
+STEP 21
+Update documentation
+
+↓
+
+STEP 22
+Verify Docker/CI/CD
+
+↓
+
+STEP 23
+Provide final implementation report
+```
+
+---
+
+# 140. MOST IMPORTANT RULE
+
+## INSPECT FIRST → UNDERSTAND SECOND → DESIGN THIRD → IMPLEMENT FOURTH → TEST FIFTH → SECURE SIXTH → DOCUMENT LAST
+
+Do not blindly generate files.
+
+Do not recreate existing modules.
+
+Do not create a second authentication system.
+
+Do not create a second RBAC system.
+
+Do not create a second notification system.
+
+Do not create a second workflow engine.
+
+Do not create a second attendance engine.
+
+Do not create a second payroll engine.
+
+Do not create a second employee system.
+
+Do not bypass tenant isolation.
+
+Do not trust frontend authorization.
+
+Do not expose confidential employee information.
+
+Do not cache sensitive employee data insecurely.
+
+Do not break Phases 1–10.
+
+The objective is to transform AxonTimeHR into a **unified employee-facing HR platform** where employees, managers, HR teams, and administrators can perform their daily HR activities through a secure, responsive, mobile-friendly, self-service experience.
+
+# END OF AXONTIMEHR PHASE 11 DEVELOPMENT PROMPT

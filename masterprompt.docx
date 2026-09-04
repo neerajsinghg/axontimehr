@@ -1,0 +1,1901 @@
+Absolutely. Since you want to build this using your **Antigravity agent**, I recommend giving the agent **one master prompt** that tells it the product vision, architecture, coding rules, development phases, database design, UI expectations, security requirements, testing, and—most importantly—**not to rush into generating the entire application at once**.
+
+You can paste the following prompt directly into your Antigravity agent.
+
+# MASTER PROMPT — MODERN ATTENDANCE & HRMS SAAS PLATFORM
+
+## 1. ROLE
+
+You are a senior software architect, product designer, full-stack engineer, database architect, DevOps engineer, security engineer, and QA automation engineer.
+
+Your task is to design and build a **modern, production-ready, scalable Attendance and HRMS SaaS platform** similar in concept to modern HRMS products such as SpineHR, but with a significantly more modern UI, better architecture, better automation, better reporting, and future AI capabilities.
+
+Do not create a simple demo application.
+
+Build this as a **real SaaS product architecture** that can eventually be offered to multiple companies as a subscription-based service.
+
+The application must be:
+
+* Modern
+* Responsive
+* Secure
+* Scalable
+* Multi-tenant
+* API-first
+* Maintainable
+* Testable
+* Production-ready
+* Easy to extend
+* Easy to deploy
+* Suitable for web and mobile clients
+
+---
+
+# 2. IMPORTANT DEVELOPMENT RULE
+
+DO NOT attempt to generate the entire application in one step.
+
+Build the application in clearly defined phases.
+
+Before implementing a major phase:
+
+1. Analyze the existing project.
+2. Inspect the current folder structure.
+3. Identify existing code.
+4. Identify dependencies.
+5. Identify potential architectural problems.
+6. Create/update the technical design.
+7. Implement the phase.
+8. Run tests.
+9. Fix errors.
+10. Verify that existing functionality still works.
+11. Document what was implemented.
+12. Then continue to the next phase.
+
+Never blindly overwrite existing code.
+
+If an existing implementation is good, reuse it.
+
+If an implementation is poor, refactor it carefully.
+
+---
+
+# 3. PRODUCT VISION
+
+Create a SaaS platform where multiple organizations can manage:
+
+* Employees
+* Departments
+* Designations
+* Branches
+* Locations
+* Attendance
+* Shifts
+* Leave
+* Holidays
+* Overtime
+* Attendance regularization
+* Approval workflows
+* Payroll preparation
+* Reports
+* Notifications
+* User roles
+* Permissions
+* Audit logs
+* Subscription plans
+* API integrations
+
+Future capabilities should include:
+
+* AI HR assistant
+* Attendance anomaly detection
+* AI-generated reports
+* Predictive absenteeism analysis
+* Advanced employee analytics
+* Face verification
+* Attendance fraud detection
+
+---
+
+# 4. TECHNOLOGY STACK
+
+Use the following architecture unless there is a strong technical reason to change it.
+
+## Frontend
+
+Use:
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Modern component architecture
+* Responsive design
+* React Router
+* React Query / TanStack Query
+* Form validation
+* Reusable components
+
+The frontend must be designed as a professional SaaS dashboard.
+
+Do NOT create old-fashioned HTML-style forms.
+
+---
+
+# 5. BACKEND
+
+Use:
+
+* Python
+* FastAPI
+* Pydantic
+* SQLAlchemy
+* Alembic
+* PostgreSQL
+
+Backend architecture should follow clean separation:
+
+```text
+API Layer
+    ↓
+Service Layer
+    ↓
+Repository/Data Access Layer
+    ↓
+Database
+```
+
+Do not put business logic directly inside route functions.
+
+Use:
+
+```text
+routers/
+services/
+repositories/
+models/
+schemas/
+core/
+middleware/
+utils/
+```
+
+---
+
+# 6. BACKGROUND PROCESSING
+
+Use:
+
+* Redis
+* Celery
+
+Background jobs should be used for tasks such as:
+
+* Email notifications
+* Report generation
+* Attendance calculations
+* Payroll processing
+* Scheduled notifications
+* Daily attendance processing
+* Monthly attendance closing
+* Large Excel exports
+* PDF generation
+* AI processing
+* Scheduled cleanup
+
+Do not perform heavy processing directly inside HTTP request handlers.
+
+---
+
+# 7. DATABASE
+
+Use PostgreSQL.
+
+The system must be designed as a **multi-tenant SaaS database**.
+
+Core tables should include:
+
+```text
+companies
+users
+employees
+departments
+designations
+branches
+locations
+shifts
+shift_assignments
+attendance
+attendance_punches
+attendance_regularization
+leave_types
+leave_balances
+leave_requests
+holidays
+overtime
+payroll
+roles
+permissions
+role_permissions
+user_roles
+notifications
+audit_logs
+subscriptions
+subscription_plans
+api_keys
+webhooks
+```
+
+Additional tables can be introduced when required.
+
+---
+
+# 8. MULTI-TENANCY
+
+This is one of the most important requirements.
+
+The application must support multiple companies.
+
+Example:
+
+```text
+Platform
+│
+├── Company A
+│   ├── Employees
+│   ├── Attendance
+│   ├── Leave
+│   └── Payroll
+│
+├── Company B
+│   ├── Employees
+│   ├── Attendance
+│   ├── Leave
+│   └── Payroll
+│
+└── Company C
+    ├── Employees
+    ├── Attendance
+    ├── Leave
+    └── Payroll
+```
+
+Company A must NEVER be able to access Company B's data.
+
+Every tenant-sensitive database record must be associated with the appropriate organization/company/tenant.
+
+Implement strong tenant isolation.
+
+Never trust a tenant/company ID supplied by the frontend without validating it against the authenticated user.
+
+---
+
+# 9. AUTHENTICATION
+
+Implement secure authentication.
+
+Use:
+
+* JWT access tokens
+* Refresh tokens
+* Password hashing
+* Secure password policies
+* Token expiration
+* Logout
+* Refresh-token rotation where appropriate
+* Account activation/deactivation
+* Password reset
+* Email verification if required
+
+Never store passwords in plain text.
+
+Never expose sensitive authentication information in logs.
+
+---
+
+# 10. RBAC
+
+Implement Role-Based Access Control.
+
+Default roles:
+
+```text
+Super Admin
+Company Admin
+HR Admin
+Branch Admin
+Manager
+Employee
+```
+
+Permissions should be granular.
+
+Examples:
+
+```text
+employee.view
+employee.create
+employee.update
+employee.delete
+
+attendance.view
+attendance.create
+attendance.update
+attendance.approve
+
+leave.view
+leave.apply
+leave.approve
+leave.reject
+
+payroll.view
+payroll.process
+
+reports.view
+reports.export
+
+settings.view
+settings.update
+```
+
+Do not hard-code authorization logic throughout the application.
+
+Create a reusable permission system.
+
+---
+
+# 11. ADMIN DASHBOARD
+
+Create a modern dashboard.
+
+The dashboard should display:
+
+```text
+Total Employees
+Present Today
+Absent Today
+Late Today
+On Leave
+Working Remotely
+Overtime
+Pending Approvals
+```
+
+Include charts:
+
+* Attendance trend
+* Present vs absent
+* Late arrival trend
+* Department attendance
+* Leave trend
+* Overtime trend
+
+Dashboard should support date filters.
+
+Example:
+
+```text
+Today
+Yesterday
+This Week
+This Month
+Custom Range
+```
+
+---
+
+# 12. EMPLOYEE MANAGEMENT
+
+Create an employee management module.
+
+Employee fields should include:
+
+```text
+Employee ID
+First Name
+Last Name
+Email
+Phone
+Date of Birth
+Joining Date
+Department
+Designation
+Manager
+Branch
+Location
+Employment Type
+Status
+Profile Photo
+Address
+Emergency Contact
+Bank Details
+Documents
+```
+
+Do not unnecessarily collect sensitive information unless required.
+
+Employee profile should have tabs:
+
+```text
+Overview
+Attendance
+Leave
+Documents
+Payroll
+Activity
+```
+
+---
+
+# 13. ATTENDANCE ENGINE
+
+Attendance is the core module.
+
+Support:
+
+```text
+Check In
+Check Out
+Break Start
+Break End
+Multiple Punches
+Late Arrival
+Early Departure
+Half Day
+Full Day
+Absent
+Present
+Holiday
+Leave
+Overtime
+Work From Home
+```
+
+Attendance should be configurable per company.
+
+Do not hard-code attendance rules.
+
+---
+
+# 14. ATTENDANCE FLOW
+
+Basic flow:
+
+```text
+Employee
+    ↓
+Check In
+    ↓
+Validate User
+    ↓
+Validate Tenant
+    ↓
+Validate Shift
+    ↓
+Validate Location
+    ↓
+Validate Geofence
+    ↓
+Optional Selfie Verification
+    ↓
+Create Attendance Punch
+    ↓
+Calculate Attendance Status
+    ↓
+Store Audit Information
+```
+
+Record useful metadata such as:
+
+```text
+timestamp
+IP address
+device information
+browser
+latitude
+longitude
+location accuracy
+attendance method
+```
+
+Do not collect unnecessary personal data.
+
+---
+
+# 15. GPS AND GEOFENCING
+
+Support office locations.
+
+Each location should have:
+
+```text
+Location Name
+Latitude
+Longitude
+Allowed Radius
+Status
+```
+
+Example:
+
+```text
+Office
+Latitude: xx.xxxxx
+Longitude: xx.xxxxx
+Radius: 200 meters
+```
+
+When an employee checks in:
+
+```text
+Employee GPS
+      ↓
+Calculate distance
+      ↓
+Inside allowed radius?
+      ↓
+YES → Continue
+NO  → Reject or require configured exception
+```
+
+Make geofencing configurable.
+
+---
+
+# 16. SELFIE ATTENDANCE
+
+Design the architecture to support selfie-based attendance.
+
+Possible flow:
+
+```text
+Camera
+ ↓
+Capture Image
+ ↓
+Face Detection
+ ↓
+Optional Face Verification
+ ↓
+Attendance
+```
+
+The implementation must consider privacy, security, consent, storage, retention, and applicable laws.
+
+Do not claim biometric verification is secure merely because an image was captured.
+
+Prevent obvious spoofing where feasible.
+
+---
+
+# 17. ATTENDANCE REGULARIZATION
+
+Employees should be able to request attendance corrections.
+
+Example:
+
+```text
+Date:
+31-Aug-2026
+
+Requested Check-In:
+09:30 AM
+
+Requested Check-Out:
+06:30 PM
+
+Reason:
+Forgot to check in
+```
+
+Manager/HR can:
+
+```text
+Approve
+Reject
+Request clarification
+```
+
+Maintain complete audit history.
+
+---
+
+# 18. SHIFT MANAGEMENT
+
+Support:
+
+```text
+Fixed Shift
+Flexible Shift
+Rotational Shift
+Night Shift
+Overnight Shift
+Split Shift
+```
+
+Shift configuration:
+
+```text
+Shift Name
+Start Time
+End Time
+Grace Period
+Break Duration
+Late Threshold
+Early Departure Threshold
+Overtime Rules
+Working Days
+```
+
+Support overnight shifts correctly.
+
+Example:
+
+```text
+10:00 PM → 06:00 AM
+```
+
+Do not incorrectly treat the end time as occurring on the same calendar date.
+
+---
+
+# 19. LEAVE MANAGEMENT
+
+Create:
+
+```text
+Leave Types
+Leave Balances
+Leave Requests
+Leave Approval
+Leave Calendar
+Holiday Calendar
+Comp Off
+```
+
+Support configurable approval workflows.
+
+Example:
+
+```text
+Employee
+   ↓
+Manager
+   ↓
+HR
+```
+
+---
+
+# 20. HOLIDAY MANAGEMENT
+
+Support:
+
+* Company holidays
+* Branch holidays
+* Optional holidays
+* Regional holidays
+* Holiday calendars
+
+Allow administrators to configure holidays by year.
+
+---
+
+# 21. OVERTIME
+
+Track:
+
+```text
+Regular Hours
+Overtime Hours
+Approved Overtime
+Rejected Overtime
+Overtime Rate
+```
+
+Do not automatically pay overtime without configurable business rules and approval.
+
+---
+
+# 22. PAYROLL PREPARATION
+
+Create an architecture that can support payroll.
+
+Attendance should produce:
+
+```text
+Working Days
+Present Days
+Absent Days
+Leave Days
+LOP Days
+Overtime Hours
+Late Counts
+Early Departure
+```
+
+Payroll calculations should be configurable.
+
+Do not hard-code Indian payroll rules unless explicitly required.
+
+Design the system so payroll rules can evolve.
+
+---
+
+# 23. REPORTING
+
+Create professional reports:
+
+```text
+Daily Attendance
+Monthly Attendance
+Employee Attendance
+Department Attendance
+Late Report
+Absent Report
+Leave Report
+Overtime Report
+Regularization Report
+Shift Report
+Location Report
+Payroll Summary
+```
+
+Support:
+
+```text
+Excel
+CSV
+PDF
+```
+
+Large reports should be generated asynchronously using Celery.
+
+---
+
+# 24. NOTIFICATIONS
+
+Support:
+
+```text
+In-App
+Email
+Push Notification
+SMS/WhatsApp integration architecture
+```
+
+Examples:
+
+```text
+You forgot to check out.
+
+Your leave request was approved.
+
+Your attendance correction was rejected.
+
+You have a pending approval.
+```
+
+Create a notification service instead of embedding notification logic into every module.
+
+---
+
+# 25. AUDIT LOG
+
+Every important administrative action should be recorded.
+
+Example:
+
+```text
+User:
+HR Admin
+
+Action:
+Updated Attendance
+
+Employee:
+EMP1024
+
+Old Value:
+Absent
+
+New Value:
+Present
+
+Timestamp:
+31-Aug-2026 10:32 AM
+```
+
+Audit logs should be append-oriented and protected from normal user modification.
+
+---
+
+# 26. API-FIRST DESIGN
+
+All important functionality should be exposed through clean REST APIs.
+
+Example:
+
+```text
+/api/v1/auth
+/api/v1/employees
+/api/v1/departments
+/api/v1/attendance
+/api/v1/shifts
+/api/v1/leaves
+/api/v1/holidays
+/api/v1/overtime
+/api/v1/reports
+/api/v1/notifications
+```
+
+Use versioning:
+
+```text
+/api/v1/
+```
+
+Use proper HTTP status codes.
+
+Use consistent API response structures.
+
+Document APIs automatically through FastAPI/OpenAPI.
+
+---
+
+# 27. API RESPONSE STANDARD
+
+Use a consistent response format.
+
+Success example:
+
+```json
+{
+  "success": true,
+  "message": "Employee created successfully",
+  "data": {}
+}
+```
+
+Error example:
+
+```json
+{
+  "success": false,
+  "message": "Employee not found",
+  "error_code": "EMPLOYEE_NOT_FOUND"
+}
+```
+
+Do not leak internal stack traces to clients.
+
+---
+
+# 28. FRONTEND DESIGN
+
+The UI must look like a modern SaaS application.
+
+Use:
+
+* Sidebar navigation
+* Top navigation
+* Dashboard cards
+* Data tables
+* Search
+* Filters
+* Pagination
+* Modal dialogs
+* Toast notifications
+* Loading states
+* Skeleton loaders
+* Empty states
+* Confirmation dialogs
+* Responsive mobile design
+
+Avoid clutter.
+
+Use consistent spacing and typography.
+
+---
+
+# 29. DESIGN SYSTEM
+
+Create reusable components:
+
+```text
+Button
+Input
+Select
+DatePicker
+Modal
+Dropdown
+Table
+Pagination
+Card
+Badge
+Toast
+Tabs
+Drawer
+Loader
+Skeleton
+ConfirmationDialog
+```
+
+Do not duplicate UI code unnecessarily.
+
+---
+
+# 30. RESPONSIVE DESIGN
+
+The application must work on:
+
+```text
+Desktop
+Laptop
+Tablet
+Mobile
+```
+
+The employee attendance screen should be particularly mobile-friendly.
+
+---
+
+# 31. SECURITY
+
+Follow secure coding practices.
+
+Protect against:
+
+```text
+SQL Injection
+XSS
+CSRF where applicable
+Broken Access Control
+IDOR
+JWT misuse
+Sensitive data exposure
+Mass assignment
+Insecure file uploads
+Rate abuse
+```
+
+Validate all incoming data.
+
+Never trust frontend validation alone.
+
+---
+
+# 32. FILE UPLOADS
+
+If employee documents/profile images are supported:
+
+Validate:
+
+```text
+File type
+File size
+File extension
+Content type
+Filename
+```
+
+Do not blindly trust file extensions.
+
+Use secure storage architecture.
+
+---
+
+# 33. ERROR HANDLING
+
+Create centralized error handling.
+
+The API should return useful errors without exposing implementation details.
+
+Frontend should display human-readable messages.
+
+Backend should log technical details securely.
+
+---
+
+# 34. LOGGING
+
+Implement structured logging.
+
+Logs should include useful context such as:
+
+```text
+timestamp
+level
+request_id
+user_id
+tenant_id
+endpoint
+status
+execution_time
+```
+
+Never log:
+
+```text
+passwords
+access tokens
+refresh tokens
+sensitive personal data
+```
+
+---
+
+# 35. TESTING
+
+Testing is mandatory.
+
+Backend:
+
+```text
+pytest
+```
+
+Test:
+
+```text
+Unit Tests
+Integration Tests
+API Tests
+Authentication Tests
+Authorization Tests
+Tenant Isolation Tests
+Attendance Tests
+Leave Tests
+Shift Tests
+```
+
+Frontend:
+
+Use an appropriate TypeScript/React testing stack.
+
+Also create end-to-end tests using:
+
+```text
+Playwright
+```
+
+Important E2E scenarios:
+
+```text
+Login
+Create Employee
+Check In
+Check Out
+Apply Leave
+Approve Leave
+Attendance Regularization
+Reports
+Role Permissions
+Multi-Tenant Isolation
+```
+
+---
+
+# 36. PYTEST STRUCTURE
+
+Use a maintainable structure such as:
+
+```text
+tests/
+├── unit/
+├── integration/
+├── api/
+├── e2e/
+├── fixtures/
+└── conftest.py
+```
+
+Use fixtures properly.
+
+Use parameterization where appropriate.
+
+Use markers such as:
+
+```text
+smoke
+regression
+api
+integration
+e2e
+```
+
+---
+
+# 37. DOCKER
+
+Create Docker support.
+
+Expected services:
+
+```text
+frontend
+backend
+postgres
+redis
+celery
+nginx
+```
+
+Use Docker Compose for local development.
+
+Production deployment should be container-friendly.
+
+---
+
+# 38. ENVIRONMENT CONFIGURATION
+
+Never hard-code secrets.
+
+Use environment variables.
+
+Example:
+
+```text
+DATABASE_URL
+REDIS_URL
+JWT_SECRET
+JWT_EXPIRATION
+SMTP_HOST
+SMTP_USER
+SMTP_PASSWORD
+STORAGE_BUCKET
+```
+
+Provide:
+
+```text
+.env.example
+```
+
+Never commit real secrets.
+
+---
+
+# 39. DATABASE MIGRATIONS
+
+Use Alembic.
+
+Every schema change must have a migration.
+
+Do not manually modify production database structures.
+
+Use:
+
+```text
+alembic revision
+alembic upgrade
+```
+
+appropriately.
+
+---
+
+# 40. CI/CD
+
+Prepare the project for CI/CD.
+
+Pipeline stages:
+
+```text
+Install
+ ↓
+Lint
+ ↓
+Type Check
+ ↓
+Unit Tests
+ ↓
+Integration Tests
+ ↓
+Build
+ ↓
+Security Checks
+ ↓
+Docker Build
+```
+
+The system should be deployable to cloud infrastructure later.
+
+---
+
+# 41. CODE QUALITY
+
+Follow:
+
+```text
+PEP8
+Type hints
+Clean architecture
+SOLID principles
+DRY
+Meaningful names
+Small functions
+Reusable services
+Proper exception handling
+```
+
+Use tools such as:
+
+```text
+ruff
+black
+mypy
+pytest
+```
+
+For frontend use appropriate:
+
+```text
+ESLint
+Prettier
+TypeScript
+```
+
+---
+
+# 42. DOCUMENTATION
+
+Create:
+
+```text
+README.md
+ARCHITECTURE.md
+DATABASE.md
+API.md
+DEVELOPMENT.md
+DEPLOYMENT.md
+SECURITY.md
+TESTING.md
+```
+
+Documentation must be updated as implementation changes.
+
+---
+
+# 43. PROJECT STRUCTURE
+
+Prefer a structure similar to:
+
+```text
+attendance-saas/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── repositories/
+│   │   ├── middleware/
+│   │   ├── workers/
+│   │   └── main.py
+│   │
+│   ├── tests/
+│   ├── alembic/
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── layouts/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── utils/
+│   ├── package.json
+│   └── Dockerfile
+│
+├── infrastructure/
+│   ├── docker/
+│   └── nginx/
+│
+├── tests/
+│
+├── docs/
+│
+├── docker-compose.yml
+├── .env.example
+├── README.md
+└── ARCHITECTURE.md
+```
+
+Adapt this if the existing project requires a different structure.
+
+---
+
+# 44. DEVELOPMENT PHASES
+
+Follow this exact high-level roadmap.
+
+## PHASE 0 — ARCHITECTURE
+
+First create:
+
+```text
+ARCHITECTURE.md
+DATABASE.md
+API.md
+```
+
+Do not start implementing all modules yet.
+
+Review the architecture for consistency.
+
+---
+
+## PHASE 1 — FOUNDATION
+
+Implement:
+
+```text
+Project setup
+FastAPI
+PostgreSQL
+SQLAlchemy
+Alembic
+React
+TypeScript
+Tailwind
+Docker
+Environment configuration
+Logging
+Error handling
+```
+
+---
+
+## PHASE 2 — AUTHENTICATION
+
+Implement:
+
+```text
+Registration
+Login
+Logout
+JWT
+Refresh Token
+Password hashing
+Password reset
+User model
+```
+
+---
+
+## PHASE 3 — MULTI-TENANCY + RBAC
+
+Implement:
+
+```text
+Companies
+Users
+Roles
+Permissions
+Tenant isolation
+Authorization middleware
+```
+
+Test tenant isolation heavily.
+
+---
+
+## PHASE 4 — EMPLOYEE MANAGEMENT
+
+Implement:
+
+```text
+Employee CRUD
+Department
+Designation
+Branch
+Location
+Employee profile
+```
+
+---
+
+## PHASE 5 — ATTENDANCE
+
+Implement:
+
+```text
+Check In
+Check Out
+Punches
+Attendance status
+Attendance history
+Daily attendance
+Monthly attendance
+```
+
+---
+
+## PHASE 6 — SHIFT + GEOFENCE
+
+Implement:
+
+```text
+Shifts
+Shift assignment
+Grace period
+Late rules
+Early departure
+GPS
+Geofence
+```
+
+---
+
+## PHASE 7 — LEAVE + HOLIDAY
+
+Implement:
+
+```text
+Leave types
+Leave balance
+Leave request
+Approval
+Holiday calendar
+```
+
+---
+
+## PHASE 8 — REGULARIZATION + OVERTIME
+
+Implement:
+
+```text
+Attendance correction
+Approval workflow
+Overtime
+Comp-off
+```
+
+---
+
+## PHASE 9 — REPORTING
+
+Implement:
+
+```text
+Dashboard
+Reports
+Excel
+CSV
+PDF
+Charts
+Filters
+```
+
+---
+
+## PHASE 10 — NOTIFICATIONS
+
+Implement:
+
+```text
+In-app
+Email
+Push architecture
+Notification preferences
+```
+
+---
+
+## PHASE 11 — MOBILE
+
+Prepare:
+
+```text
+React Native or Flutter
+```
+
+with:
+
+```text
+Login
+Check-in
+Check-out
+GPS
+Selfie
+Attendance history
+Leave
+Notifications
+```
+
+---
+
+## PHASE 12 — PAYROLL
+
+Add payroll preparation and configurable payroll rules.
+
+---
+
+## PHASE 13 — API + WEBHOOKS
+
+Implement:
+
+```text
+API keys
+Webhooks
+Integration framework
+External system integration
+```
+
+---
+
+## PHASE 14 — ADVANCED ANALYTICS
+
+Add:
+
+```text
+Attendance trends
+Employee analytics
+Department analytics
+Overtime analytics
+Absenteeism analytics
+```
+
+---
+
+## PHASE 15 — AI
+
+Only after the core system is stable.
+
+Add:
+
+```text
+AI HR Assistant
+AI Attendance Insights
+Anomaly Detection
+Natural Language Reports
+Predictive Analytics
+```
+
+---
+
+# 45. AI HR ASSISTANT FUTURE DESIGN
+
+The architecture should eventually support queries like:
+
+```text
+"Who was absent more than 3 days last month?"
+
+"Which employees have frequent late arrivals?"
+
+"Show employees with more than 10 hours overtime."
+
+"Which department has the highest absenteeism?"
+
+"Generate a monthly attendance summary."
+```
+
+The AI must respect:
+
+* Tenant isolation
+* User permissions
+* Data privacy
+* Audit requirements
+
+Never allow the AI to bypass authorization.
+
+---
+
+# 46. PERFORMANCE
+
+Design for scalability.
+
+Avoid:
+
+```text
+N+1 queries
+Large unpaginated queries
+Repeated database calls
+Blocking HTTP requests
+Unnecessary frontend API calls
+```
+
+Use:
+
+```text
+Pagination
+Caching
+Indexes
+Async/background jobs
+Database optimization
+Connection pooling
+```
+
+---
+
+# 47. DATABASE INDEXING
+
+Identify frequently queried fields and create appropriate indexes.
+
+Examples:
+
+```text
+tenant_id
+employee_id
+attendance_date
+department_id
+branch_id
+status
+created_at
+```
+
+Do not blindly index every column.
+
+---
+
+# 48. DATA RETENTION
+
+Create configurable retention policies for:
+
+```text
+Attendance records
+Audit logs
+Notifications
+Uploaded documents
+Selfie images
+Location records
+```
+
+Do not retain sensitive information forever without a business/legal reason.
+
+---
+
+# 49. SUBSCRIPTION / SaaS BILLING
+
+Eventually support:
+
+```text
+Free
+Starter
+Professional
+Enterprise
+```
+
+Possible limits:
+
+```text
+Employees
+Storage
+Reports
+API calls
+Locations
+Admin users
+Features
+```
+
+Implement feature flags/entitlements rather than hard-coding plan checks throughout the application.
+
+---
+
+# 50. ADMIN SETTINGS
+
+Create centralized settings.
+
+Examples:
+
+```text
+Company Settings
+Attendance Settings
+Shift Settings
+Leave Settings
+Notification Settings
+Security Settings
+Payroll Settings
+Subscription Settings
+```
+
+Settings should be tenant-specific where appropriate.
+
+---
+
+# 51. IMPORTANT UI REQUIREMENT
+
+The application should look like a premium modern SaaS product.
+
+Do NOT create:
+
+* outdated Bootstrap-looking pages
+* huge forms
+* unnecessary borders
+* cluttered screens
+* inconsistent buttons
+* random colors
+* poor spacing
+
+Use:
+
+```text
+Clean dashboard
+Modern cards
+Professional tables
+Clear typography
+Responsive layouts
+Consistent icons
+Good empty states
+Good loading states
+Good error states
+```
+
+The UI should feel suitable for a commercial HR product.
+
+---
+
+# 52. ACCESSIBILITY
+
+Support:
+
+```text
+Keyboard navigation
+Readable contrast
+Proper labels
+ARIA where appropriate
+Focus states
+Accessible forms
+```
+
+---
+
+# 53. IMPORTANT AGENT BEHAVIOR
+
+Before changing code:
+
+1. Inspect the repository.
+2. Understand existing architecture.
+3. Search before creating new utilities.
+4. Reuse existing components when possible.
+5. Avoid duplicate implementations.
+6. Do not delete working functionality without justification.
+7. Do not introduce unnecessary dependencies.
+8. Explain architectural decisions.
+9. Run tests after significant changes.
+10. Fix errors before continuing.
+
+When you encounter ambiguity:
+
+* Prefer the simplest maintainable architecture.
+* Keep the system extensible.
+* Do not invent unnecessary features.
+* Ask for clarification only when the decision materially affects architecture or business behavior.
+
+---
+
+# 54. DEVELOPMENT CHECKPOINT
+
+After every major phase, provide a concise report:
+
+```text
+PHASE:
+What was implemented:
+
+Files created:
+
+Files modified:
+
+Database changes:
+
+API endpoints:
+
+Frontend pages:
+
+Tests added:
+
+Tests passed:
+
+Known issues:
+
+Next recommended phase:
+```
+
+Do not claim something works unless you actually tested it.
+
+---
+
+# 55. FIRST TASK
+
+DO NOT immediately build the entire application.
+
+Your first task is:
+
+### Step 1
+
+Inspect the current workspace/repository.
+
+### Step 2
+
+Determine whether the project is empty or already contains code.
+
+### Step 3
+
+Create a complete technical architecture proposal.
+
+Create/update:
+
+```text
+ARCHITECTURE.md
+DATABASE.md
+API.md
+DEVELOPMENT_ROADMAP.md
+```
+
+### Step 4
+
+Define:
+
+```text
+Folder structure
+Database entities
+Relationships
+Authentication architecture
+Multi-tenancy architecture
+RBAC architecture
+API architecture
+Frontend architecture
+Docker architecture
+Testing architecture
+```
+
+### Step 5
+
+Identify risks and architectural decisions.
+
+### Step 6
+
+Do NOT implement Phase 1 until the architecture is internally consistent.
+
+After completing the architecture documentation, summarize your findings and wait for approval before proceeding with the next major implementation phase.
+
+---
+
+# FINAL PRINCIPLE
+
+Build this system as if it will eventually serve:
+
+```text
+1 company
+      ↓
+10 companies
+      ↓
+100 companies
+      ↓
+1,000+ companies
+```
+
+The architecture must therefore prioritize:
+
+```text
+Security
+Multi-tenancy
+Scalability
+Maintainability
+Performance
+Testing
+Observability
+Data isolation
+Extensibility
+```
+
+Do not optimize only for making the first demo work.
+
+Build the foundation correctly so future modules can be added without rewriting the entire application.
+
+### How I recommend using this in Antigravity
+
+**Don't give the agent a second huge prompt immediately.** Let it first inspect your workspace and create the architecture documents. Once it finishes Phase 0, you can give it a focused prompt such as:
+
+> **"Review the architecture you just created. Now implement Phase 1 — Foundation. Do not implement Phase 2 or any business modules yet. Follow the architecture strictly, run all available tests, and provide the phase completion report."**
+
+Then proceed **Phase 2 → Phase 3 → Phase 4** one at a time.
+
+This approach is much safer than telling an AI agent *“build the whole HRMS”* in one command, especially for a system with **multi-tenancy, attendance rules, GPS, RBAC, payroll, and audit requirements**.

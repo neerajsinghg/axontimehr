@@ -1,0 +1,3335 @@
+# AXONTIMEHR — PHASE 12 DEVELOPMENT PROMPT
+
+## COMPLIANCE, STATUTORY HR, LEGAL/GOVERNANCE & ENTERPRISE ADMINISTRATION
+
+---
+
+# 1. ROLE
+
+Act as a:
+
+* Principal Software Architect
+* Senior Full-Stack Engineer
+* HRMS Product Architect
+* Payroll & Compliance Systems Architect
+* PostgreSQL Database Architect
+* FastAPI Backend Engineer
+* React + TypeScript Frontend Engineer
+* Security Engineer
+* Multi-Tenant SaaS Architect
+* RBAC/Authorization Engineer
+* Compliance/Governance Systems Engineer
+* QA Automation Architect
+* DevOps Engineer
+* API Architect
+* Data Privacy Engineer
+
+You are extending an existing production-oriented SaaS product named:
+
+**AxonTimeHR**
+
+Do NOT treat this as a greenfield application.
+
+The repository already contains functionality from previous development phases.
+
+Your first responsibility is to understand the existing implementation and extend it safely.
+
+---
+
+# 2. IMPORTANT RULE — DO NOT REBUILD EXISTING PHASES
+
+Before writing any code:
+
+1. Inspect the complete repository.
+2. Identify the existing architecture.
+3. Identify implemented modules.
+4. Identify database models.
+5. Identify migrations.
+6. Identify API routes.
+7. Identify authentication and authorization.
+8. Identify tenant isolation.
+9. Identify employee/organization relationships.
+10. Identify payroll functionality.
+11. Identify attendance functionality.
+12. Identify leave functionality.
+13. Identify expense/loan functionality.
+14. Identify performance/recruitment functionality.
+15. Identify ESS/MSS functionality.
+16. Identify notification infrastructure.
+17. Identify document/file storage.
+18. Identify audit logging.
+19. Identify Celery/Redis jobs.
+20. Identify frontend architecture.
+21. Identify existing tests.
+22. Identify existing coding conventions.
+
+Reuse existing components wherever possible.
+
+Do NOT create duplicate:
+
+* User models
+* Employee models
+* Organization models
+* Tenant models
+* Payroll models
+* Attendance models
+* Leave models
+* RBAC models
+* Notification systems
+* Audit systems
+* File-storage systems
+* Authentication systems
+
+Extend existing implementations instead.
+
+---
+
+# 3. PHASE 12 OBJECTIVE
+
+Build an enterprise-grade:
+
+# COMPLIANCE + STATUTORY HR + GOVERNANCE PLATFORM
+
+The module should provide organizations with centralized capabilities for:
+
+* Statutory compliance
+* Labour-law configuration
+* Payroll compliance
+* Tax configuration
+* Social-security configuration
+* Employee statutory records
+* Compliance calendars
+* Compliance tasks
+* Compliance alerts
+* Compliance documents
+* Policy governance
+* Legal document management
+* Regulatory reporting
+* Audit readiness
+* Data privacy controls
+* Consent management
+* Data retention
+* Record lifecycle management
+* Organization-level compliance settings
+* Compliance dashboards
+* Compliance reporting
+* Enterprise administration
+* Configuration governance
+
+The system must be configurable and should NOT hard-code country-specific assumptions into the core architecture.
+
+Design a flexible:
+
+**Country → State/Province → Organization → Establishment → Employee**
+
+compliance hierarchy.
+
+---
+
+# 4. CORE DESIGN PRINCIPLE
+
+Compliance functionality must be:
+
+* Multi-tenant
+* Configurable
+* Versioned
+* Auditable
+* Permission-controlled
+* Effective-date based
+* Organization-specific
+* Establishment-specific where required
+* Employee-specific where required
+* Payroll-aware
+* Reportable
+* Secure
+* Extensible
+
+Avoid hard-coded compliance rules wherever possible.
+
+Use configurable rule engines and effective-dated configuration.
+
+---
+
+# 5. MODULES TO IMPLEMENT
+
+Implement the following major modules.
+
+---
+
+# MODULE A — COMPLIANCE MASTER CONFIGURATION
+
+Create a centralized compliance configuration framework.
+
+Administrators should be able to configure:
+
+* Country
+* State
+* Region
+* Establishment
+* Legal entity
+* Registration type
+* Registration number
+* Authority
+* Compliance type
+* Compliance frequency
+* Applicable employee categories
+* Effective date
+* Expiry date
+* Compliance status
+* Responsible department
+* Responsible employee
+* External consultant
+* Supporting documents
+* Filing requirements
+
+Example compliance categories:
+
+* Payroll compliance
+* Tax compliance
+* Labour compliance
+* Social security
+* Benefits compliance
+* Leave compliance
+* Attendance compliance
+* Working-hours compliance
+* Minimum-wage compliance
+* Employment documentation
+* Workplace policy compliance
+* Data privacy
+* Information security
+* Occupational safety
+* Contractor compliance
+
+---
+
+# MODULE B — COUNTRY / STATE / REGION CONFIGURATION
+
+Create a generic geographical compliance hierarchy.
+
+Potential entities:
+
+countries
+states
+regions
+legal_entities
+establishments
+
+Relationships:
+
+Tenant
+→ Legal Entity
+→ Establishment
+→ Country
+→ State/Region
+
+The architecture must support organizations operating:
+
+* In one country
+* Multiple countries
+* Multiple states
+* Multiple establishments
+* Multiple legal entities
+
+Do not assume that every organization has only one establishment.
+
+---
+
+# MODULE C — STATUTORY REGISTRATION MANAGEMENT
+
+Create a statutory registration management system.
+
+Administrators should be able to store:
+
+* Registration type
+* Registration number
+* Authority
+* Issuing jurisdiction
+* Establishment
+* Registration date
+* Effective date
+* Expiry date
+* Renewal date
+* Status
+* Responsible person
+* Supporting document
+* Notes
+
+Examples:
+
+* Tax registration
+* Social-security registration
+* Labour registration
+* Establishment registration
+* Professional tax registration
+* Payroll-related registrations
+* Insurance registration
+
+Registration numbers must be treated as sensitive information.
+
+Implement:
+
+* Encryption where appropriate
+* Masked display
+* Role-based visibility
+* Audit logging
+* Access logging
+
+---
+
+# MODULE D — EMPLOYEE STATUTORY PROFILE
+
+Extend the employee profile with a separate secure statutory section.
+
+Do NOT put sensitive statutory data directly into the general employee profile if existing architecture supports separation.
+
+Possible fields:
+
+* Employee statutory identifiers
+* Tax identifiers
+* Social-security identifiers
+* Pension identifiers
+* Insurance identifiers
+* Professional-tax information
+* Benefit enrollment information
+* Employment category
+* Worker category
+* Eligibility flags
+* Effective dates
+* Verification status
+* Verification date
+* Supporting documents
+
+Every sensitive field must have appropriate authorization.
+
+Example access levels:
+
+Employee:
+
+* Own information only
+
+Manager:
+
+* No sensitive statutory information unless explicitly authorized
+
+HR:
+
+* Authorized employee statutory information
+
+Payroll:
+
+* Payroll-related statutory information
+
+Compliance Admin:
+
+* Compliance information
+
+Super Admin:
+
+* Tenant-level administrative visibility
+
+---
+
+# MODULE E — STATUTORY IDENTIFIER VERIFICATION
+
+Create a generic verification workflow.
+
+Statuses:
+
+* NOT_VERIFIED
+* PENDING
+* VERIFIED
+* REJECTED
+* EXPIRED
+
+Track:
+
+* Submitted by
+* Submitted at
+* Verified by
+* Verified at
+* Rejection reason
+* Verification notes
+* Supporting document
+* Last updated timestamp
+
+Never expose full sensitive identifiers unnecessarily.
+
+Support masked display such as:
+
+********1234
+
+where appropriate.
+
+---
+
+# MODULE F — COMPLIANCE RULE ENGINE
+
+Create a configurable compliance rule engine.
+
+Rules should support:
+
+* Rule name
+* Rule code
+* Description
+* Jurisdiction
+* Compliance category
+* Effective date
+* Expiry date
+* Priority
+* Applicability conditions
+* Employee category
+* Employment type
+* Salary threshold
+* Age criteria where applicable
+* Location
+* Establishment
+* Organization configuration
+* Payroll configuration
+* Status
+
+Rules should be versioned.
+
+Example:
+
+Rule v1:
+Effective:
+01-01-2026
+
+Rule v2:
+Effective:
+01-04-2026
+
+Historical payroll should continue using the rule applicable at that time.
+
+Never overwrite historical compliance rules without preserving versions.
+
+---
+
+# MODULE G — EFFECTIVE-DATED CONFIGURATION
+
+All compliance-related configurations must support:
+
+effective_from
+
+effective_to
+
+Do not rely only on:
+
+created_at
+
+updated_at
+
+Examples:
+
+* Tax rules
+* Minimum wage
+* Contribution rates
+* Employee eligibility
+* Compliance thresholds
+* Filing frequencies
+* Benefit rules
+
+Historical records must remain reproducible.
+
+---
+
+# MODULE H — TAX CONFIGURATION FRAMEWORK
+
+Create a generic tax configuration engine.
+
+Support configurable:
+
+* Tax slabs
+* Tax rates
+* Thresholds
+* Deductions
+* Exemptions
+* Rebates
+* Tax regimes
+* Effective dates
+* Jurisdiction
+* Employee eligibility
+
+Do NOT hard-code one country's tax rules into core payroll logic.
+
+Design the system so future country-specific tax modules can be added.
+
+Example architecture:
+
+TaxEngine
+
+→ CountryTaxProvider
+
+→ StateTaxProvider
+
+→ OrganizationTaxConfiguration
+
+→ EmployeeTaxProfile
+
+→ PayrollCalculation
+
+---
+
+# MODULE I — SOCIAL SECURITY / BENEFIT CONTRIBUTION CONFIGURATION
+
+Create configurable contribution rules.
+
+Examples:
+
+* Employee contribution
+* Employer contribution
+* Contribution ceiling
+* Contribution floor
+* Eligibility
+* Contribution percentage
+* Fixed contribution
+* Effective date
+
+Support:
+
+Employee contribution
+
+Employer contribution
+
+Total contribution
+
+Store calculation results with the payroll transaction.
+
+Historical calculations must remain reproducible.
+
+---
+
+# MODULE J — MINIMUM WAGE MANAGEMENT
+
+Create a configurable minimum-wage module.
+
+Support:
+
+* Jurisdiction
+* Industry
+* Worker category
+* Skill category
+* Wage category
+* Effective date
+* Minimum basic wage
+* Minimum gross wage
+* Currency
+* Establishment applicability
+
+Provide compliance validation:
+
+Employee compensation
+vs
+Applicable minimum wage
+
+Generate warnings when:
+
+Actual compensation < configured minimum threshold
+
+Do not automatically modify payroll unless explicitly configured.
+
+---
+
+# MODULE K — WORKING HOURS & LABOUR COMPLIANCE
+
+Integrate with the existing attendance and shift engine.
+
+Track configurable:
+
+* Maximum working hours
+* Daily limits
+* Weekly limits
+* Rest periods
+* Break requirements
+* Overtime limits
+* Night-shift rules
+* Weekly-off rules
+* Holiday rules
+
+Build compliance checks against actual attendance.
+
+Examples:
+
+Employee works beyond configured threshold.
+
+System should detect:
+
+COMPLIANCE_WARNING
+
+or
+
+COMPLIANCE_VIOLATION
+
+depending on configuration.
+
+---
+
+# MODULE L — OVERTIME COMPLIANCE
+
+Integrate with existing overtime functionality.
+
+Support:
+
+* Overtime eligibility
+* Maximum overtime
+* Approval requirement
+* Compensation rules
+* Jurisdiction
+* Worker category
+* Effective date
+
+Generate compliance alerts when configured limits are exceeded.
+
+---
+
+# MODULE M — LEAVE COMPLIANCE
+
+Integrate with existing leave management.
+
+Support configurable statutory leave rules.
+
+Examples:
+
+* Annual leave
+* Sick leave
+* Maternity-related leave
+* Paternity-related leave
+* Public holidays
+* Special leave
+* Statutory leave
+
+Rules must be configurable by:
+
+Country
+State
+Organization
+Establishment
+Employee category
+
+Do not hard-code statutory leave entitlements.
+
+---
+
+# MODULE N — HOLIDAY / STATUTORY CALENDAR
+
+Create a compliance holiday calendar.
+
+Support:
+
+* National holidays
+* Regional holidays
+* State holidays
+* Organization holidays
+* Establishment holidays
+* Optional holidays
+
+Properties:
+
+* Name
+* Date
+* Jurisdiction
+* Holiday type
+* Paid/unpaid
+* Applicable establishment
+* Applicable employee group
+
+Integrate with:
+
+Attendance
+Leave
+Payroll
+Reports
+
+---
+
+# MODULE O — COMPLIANCE CALENDAR
+
+Build a centralized compliance calendar.
+
+Display:
+
+* Upcoming filings
+* Registration renewals
+* Policy renewals
+* Document expiry
+* Statutory deadlines
+* Payroll deadlines
+* Tax deadlines
+* Audit activities
+* Compliance tasks
+
+Statuses:
+
+* UPCOMING
+* DUE_SOON
+* DUE
+* OVERDUE
+* COMPLETED
+* WAIVED
+
+Provide filters:
+
+* Jurisdiction
+* Establishment
+* Compliance type
+* Responsible person
+* Department
+* Status
+* Date range
+
+---
+
+# MODULE P — COMPLIANCE TASK MANAGEMENT
+
+Create compliance tasks.
+
+Fields:
+
+* Task title
+* Compliance type
+* Description
+* Organization
+* Establishment
+* Responsible user
+* Reviewer
+* Due date
+* Priority
+* Status
+* Evidence
+* Comments
+* Completion date
+* Escalation level
+
+Statuses:
+
+* OPEN
+* IN_PROGRESS
+* PENDING_REVIEW
+* COMPLETED
+* REJECTED
+* OVERDUE
+* CANCELLED
+
+Support assignment and approval workflows.
+
+---
+
+# MODULE Q — COMPLIANCE EVIDENCE MANAGEMENT
+
+Every compliance activity should be able to store evidence.
+
+Evidence can include:
+
+* PDF
+* Spreadsheet
+* Document
+* Image
+* Certificate
+* Filing acknowledgement
+* Receipt
+* Approval document
+
+Reuse the existing file-storage architecture.
+
+Implement:
+
+* File type validation
+* Size validation
+* Malware scanning integration point
+* Access control
+* Versioning
+* Audit logging
+* Download logging
+* Expiry tracking
+
+---
+
+# MODULE R — POLICY GOVERNANCE
+
+Extend the Phase 11 policy center.
+
+Support:
+
+* Policy creation
+* Policy version
+* Effective date
+* Expiry date
+* Jurisdiction
+* Employee applicability
+* Department applicability
+* Establishment applicability
+* Mandatory acknowledgement
+* Acknowledgement deadline
+
+Examples:
+
+* HR policy
+* Attendance policy
+* Leave policy
+* Remote-work policy
+* Information-security policy
+* Data-protection policy
+* Code of conduct
+* Workplace safety policy
+
+---
+
+# MODULE S — POLICY ACKNOWLEDGEMENT
+
+Employees should be able to:
+
+* View policy
+* Read policy
+* Download policy if allowed
+* Acknowledge policy
+* Reject/raise clarification if supported
+* View acknowledgement history
+
+Store:
+
+* Employee
+* Policy
+* Policy version
+* Timestamp
+* IP address where appropriate
+* User agent where appropriate
+* Acknowledgement status
+
+Never allow an acknowledgement to be silently changed.
+
+---
+
+# MODULE T — LEGAL DOCUMENT MANAGEMENT
+
+Create a legal document repository.
+
+Support:
+
+* Employment agreements
+* Offer letters
+* Appointment letters
+* Amendments
+* Confidentiality agreements
+* Policy documents
+* Contractor agreements
+* Compliance certificates
+* Regulatory documents
+
+Support:
+
+* Document versioning
+* Effective date
+* Expiration date
+* Document owner
+* Employee linkage
+* Organization linkage
+* Establishment linkage
+* Access permissions
+* Audit trail
+
+---
+
+# MODULE U — DOCUMENT EXPIRATION
+
+Implement automated document expiry tracking.
+
+Examples:
+
+* Registration expiry
+* Employee certification expiry
+* Work permit expiry
+* Contract expiry
+* Insurance expiry
+* Compliance certificate expiry
+
+Generate alerts:
+
+30 days before
+15 days before
+7 days before
+1 day before
+On expiry
+
+These intervals should be configurable.
+
+Use Celery/Redis if already available.
+
+---
+
+# MODULE V — COMPLIANCE ALERT ENGINE
+
+Create a centralized compliance alert engine.
+
+Alert types:
+
+* Registration expiring
+* Document expiring
+* Filing overdue
+* Payroll compliance failure
+* Minimum wage violation
+* Overtime threshold violation
+* Missing employee statutory information
+* Missing acknowledgement
+* Missing compliance evidence
+* Policy expiration
+* Audit finding
+* Configuration conflict
+
+Severity:
+
+INFO
+LOW
+MEDIUM
+HIGH
+CRITICAL
+
+Alerts should integrate with the existing notification system.
+
+---
+
+# MODULE W — ESCALATION ENGINE
+
+Implement configurable escalation.
+
+Example:
+
+Day 0:
+Notify responsible person
+
+Day 3:
+Notify manager
+
+Day 7:
+Notify compliance administrator
+
+Day 10:
+Notify HR head
+
+Day 15:
+Notify tenant administrator
+
+Do not hard-code these intervals.
+
+Create configurable escalation policies.
+
+---
+
+# MODULE X — COMPLIANCE DASHBOARD
+
+Create a dedicated Compliance Dashboard.
+
+Display:
+
+* Compliance score
+* Open compliance tasks
+* Overdue tasks
+* Upcoming deadlines
+* Expiring registrations
+* Expiring documents
+* Violations
+* High-risk issues
+* Pending approvals
+* Missing employee data
+* Policy acknowledgement percentage
+* Audit findings
+
+Charts:
+
+* Compliance status
+* Risk distribution
+* Compliance trend
+* Overdue trend
+* Upcoming deadlines
+* Violations by category
+
+---
+
+# MODULE Y — COMPLIANCE SCORE
+
+Create a configurable compliance scoring framework.
+
+Example:
+
+Compliance Score =
+100
+
+* overdue penalties
+* unresolved critical violations
+* missing mandatory documents
+* overdue registrations
+* incomplete acknowledgements
+
+However, do not hard-code business weights.
+
+Create configurable scoring rules.
+
+Store historical scores.
+
+Example:
+
+ComplianceScore
+
+* tenant_id
+* score
+* score_date
+* calculation_version
+* risk_level
+
+Risk levels:
+
+LOW
+MEDIUM
+HIGH
+CRITICAL
+
+---
+
+# MODULE Z — COMPLIANCE VIOLATIONS
+
+Create a formal violation management system.
+
+Fields:
+
+* Violation ID
+* Category
+* Rule
+* Employee
+* Department
+* Establishment
+* Description
+* Detected date
+* Severity
+* Evidence
+* Responsible person
+* Corrective action
+* Due date
+* Resolution
+* Resolved date
+* Status
+
+Statuses:
+
+OPEN
+INVESTIGATING
+ACTION_REQUIRED
+PENDING_REVIEW
+RESOLVED
+CLOSED
+WAIVED
+
+Maintain complete history.
+
+---
+
+# MODULE AA — CORRECTIVE ACTION MANAGEMENT
+
+For violations, support:
+
+* Root cause
+* Corrective action
+* Preventive action
+* Owner
+* Due date
+* Evidence
+* Verification
+* Closure approval
+
+This should support enterprise audit workflows.
+
+---
+
+# MODULE AB — AUDIT MANAGEMENT
+
+Create an internal audit module.
+
+Support:
+
+* Audit plan
+* Audit period
+* Audit type
+* Auditor
+* Scope
+* Checklist
+* Findings
+* Evidence
+* Corrective actions
+* Final report
+
+Audit statuses:
+
+PLANNED
+IN_PROGRESS
+COMPLETED
+CLOSED
+
+---
+
+# MODULE AC — AUDIT CHECKLIST ENGINE
+
+Create configurable audit checklists.
+
+Checklist items should support:
+
+* Question
+* Requirement
+* Compliance rule
+* Expected evidence
+* Pass/fail
+* Observation
+* Severity
+* Attachment
+* Auditor comment
+
+Support reusable checklist templates.
+
+---
+
+# MODULE AD — DATA PRIVACY MANAGEMENT
+
+Create a generic privacy framework.
+
+Support:
+
+* Privacy policy version
+* Consent records
+* Data-processing purpose
+* Consent timestamp
+* Withdrawal
+* Data access request
+* Data correction request
+* Data deletion request where legally applicable
+* Data export request
+* Retention policy
+
+Do not assume one country's privacy law.
+
+Create configurable jurisdiction-level privacy settings.
+
+---
+
+# MODULE AE — CONSENT MANAGEMENT
+
+Create:
+
+consents
+
+and
+
+consent_versions
+
+Support:
+
+* Consent type
+* Purpose
+* Version
+* Employee/user
+* Granted at
+* Withdrawn at
+* Source
+* IP address where appropriate
+* User agent where appropriate
+
+Consent history must be immutable.
+
+---
+
+# MODULE AF — DATA SUBJECT REQUESTS
+
+Create a workflow for employee/user data requests.
+
+Types:
+
+* DATA_ACCESS
+* DATA_CORRECTION
+* DATA_EXPORT
+* DATA_DELETION
+* CONSENT_WITHDRAWAL
+
+Statuses:
+
+SUBMITTED
+UNDER_REVIEW
+APPROVED
+REJECTED
+PROCESSING
+COMPLETED
+
+Support authorized HR/privacy administrators.
+
+Sensitive operations must require elevated authorization.
+
+---
+
+# MODULE AG — DATA RETENTION ENGINE
+
+Create configurable data-retention policies.
+
+Configure retention by:
+
+* Data category
+* Jurisdiction
+* Organization
+* Employee type
+* Record type
+* Retention duration
+* Legal hold
+
+Examples:
+
+Employee documents
+Payroll records
+Attendance records
+Audit logs
+Consent records
+Compliance evidence
+
+Do NOT automatically delete records merely because a retention period has passed.
+
+Implement:
+
+RETENTION_DUE
+
+and require configured approval/legal basis before destructive deletion where appropriate.
+
+---
+
+# MODULE AH — LEGAL HOLD
+
+Create legal hold functionality.
+
+When legal hold is active:
+
+* Prevent deletion
+* Prevent destructive anonymization
+* Preserve records
+* Log access
+* Track legal-hold owner
+* Track reason
+* Track start date
+* Track release date
+
+Legal holds must override normal retention deletion workflows.
+
+---
+
+# MODULE AI — RECORD LIFECYCLE MANAGEMENT
+
+Create generic lifecycle states:
+
+ACTIVE
+ARCHIVED
+RETENTION_DUE
+LEGAL_HOLD
+PENDING_DELETION
+DELETED
+ANONYMIZED
+
+The system must preserve auditability.
+
+---
+
+# MODULE AJ — ENTERPRISE ADMINISTRATION
+
+Create an Enterprise Administration module.
+
+Support:
+
+* Organization settings
+* Legal entities
+* Establishments
+* Compliance configuration
+* Security settings
+* Data-retention settings
+* Notification policies
+* Password policies
+* Session policies
+* API policies
+* Integration settings
+* Audit settings
+
+Only authorized administrators should access these settings.
+
+---
+
+# MODULE AK — CONFIGURATION CHANGE MANAGEMENT
+
+Important enterprise requirement.
+
+Critical configuration changes should be auditable.
+
+Examples:
+
+* Payroll rules
+* Tax rules
+* Compliance rules
+* Leave rules
+* Minimum wage
+* Overtime rules
+* Statutory contribution rules
+
+Track:
+
+Old value
+New value
+Changed by
+Changed at
+Reason
+Approval
+Effective date
+
+Where appropriate, require maker-checker approval.
+
+---
+
+# MODULE AL — MAKER-CHECKER WORKFLOW
+
+Implement optional maker-checker approval.
+
+Example:
+
+HR Admin creates compliance rule.
+
+Status:
+
+DRAFT
+
+Reviewer:
+
+PENDING_APPROVAL
+
+After approval:
+
+APPROVED
+
+Then:
+
+ACTIVE
+
+Unauthorized users must not be able to bypass the workflow.
+
+Support configuration by module.
+
+---
+
+# MODULE AM — COMPLIANCE REPORTING
+
+Create comprehensive compliance reports.
+
+Reports:
+
+1. Compliance Summary
+2. Compliance Violations
+3. Compliance Tasks
+4. Overdue Compliance
+5. Registration Report
+6. Document Expiry Report
+7. Employee Statutory Report
+8. Minimum Wage Report
+9. Overtime Compliance Report
+10. Leave Compliance Report
+11. Payroll Compliance Report
+12. Policy Acknowledgement Report
+13. Audit Findings
+14. Corrective Action Report
+15. Consent Report
+16. Data Request Report
+17. Retention Report
+18. Legal Hold Report
+
+Support:
+
+* Filtering
+* Sorting
+* Pagination
+* Export
+* CSV
+* Excel
+* PDF where existing architecture supports it
+
+---
+
+# MODULE AN — COMPLIANCE API
+
+Follow existing API conventions.
+
+Potential endpoints:
+
+GET
+/api/v1/compliance/dashboard
+
+GET
+/api/v1/compliance/rules
+
+POST
+/api/v1/compliance/rules
+
+GET
+/api/v1/compliance/rules/{id}
+
+PUT
+/api/v1/compliance/rules/{id}
+
+GET
+/api/v1/compliance/registrations
+
+POST
+/api/v1/compliance/registrations
+
+GET
+/api/v1/compliance/tasks
+
+POST
+/api/v1/compliance/tasks
+
+PATCH
+/api/v1/compliance/tasks/{id}
+
+GET
+/api/v1/compliance/violations
+
+POST
+/api/v1/compliance/violations
+
+PATCH
+/api/v1/compliance/violations/{id}
+
+GET
+/api/v1/compliance/audits
+
+POST
+/api/v1/compliance/audits
+
+GET
+/api/v1/compliance/reports
+
+GET
+/api/v1/compliance/alerts
+
+GET
+/api/v1/compliance/calendar
+
+GET
+/api/v1/compliance/documents
+
+GET
+/api/v1/compliance/employee/{employee_id}
+
+Use existing API architecture.
+
+---
+
+# MODULE AO — PRIVACY APIs
+
+Potential APIs:
+
+GET
+/api/v1/privacy/policies
+
+GET
+/api/v1/privacy/consents
+
+POST
+/api/v1/privacy/consents
+
+POST
+/api/v1/privacy/consents/{id}/withdraw
+
+GET
+/api/v1/privacy/requests
+
+POST
+/api/v1/privacy/requests
+
+GET
+/api/v1/privacy/requests/{id}
+
+PATCH
+/api/v1/privacy/requests/{id}
+
+GET
+/api/v1/privacy/retention-policies
+
+GET
+/api/v1/privacy/legal-holds
+
+---
+
+# MODULE AP — EMPLOYEE SELF-SERVICE INTEGRATION
+
+Integrate Phase 12 with Phase 11 ESS.
+
+Employees should be able to access:
+
+My Compliance Information
+
+My Documents
+
+My Policy Acknowledgements
+
+My Consent
+
+My Data Requests
+
+My Certifications
+
+My Statutory Profile
+
+My Expiring Documents
+
+However:
+
+Employees must NEVER be able to access another employee's sensitive compliance data.
+
+---
+
+# MODULE AQ — MANAGER INTEGRATION
+
+Managers should see only permitted compliance information.
+
+Examples:
+
+* Team compliance warnings
+* Missing documents
+* Expiring certifications
+* Attendance compliance alerts
+* Overtime threshold warnings
+
+Do NOT expose sensitive tax/social-security identifiers to managers by default.
+
+---
+
+# MODULE AR — HR ADMIN INTEGRATION
+
+HR administrators should be able to:
+
+* Manage employee statutory records
+* Monitor compliance
+* Manage registrations
+* Manage documents
+* Review violations
+* Manage policy acknowledgements
+* Run reports
+* Handle employee privacy requests where authorized
+
+---
+
+# MODULE AS — PAYROLL INTEGRATION
+
+Compliance must integrate with the existing payroll engine.
+
+Before payroll finalization, support checks such as:
+
+* Applicable tax configuration exists
+* Employee statutory profile complete
+* Required contribution configuration exists
+* Minimum wage validation
+* Overtime compliance
+* Required deductions configured
+* Required registration configuration
+* Effective-dated rule availability
+
+Payroll should be able to produce:
+
+COMPLIANCE_CHECK_PASSED
+
+or
+
+COMPLIANCE_CHECK_FAILED
+
+or
+
+COMPLIANCE_CHECK_WARNING
+
+Do not silently change payroll values.
+
+---
+
+# MODULE AT — PRE-PAYROLL COMPLIANCE VALIDATION
+
+Create a pre-payroll compliance validation engine.
+
+Example:
+
+POST
+
+/api/v1/compliance/payroll/precheck
+
+Return:
+
+* Errors
+* Warnings
+* Affected employees
+* Rules triggered
+* Recommended actions
+
+Example:
+
+Employee 1023
+
+Issue:
+Applicable minimum wage rule violated.
+
+Severity:
+HIGH
+
+Action:
+Review compensation configuration.
+
+---
+
+# MODULE AU — POST-PAYROLL COMPLIANCE VALIDATION
+
+After payroll processing:
+
+Validate:
+
+* Tax calculations
+* Contributions
+* Statutory deductions
+* Employer contributions
+* Minimum wage
+* Overtime
+* Payroll totals
+* Compliance rules
+
+Store validation results.
+
+Never modify historical payroll silently.
+
+---
+
+# MODULE AV — COMPLIANCE SNAPSHOTS
+
+Create compliance snapshots.
+
+A snapshot represents the compliance state at a particular point in time.
+
+Fields:
+
+snapshot_id
+tenant_id
+snapshot_date
+calculation_version
+compliance_score
+open_violations
+overdue_tasks
+expiring_documents
+risk_level
+
+This supports historical reporting and audits.
+
+---
+
+# MODULE AW — MULTI-TENANT SECURITY
+
+This is mandatory.
+
+Every compliance entity must be tenant-scoped.
+
+Never allow:
+
+Tenant A
+
+to access:
+
+Tenant B
+
+data.
+
+Use existing tenant isolation architecture.
+
+Validate tenant ownership at:
+
+* API
+* Service
+* Repository
+* Database query
+* File access
+* Report generation
+
+Do not rely only on frontend filtering.
+
+---
+
+# MODULE AX — RBAC
+
+Extend existing RBAC.
+
+Potential permissions:
+
+compliance.view
+compliance.create
+compliance.update
+compliance.delete
+compliance.approve
+compliance.manage_rules
+compliance.manage_registrations
+compliance.manage_tasks
+compliance.manage_violations
+compliance.manage_audits
+compliance.view_reports
+compliance.export
+compliance.manage_privacy
+compliance.manage_retention
+compliance.manage_legal_hold
+compliance.manage_statutory_data
+
+Do not automatically grant these permissions to all administrators.
+
+---
+
+# MODULE AY — FIELD-LEVEL SECURITY
+
+Sensitive fields require stronger controls.
+
+Examples:
+
+* Tax identifiers
+* Social-security identifiers
+* Bank-related compliance information
+* Legal documents
+* Employee statutory information
+
+Implement masking.
+
+Example:
+
+Full value:
+
+XXXXXXXX1234
+
+Authorized user:
+
+FULL_VALUE
+
+Unauthorized user:
+
+********1234
+
+Where appropriate, implement access logging for sensitive field access.
+
+---
+
+# MODULE AZ — AUDIT LOGGING
+
+Every sensitive compliance action must generate an audit record.
+
+Track:
+
+* Actor
+* Tenant
+* Action
+* Resource
+* Resource ID
+* Timestamp
+* IP
+* User agent
+* Old value where safe
+* New value where safe
+* Reason
+* Result
+
+Examples:
+
+RULE_CREATED
+
+RULE_UPDATED
+
+RULE_APPROVED
+
+REGISTRATION_CREATED
+
+REGISTRATION_UPDATED
+
+DOCUMENT_ACCESSED
+
+DOCUMENT_DOWNLOADED
+
+STATUTORY_PROFILE_UPDATED
+
+CONSENT_GRANTED
+
+CONSENT_WITHDRAWN
+
+DATA_REQUEST_CREATED
+
+LEGAL_HOLD_CREATED
+
+RETENTION_POLICY_UPDATED
+
+COMPLIANCE_REPORT_EXPORTED
+
+---
+
+# 6. DATABASE DESIGN
+
+Follow existing SQLAlchemy/database conventions.
+
+Potential new tables:
+
+countries
+
+states
+
+regions
+
+legal_entities
+
+establishments
+
+compliance_categories
+
+compliance_rules
+
+compliance_rule_versions
+
+compliance_registrations
+
+employee_statutory_profiles
+
+employee_statutory_identifiers
+
+statutory_verification_requests
+
+tax_configurations
+
+tax_rule_versions
+
+contribution_rules
+
+minimum_wage_rules
+
+working_hour_compliance_rules
+
+overtime_compliance_rules
+
+leave_compliance_rules
+
+compliance_tasks
+
+compliance_task_comments
+
+compliance_evidence
+
+compliance_alerts
+
+compliance_escalation_rules
+
+compliance_violations
+
+corrective_actions
+
+audit_plans
+
+audits
+
+audit_checklists
+
+audit_findings
+
+policy_versions
+
+policy_acknowledgements
+
+legal_documents
+
+document_versions
+
+document_expiry_records
+
+privacy_policies
+
+privacy_policy_versions
+
+consents
+
+consent_versions
+
+data_subject_requests
+
+retention_policies
+
+retention_jobs
+
+legal_holds
+
+record_lifecycle_events
+
+configuration_change_requests
+
+configuration_approvals
+
+compliance_snapshots
+
+compliance_scores
+
+---
+
+# 7. DATABASE REQUIREMENTS
+
+Every tenant-owned table must have:
+
+tenant_id
+
+where applicable.
+
+Use:
+
+* UUID primary keys if that is the existing architecture
+* Foreign keys
+* Unique constraints
+* Composite unique constraints
+* Check constraints
+* Indexes
+* Created timestamps
+* Updated timestamps
+* Soft-delete strategy where already established
+
+Sensitive identifiers must not be casually exposed in logs.
+
+Use appropriate indexes for:
+
+tenant_id
+employee_id
+organization_id
+establishment_id
+status
+effective_from
+effective_to
+due_date
+expiry_date
+created_at
+
+---
+
+# 8. MIGRATIONS
+
+Create proper database migrations.
+
+Do NOT modify production database manually.
+
+Ensure:
+
+migration up
+
+and
+
+migration down
+
+work correctly where the existing migration framework supports rollback.
+
+Test migrations against a clean database.
+
+Test migrations against an existing Phase 11 database.
+
+---
+
+# 9. FRONTEND
+
+Extend the existing React + TypeScript application.
+
+Do NOT redesign the complete application.
+
+Reuse:
+
+* Existing layout
+* Existing sidebar
+* Existing authentication
+* Existing components
+* Existing tables
+* Existing modal system
+* Existing form system
+* Existing API client
+* Existing notification system
+* Existing theme
+
+Create a new:
+
+# Compliance Center
+
+Navigation:
+
+Compliance
+├── Dashboard
+├── Calendar
+├── Rules
+├── Registrations
+├── Employee Statutory
+├── Tasks
+├── Violations
+├── Corrective Actions
+├── Audits
+├── Policies
+├── Documents
+├── Alerts
+├── Privacy
+├── Retention
+├── Legal Holds
+└── Reports
+
+Only show navigation items when the user has appropriate permissions.
+
+---
+
+# 10. COMPLIANCE DASHBOARD UI
+
+Create:
+
+Top cards:
+
+Compliance Score
+
+Open Violations
+
+Overdue Tasks
+
+Expiring Documents
+
+Upcoming Deadlines
+
+High-Risk Issues
+
+Below:
+
+Compliance trend
+
+Risk distribution
+
+Upcoming deadlines
+
+Violation breakdown
+
+Recent activities
+
+Pending approvals
+
+---
+
+# 11. COMPLIANCE RULE UI
+
+Create:
+
+Rule List
+
+Rule Details
+
+Create Rule
+
+Edit Rule
+
+Version History
+
+Approval History
+
+Effective Date
+
+Applicability
+
+Audit History
+
+Do not allow users to edit an already-used historical version in a way that changes historical calculations.
+
+---
+
+# 12. COMPLIANCE TASK UI
+
+Provide:
+
+Task table
+
+Filters
+
+Status
+
+Priority
+
+Due date
+
+Responsible person
+
+Compliance category
+
+Actions:
+
+View
+
+Edit
+
+Assign
+
+Complete
+
+Reject
+
+Approve
+
+Attach evidence
+
+Add comment
+
+---
+
+# 13. VIOLATION UI
+
+Create a professional violation-management interface.
+
+Display:
+
+Severity
+
+Rule
+
+Employee
+
+Department
+
+Establishment
+
+Detected date
+
+Owner
+
+Due date
+
+Status
+
+Corrective action
+
+Evidence
+
+History
+
+---
+
+# 14. AUDIT UI
+
+Create:
+
+Audit dashboard
+
+Audit list
+
+Audit details
+
+Checklist
+
+Findings
+
+Evidence
+
+Corrective actions
+
+Audit report
+
+Audit history
+
+---
+
+# 15. PRIVACY CENTER
+
+Create:
+
+Privacy Policies
+
+Consent Management
+
+Data Requests
+
+Retention Policies
+
+Legal Holds
+
+Privacy Audit Log
+
+Only authorized roles can access administrative privacy functions.
+
+Employees should see their own privacy information through ESS.
+
+---
+
+# 16. COMPLIANCE SEARCH
+
+Extend global search.
+
+Search:
+
+* Compliance rule
+* Registration
+* Employee statutory record
+* Compliance task
+* Violation
+* Audit
+* Policy
+* Document
+
+Search results must be authorization-aware.
+
+Never expose unauthorized records through search.
+
+---
+
+# 17. BACKGROUND JOBS
+
+Use the existing Celery + Redis infrastructure.
+
+Implement scheduled jobs for:
+
+1. Registration expiry detection
+2. Document expiry detection
+3. Compliance deadline reminders
+4. Overdue task detection
+5. Escalation processing
+6. Policy acknowledgement reminders
+7. Compliance score calculation
+8. Payroll compliance validation
+9. Retention evaluation
+10. Legal-hold enforcement
+11. Audit reminders
+12. Certification expiry reminders
+
+Jobs must be:
+
+* Idempotent
+* Retry-safe
+* Logged
+* Tenant-aware
+
+Do not create duplicate notifications when a job is retried.
+
+---
+
+# 18. NOTIFICATION CHANNELS
+
+Reuse the existing notification architecture.
+
+Support where already available:
+
+* In-app
+* Email
+* Push
+* Webhook
+
+Examples:
+
+"Compliance registration expires in 30 days."
+
+"Payroll compliance validation failed."
+
+"Compliance task is overdue."
+
+"Policy acknowledgement is pending."
+
+---
+
+# 19. API SECURITY
+
+Protect every endpoint.
+
+Validate:
+
+Authentication
+
+Tenant
+
+Permission
+
+Resource ownership
+
+Manager scope
+
+Employee scope
+
+Field-level access
+
+Input validation
+
+File access
+
+Pagination
+
+Sorting
+
+Filtering
+
+Export authorization
+
+Never trust:
+
+employee_id
+tenant_id
+organization_id
+user_id
+
+from the frontend without server-side validation.
+
+For `/me` APIs, resolve identity from the authenticated session/token.
+
+---
+
+# 20. IDOR PROTECTION
+
+Explicitly test:
+
+Tenant A user requesting Tenant B compliance rule.
+
+Employee A requesting Employee B statutory profile.
+
+Manager requesting another department's compliance data.
+
+Unauthorized HR user requesting payroll compliance details.
+
+User changing IDs in URL/query parameters.
+
+Every case must return an appropriate authorization error.
+
+---
+
+# 21. RATE LIMITING
+
+Protect sensitive endpoints:
+
+* Privacy requests
+* Document downloads
+* Compliance exports
+* Search
+* Authentication-related endpoints
+* Sensitive data access
+
+Reuse the existing rate-limiting architecture.
+
+---
+
+# 22. REPORT EXPORT SECURITY
+
+Exports can contain highly sensitive data.
+
+Therefore:
+
+* Permission required
+* Audit every export
+* Record export type
+* Record actor
+* Record filters
+* Record timestamp
+* Avoid logging sensitive data
+* Restrict export columns by role
+
+---
+
+# 23. TESTING
+
+Testing is mandatory.
+
+Use the existing pytest architecture.
+
+Create:
+
+Unit tests
+
+API tests
+
+Integration tests
+
+Database tests
+
+RBAC tests
+
+Tenant-isolation tests
+
+Security tests
+
+Regression tests
+
+Frontend tests
+
+End-to-end tests
+
+Background-job tests
+
+Report/export tests
+
+---
+
+# 24. UNIT TESTS
+
+Test:
+
+* Rule evaluation
+* Effective dates
+* Tax calculations
+* Contribution calculations
+* Minimum wage validation
+* Working-hour validation
+* Overtime validation
+* Leave compliance
+* Compliance score
+* Risk calculation
+* Expiry calculations
+* Retention calculation
+* Escalation calculation
+
+---
+
+# 25. API TESTS
+
+Test:
+
+* CRUD
+* Authentication
+* Authorization
+* Tenant isolation
+* Pagination
+* Filtering
+* Sorting
+* Validation
+* Error responses
+* File upload
+* File download
+* Export
+* Privacy requests
+* Legal holds
+
+---
+
+# 26. SECURITY TEST MATRIX
+
+Explicitly test:
+
+### Authentication
+
+Unauthenticated request
+
+→ 401
+
+### Authorization
+
+Authenticated but unauthorized
+
+→ 403
+
+### Tenant isolation
+
+Tenant A → Tenant B
+
+→ 403 or 404 according to existing security convention
+
+### Employee isolation
+
+Employee A → Employee B
+
+→ denied
+
+### Manager scope
+
+Manager → unauthorized department
+
+→ denied
+
+### Sensitive fields
+
+Unauthorized role → statutory identifier
+
+→ masked/denied
+
+### Export
+
+Unauthorized user → export
+
+→ denied
+
+---
+
+# 27. DATABASE TESTING
+
+Test:
+
+* Foreign keys
+* Unique constraints
+* Cascading behavior
+* Soft deletes
+* Effective-date overlaps
+* Tenant isolation
+* Required fields
+* Status transitions
+
+Prevent overlapping active rule versions unless explicitly supported.
+
+---
+
+# 28. WORKFLOW TESTING
+
+Test:
+
+Draft
+→ Submitted
+→ Approved
+→ Active
+
+And:
+
+Draft
+→ Rejected
+
+And:
+
+Active
+→ Superseded
+
+And:
+
+Compliance violation
+→ Investigation
+→ Corrective action
+→ Review
+→ Resolved
+→ Closed
+
+---
+
+# 29. AUDIT TESTING
+
+Verify every sensitive operation creates an audit record.
+
+Examples:
+
+Create rule
+
+Update rule
+
+Approve rule
+
+Download document
+
+Access statutory profile
+
+Export report
+
+Create privacy request
+
+Withdraw consent
+
+Create legal hold
+
+Release legal hold
+
+---
+
+# 30. FRONTEND TESTING
+
+Test:
+
+* Dashboard
+* Filters
+* Tables
+* Forms
+* Validation
+* Role-based visibility
+* Permission-based buttons
+* Responsive layout
+* Mobile layout
+* Error states
+* Loading states
+* Empty states
+* Pagination
+* Export actions
+
+---
+
+# 31. MOBILE RESPONSIVENESS
+
+All compliance screens must be responsive.
+
+On mobile:
+
+* Tables should transform appropriately
+* Filters should use drawers
+* Cards should stack
+* Forms should remain usable
+* Sensitive information should not be unnecessarily displayed
+
+---
+
+# 32. ACCESSIBILITY
+
+Follow accessible UI principles.
+
+Support:
+
+* Keyboard navigation
+* Labels
+* Focus management
+* Accessible dialogs
+* Screen-reader-friendly controls
+* Proper error messages
+* Sufficient contrast
+* Semantic HTML
+
+---
+
+# 33. OBSERVABILITY
+
+Integrate with the existing logging/monitoring system.
+
+Log:
+
+* Compliance job failures
+* Rule evaluation failures
+* Payroll compliance failures
+* Notification failures
+* Export failures
+* File-processing failures
+* Privacy workflow failures
+
+Never log:
+
+* Passwords
+* Tokens
+* Full tax identifiers
+* Full social-security identifiers
+* Sensitive document contents
+
+---
+
+# 34. ERROR HANDLING
+
+Create consistent API error responses.
+
+Handle:
+
+400
+401
+403
+404
+409
+422
+429
+500
+
+Use existing error-handling architecture.
+
+Examples:
+
+RULE_VERSION_CONFLICT
+
+COMPLIANCE_RULE_NOT_APPLICABLE
+
+STATUTORY_PROFILE_NOT_FOUND
+
+INSUFFICIENT_PERMISSION
+
+TENANT_ACCESS_DENIED
+
+COMPLIANCE_TASK_ALREADY_COMPLETED
+
+LEGAL_HOLD_ACTIVE
+
+RETENTION_BLOCKED
+
+---
+
+# 35. PERFORMANCE
+
+Compliance dashboards can contain large datasets.
+
+Implement:
+
+* Pagination
+* Database indexes
+* Efficient joins
+* Aggregation queries
+* Caching where safe
+* Background calculations
+* Lazy loading
+* Avoid N+1 queries
+
+Do not load thousands of employee records into memory unnecessarily.
+
+---
+
+# 36. DATA INTEGRITY
+
+Critical compliance data must be transaction-safe.
+
+Example:
+
+Approving a compliance rule should atomically:
+
+1. Validate permission
+2. Validate version
+3. Create approval record
+4. Activate rule
+5. Update previous version if required
+6. Create audit record
+
+If one step fails:
+
+Rollback the transaction.
+
+---
+
+# 37. CONCURRENCY
+
+Protect against simultaneous updates.
+
+Examples:
+
+Two administrators approving the same rule.
+
+Two users modifying the same compliance task.
+
+Two jobs processing the same expiry record.
+
+Use:
+
+* Optimistic locking
+* Unique constraints
+* Transactions
+* Idempotency keys
+* Job locking
+
+according to existing architecture.
+
+---
+
+# 38. SEED DATA
+
+Create development/demo seed data.
+
+Include:
+
+* Countries
+* States
+* Compliance categories
+* Sample compliance rules
+* Sample registration
+* Sample tasks
+* Sample violations
+* Sample policies
+* Sample audit
+* Sample privacy policy
+* Sample retention policy
+
+Clearly mark demo/sample data.
+
+Do not pretend sample rules are actual legal requirements.
+
+---
+
+# 39. DOCUMENTATION
+
+Update documentation.
+
+Create/update:
+
+docs/architecture.md
+
+docs/compliance.md
+
+docs/privacy.md
+
+docs/api.md
+
+docs/database.md
+
+docs/security.md
+
+docs/testing.md
+
+docs/deployment.md
+
+Include:
+
+* Architecture
+* Data flow
+* Database model
+* API endpoints
+* RBAC
+* Tenant isolation
+* Compliance engine
+* Effective dating
+* Privacy
+* Retention
+* Legal holds
+* Background jobs
+* Security model
+* Testing
+
+---
+
+# 40. API DOCUMENTATION
+
+Ensure FastAPI OpenAPI documentation correctly describes:
+
+* Request schemas
+* Response schemas
+* Authentication
+* Permissions
+* Errors
+* Pagination
+* Filters
+
+Add examples where useful.
+
+---
+
+# 41. CONFIGURATION
+
+Do not hard-code environment-specific values.
+
+Use environment configuration for:
+
+* Database
+* Redis
+* Celery
+* Storage
+* Email
+* Notification providers
+* Encryption keys
+* Feature flags
+
+Never commit secrets.
+
+---
+
+# 42. FEATURE FLAGS
+
+Where appropriate, introduce feature flags.
+
+Examples:
+
+ENABLE_COMPLIANCE_MODULE
+
+ENABLE_PRIVACY_CENTER
+
+ENABLE_AUDIT_MODULE
+
+ENABLE_LEGAL_HOLD
+
+ENABLE_RETENTION_ENGINE
+
+ENABLE_COMPLIANCE_ALERTS
+
+Follow the existing feature-flag system if available.
+
+---
+
+# 43. BACKWARD COMPATIBILITY
+
+Phase 12 must not break:
+
+Phase 1:
+Foundation
+
+Phase 2:
+Authentication/RBAC
+
+Phase 3:
+Organization/Employee
+
+Phase 4:
+Attendance/Shift
+
+Phase 5:
+GPS/Geofencing
+
+Phase 6:
+Leave/Approval
+
+Phase 7:
+Payroll
+
+Phase 8:
+Expense/Loan
+
+Phase 9:
+Performance/Training
+
+Phase 10:
+Recruitment/Analytics
+
+Phase 11:
+ESS/MSS/Mobile/Documents/Communication
+
+Run the full regression suite.
+
+---
+
+# 44. IMPLEMENTATION ORDER
+
+Follow this exact order.
+
+## STEP 1 — Repository Inspection
+
+Understand everything already implemented.
+
+## STEP 2 — Architecture Mapping
+
+Create a short internal architecture map.
+
+## STEP 3 — Database Design
+
+Design normalized schemas.
+
+## STEP 4 — Migration
+
+Create migrations.
+
+## STEP 5 — Domain Models
+
+Implement models.
+
+## STEP 6 — Services
+
+Implement business logic.
+
+## STEP 7 — Rule Engine
+
+Implement effective-dated compliance rules.
+
+## STEP 8 — API
+
+Implement secured endpoints.
+
+## STEP 9 — RBAC
+
+Implement permissions.
+
+## STEP 10 — Frontend
+
+Implement Compliance Center.
+
+## STEP 11 — Background Jobs
+
+Implement scheduled compliance jobs.
+
+## STEP 12 — Notifications
+
+Integrate alerting.
+
+## STEP 13 — Reports
+
+Implement compliance reports.
+
+## STEP 14 — Privacy
+
+Implement privacy workflows.
+
+## STEP 15 — Audit
+
+Implement complete audit trail.
+
+## STEP 16 — Testing
+
+Implement unit/API/integration/security/E2E tests.
+
+## STEP 17 — Performance
+
+Optimize queries and background jobs.
+
+## STEP 18 — Security Review
+
+Perform IDOR, RBAC, tenant-isolation and sensitive-data review.
+
+## STEP 19 — Documentation
+
+Update technical and user documentation.
+
+## STEP 20 — Regression
+
+Run the complete existing test suite.
+
+---
+
+# 45. DO NOT DO THESE THINGS
+
+Do NOT:
+
+* Rebuild authentication
+* Rebuild employee management
+* Duplicate payroll
+* Duplicate attendance
+* Duplicate leave
+* Duplicate notifications
+* Duplicate file storage
+* Duplicate audit logging
+* Hard-code country-specific laws into core logic
+* Delete historical compliance rules
+* Modify historical payroll silently
+* Expose sensitive statutory identifiers
+* Trust frontend tenant_id
+* Trust frontend employee_id
+* Bypass RBAC
+* bypass approval workflows
+* store secrets in source code
+* log sensitive identifiers
+* create unindexed large queries
+* introduce N+1 queries
+* delete data automatically without retention/legal-hold safeguards
+
+---
+
+# 46. FINAL SECURITY REVIEW
+
+Before declaring Phase 12 complete, perform a security review for:
+
+### Authentication
+
+### Authorization
+
+### RBAC
+
+### Tenant isolation
+
+### Employee isolation
+
+### Manager scope
+
+### IDOR
+
+### Sensitive field exposure
+
+### File access
+
+### Report export
+
+### Audit logs
+
+### Privacy requests
+
+### Retention
+
+### Legal holds
+
+### SQL injection
+
+### XSS
+
+### CSRF where applicable
+
+### SSRF where applicable
+
+### Path traversal
+
+### File upload attacks
+
+### Rate limiting
+
+### Information leakage
+
+### Error leakage
+
+### Background-job isolation
+
+---
+
+# 47. FINAL QA COMMANDS
+
+Run the project's appropriate commands for:
+
+Backend:
+
+pytest
+
+Lint:
+
+ruff / flake8
+
+Formatting:
+
+black
+
+Type checking:
+
+mypy
+
+Frontend:
+
+npm test
+
+npm run build
+
+and any existing project-specific test commands.
+
+Do not assume these exact commands exist.
+
+First inspect the repository's tooling and use the established commands.
+
+---
+
+# 48. DEFINITION OF DONE
+
+Phase 12 is complete only when:
+
+[ ] Repository inspected
+
+[ ] Existing architecture understood
+
+[ ] No existing modules unnecessarily duplicated
+
+[ ] Compliance architecture implemented
+
+[ ] Compliance rules implemented
+
+[ ] Effective dating implemented
+
+[ ] Statutory registration implemented
+
+[ ] Employee statutory profile implemented
+
+[ ] Verification workflow implemented
+
+[ ] Tax configuration framework implemented
+
+[ ] Contribution configuration implemented
+
+[ ] Minimum wage validation implemented
+
+[ ] Working-hour compliance implemented
+
+[ ] Overtime compliance implemented
+
+[ ] Leave compliance implemented
+
+[ ] Compliance calendar implemented
+
+[ ] Compliance tasks implemented
+
+[ ] Evidence management implemented
+
+[ ] Compliance alerts implemented
+
+[ ] Escalation implemented
+
+[ ] Violations implemented
+
+[ ] Corrective actions implemented
+
+[ ] Audit management implemented
+
+[ ] Policy governance implemented
+
+[ ] Privacy center implemented
+
+[ ] Consent management implemented
+
+[ ] Data requests implemented
+
+[ ] Retention implemented
+
+[ ] Legal hold implemented
+
+[ ] Record lifecycle implemented
+
+[ ] Enterprise administration implemented
+
+[ ] Maker-checker workflow implemented where required
+
+[ ] Compliance dashboard implemented
+
+[ ] Compliance reports implemented
+
+[ ] Payroll integration implemented
+
+[ ] ESS integration implemented
+
+[ ] RBAC implemented
+
+[ ] Tenant isolation verified
+
+[ ] Sensitive-field protection verified
+
+[ ] Audit logging implemented
+
+[ ] Background jobs implemented
+
+[ ] Notifications implemented
+
+[ ] Database migrations implemented
+
+[ ] Seed data implemented
+
+[ ] API documentation updated
+
+[ ] Frontend documentation updated
+
+[ ] Unit tests implemented
+
+[ ] API tests implemented
+
+[ ] Integration tests implemented
+
+[ ] Security tests implemented
+
+[ ] Tenant-isolation tests implemented
+
+[ ] Regression tests passed
+
+[ ] Frontend build passed
+
+[ ] Backend validation passed
+
+[ ] No critical security vulnerabilities remain
+
+[ ] No secrets committed
+
+---
+
+# 49. FINAL DELIVERY REPORT
+
+At the end, provide a detailed implementation report containing:
+
+## 1. Repository Analysis
+
+What already existed.
+
+## 2. Architecture
+
+How Phase 12 integrates with the existing architecture.
+
+## 3. Database Changes
+
+Every new table and important relationship.
+
+## 4. Migrations
+
+Migration files created.
+
+## 5. Backend
+
+Services, models, schemas and APIs created/modified.
+
+## 6. Compliance Engine
+
+Explain rule evaluation and effective dating.
+
+## 7. Payroll Integration
+
+Explain pre-payroll and post-payroll validation.
+
+## 8. Frontend
+
+Screens/pages/components created.
+
+## 9. RBAC
+
+New permissions and role behavior.
+
+## 10. Security
+
+Tenant isolation, IDOR protection, sensitive-data handling.
+
+## 11. Privacy
+
+Consent, data requests, retention and legal holds.
+
+## 12. Background Jobs
+
+Jobs and schedules created.
+
+## 13. Notifications
+
+Notification events created.
+
+## 14. Reports
+
+Reports and exports implemented.
+
+## 15. Tests
+
+Number/type of tests executed.
+
+## 16. Test Results
+
+Pass/fail summary.
+
+## 17. Known Limitations
+
+Clearly list remaining limitations.
+
+## 18. Future Improvements
+
+List logical Phase 13 candidates.
+
+---
+
+# 50. IMPORTANT IMPLEMENTATION PHILOSOPHY
+
+Build this as a commercial SaaS product.
+
+The system must be:
+
+* Production-ready
+* Secure
+* Maintainable
+* Scalable
+* Multi-tenant
+* Auditable
+* Configurable
+* Extensible
+* Testable
+* API-first
+* Mobile-ready
+* Cloud-ready
+
+Do not implement superficial CRUD screens only.
+
+Build proper domain services, authorization, workflows, database constraints, auditability, effective-dated configuration, background processing and automated tests.
+
+Always prefer:
+
+Reusable architecture
++
+Strong domain modeling
++
+Security
++
+Data integrity
++
+Testability
++
+Observability
+
+over quick implementation.
+
+---
+
+# FINAL INSTRUCTION
+
+START BY INSPECTING THE EXISTING AXONTIMEHR CODEBASE.
+
+DO NOT WRITE CODE IMMEDIATELY.
+
+First determine:
+
+1. What Phases 1–11 already implemented.
+2. What database tables already exist.
+3. What APIs already exist.
+4. What authentication/RBAC architecture already exists.
+5. What payroll engine already exists.
+6. What attendance/leave modules already exist.
+7. What document/file system already exists.
+8. What notification system already exists.
+9. What audit system already exists.
+10. What frontend architecture already exists.
+11. What can be reused.
+12. What must be extended.
+13. What genuinely needs to be created.
+
+Then produce a concise implementation plan.
+
+After that, implement Phase 12 incrementally.
+
+After every major module:
+
+* Run relevant tests.
+* Fix failures.
+* Check migrations.
+* Check authorization.
+* Check tenant isolation.
+* Check regression impact.
+
+Do not leave the repository in a partially broken state.
+
+The final result must be a coherent, integrated AxonTimeHR Phase 12 implementation rather than an isolated compliance application.
+
+# END OF PHASE 12 PROMPT

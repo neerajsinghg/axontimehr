@@ -1,0 +1,2697 @@
+Absolutely. After the architecture we established, **Phase 5 should be the Location-Based & Verified Attendance layer**: GPS attendance, geofencing, device/location metadata, selfie verification foundation, anti-spoofing controls, and the related admin configuration.
+
+This phase should **extend Phase 4**, not replace its attendance engine.
+
+# PHASE 5 — GPS, GEOFENCING & VERIFIED ATTENDANCE DEVELOPMENT
+
+# AXONTIMEHR — LOCATION-AWARE & VERIFIED ATTENDANCE ENGINE
+
+---
+
+# 1. PROJECT CONTEXT
+
+You are continuing development of **AxonTimeHR**, a modern, production-ready, multi-tenant Attendance + HRMS SaaS platform.
+
+The platform is being developed incrementally.
+
+Previously completed:
+
+## PHASE 1 — FOUNDATION
+
+Established:
+
+* Backend architecture
+* Frontend architecture
+* PostgreSQL
+* Database migrations
+* Configuration
+* Environment management
+* API foundation
+* Common infrastructure
+
+## PHASE 2 — AUTHENTICATION & IDENTITY
+
+Established:
+
+* Authentication
+* JWT/token handling
+* User identity
+* RBAC
+* Permissions
+* Tenant-aware authentication
+* Protected APIs
+* Security foundation
+
+## PHASE 3 — ORGANIZATION & EMPLOYEE MANAGEMENT
+
+Established:
+
+* Organizations
+* Branches
+* Departments
+* Designations
+* Employees
+* Employee lifecycle
+* Reporting hierarchy
+* Employee ↔ User relationship
+* Employee documents
+* Employee search/filtering/pagination
+* Audit foundation
+
+## PHASE 4 — ATTENDANCE & SHIFT MANAGEMENT
+
+Established:
+
+* Attendance
+* Attendance events
+* Check-in
+* Check-out
+* Attendance state machine
+* Shift management
+* Employee shift assignment
+* Work-week rules
+* Holiday foundation
+* Break calculation
+* Late calculation
+* Early-exit calculation
+* Overnight shifts
+* Attendance regularization foundation
+* Attendance history
+* Attendance dashboard
+* Attendance policies
+* Tenant isolation
+* RBAC
+* Audit logging
+
+---
+
+# 2. PHASE 5 OBJECTIVE
+
+Build the next layer:
+
+# LOCATION-AWARE + VERIFIED ATTENDANCE
+
+Phase 5 should add:
+
+```text
+GPS Attendance
+Geolocation
+Geofencing
+Location Validation
+Device Metadata
+Location Accuracy Validation
+Selfie Verification Foundation
+Attendance Verification
+Anti-Spoofing Controls
+Location Audit Trail
+Admin Geofence Management
+```
+
+The objective is to allow organizations to configure rules such as:
+
+```text
+Employee must be physically present at the assigned office
+        ↓
+Employee opens AxonTimeHR
+        ↓
+Device requests location
+        ↓
+GPS coordinates captured
+        ↓
+Server validates location
+        ↓
+Geofence checked
+        ↓
+Attendance policy checked
+        ↓
+Optional selfie verification
+        ↓
+Attendance accepted/rejected
+```
+
+---
+
+# 3. CRITICAL RULE
+
+Before coding:
+
+**INSPECT THE COMPLETE EXISTING AXONTIMEHR REPOSITORY.**
+
+Do not rebuild:
+
+* Authentication
+* JWT
+* RBAC
+* Tenant handling
+* Employee management
+* Attendance
+* Shift engine
+* Database session
+* Existing API structure
+* Existing frontend architecture
+* Existing audit logging
+
+Reuse Phase 1–4 implementations.
+
+If an existing model/service can be extended safely, extend it.
+
+Do not create duplicate attendance tables or duplicate employee models.
+
+---
+
+# 4. FIRST STEP — CODEBASE ANALYSIS
+
+Before implementation, inspect:
+
+```text
+Backend
+Frontend
+Database models
+Migrations
+Authentication
+RBAC
+Tenant middleware
+Employee module
+Attendance module
+Shift module
+Attendance calculation engine
+Audit logging
+Testing framework
+Configuration
+Docker configuration
+```
+
+Then produce:
+
+```text
+1. Existing architecture
+2. Existing attendance architecture
+3. Existing employee architecture
+4. Existing database relationships
+5. Existing authentication flow
+6. Existing RBAC
+7. Existing API patterns
+8. Existing frontend patterns
+9. Existing testing strategy
+10. Phase 5 implementation plan
+```
+
+Only then begin development.
+
+---
+
+# 5. PHASE 5 ARCHITECTURE
+
+Target:
+
+```text
+                     AxonTimeHR
+                         |
+                 Authentication
+                         |
+                    Tenant Context
+                         |
+                  Attendance API
+                         |
+             Attendance Verification
+                    /          \
+                   /            \
+             Location          Identity
+             Validation        Verification
+                |                  |
+             GPS/Geo            Selfie
+                |                  |
+             Geofence          Verification
+                   \              /
+                    \            /
+                     Attendance
+                        Engine
+                          |
+                      PostgreSQL
+```
+
+Future:
+
+```text
+Mobile App
+   |
+GPS
+   |
+Camera
+   |
+Offline Queue
+   |
+Sync Service
+```
+
+---
+
+# 6. LOCATION MODEL
+
+Create a reusable location model.
+
+A location may contain:
+
+```text
+id
+tenant_id
+organization_id
+branch_id
+name
+latitude
+longitude
+radius_meters
+accuracy_requirement
+status
+created_at
+updated_at
+created_by
+updated_by
+```
+
+The exact fields should follow existing architecture.
+
+Do not store unnecessary personal location history.
+
+---
+
+# 7. BRANCH LOCATION
+
+Integrate location configuration with Phase 3 branches.
+
+Example:
+
+```text
+Branch
+  |
+  +-- Office Location
+  |
+  +-- Latitude
+  +-- Longitude
+  +-- Geofence
+```
+
+A branch should optionally have one or more attendance locations.
+
+Support future scenarios such as:
+
+```text
+Head Office
+Site Office
+Warehouse
+Factory
+Client Location
+Remote Work Location
+```
+
+---
+
+# 8. GEOFENCE
+
+Implement geofence management.
+
+A basic geofence should support:
+
+```text
+center latitude
+center longitude
+radius
+```
+
+Example:
+
+```text
+Office:
+28.4595
+77.0266
+
+Radius:
+150 meters
+```
+
+Employee is considered inside if the calculated distance is within the configured radius, subject to accuracy/business rules.
+
+---
+
+# 9. GEO-FENCE TYPES
+
+Design an extensible structure supporting:
+
+```text
+CIRCULAR
+POLYGON
+```
+
+Phase 5 may initially implement:
+
+```text
+CIRCULAR
+```
+
+but the architecture should not make polygon geofencing impossible later.
+
+Future:
+
+```text
+Polygon
+      ↓
+Office boundary
+      ↓
+Employee must be inside exact boundary
+```
+
+---
+
+# 10. GEOFENCE ASSIGNMENT
+
+Allow authorized administrators to assign locations/geofences to:
+
+* Branch
+* Department
+* Employee
+* Attendance policy
+
+The precedence rule must be clearly defined.
+
+Example:
+
+```text
+Employee-specific geofence
+        ↓
+Department geofence
+        ↓
+Branch geofence
+        ↓
+Organization default
+```
+
+Do not implement multiple conflicting rules without documenting precedence.
+
+---
+
+# 11. LOCATION POLICY
+
+Create a location attendance policy.
+
+Possible configuration:
+
+```text
+location_required
+geofence_enabled
+allowed_radius
+minimum_accuracy
+location_timeout
+location_freshness_seconds
+allow_outside_geofence
+outside_geofence_action
+```
+
+Example:
+
+```text
+Location Required: YES
+Geofence: YES
+Radius: 100 meters
+Minimum Accuracy: 50 meters
+```
+
+---
+
+# 12. GPS CHECK-IN
+
+Extend Phase 4 check-in.
+
+Example:
+
+```http
+POST /api/v1/attendance/check-in
+```
+
+Request may contain:
+
+```json
+{
+  "latitude": 28.4595,
+  "longitude": 77.0266,
+  "accuracy": 12.5,
+  "captured_at": "2026-09-01T09:02:15+05:30"
+}
+```
+
+Do not blindly trust these values.
+
+The server must validate:
+
+* authenticated employee
+* tenant
+* timestamp
+* coordinate ranges
+* accuracy
+* location freshness
+* geofence
+* attendance state
+* attendance policy
+
+---
+
+# 13. COORDINATE VALIDATION
+
+Validate:
+
+```text
+latitude: -90 to +90
+longitude: -180 to +180
+accuracy > 0
+```
+
+Reject invalid coordinates.
+
+Examples:
+
+```text
+latitude = 500        ❌
+longitude = -500     ❌
+accuracy = -10       ❌
+```
+
+---
+
+# 14. LOCATION FRESHNESS
+
+Do not accept an old location indefinitely.
+
+Example:
+
+```text
+GPS captured:
+09:00
+
+Request:
+09:25
+```
+
+Depending on policy, the location may be considered stale.
+
+Create configurable:
+
+```text
+location_freshness_seconds
+```
+
+Example:
+
+```text
+60 seconds
+120 seconds
+300 seconds
+```
+
+Do not hard-code one universal value.
+
+---
+
+# 15. GPS ACCURACY
+
+GPS coordinates have an accuracy radius.
+
+Example:
+
+```text
+Latitude
+Longitude
+Accuracy = 8 meters
+```
+
+Do not treat GPS coordinates as infinitely precise.
+
+Implement:
+
+```text
+minimum acceptable accuracy
+```
+
+Example:
+
+```text
+Accuracy <= 50m → accepted
+Accuracy > 50m → rejected/pending according to policy
+```
+
+The exact rule must be configurable.
+
+---
+
+# 16. DISTANCE CALCULATION
+
+Implement server-side distance calculation.
+
+For circular geofences, use a proper geographic distance calculation such as the Haversine formula or an appropriate geospatial library.
+
+Do NOT calculate distance only in JavaScript/frontend.
+
+The backend must be authoritative.
+
+Example:
+
+```text
+Employee GPS
+     |
+     ↓
+Distance Calculator
+     |
+     ↓
+Office Location
+     |
+     ↓
+Distance = 43 meters
+     |
+     ↓
+Allowed Radius = 100 meters
+     |
+     ↓
+INSIDE GEOFENCE
+```
+
+---
+
+# 17. GEOFENCE DECISION
+
+Possible results:
+
+```text
+INSIDE
+OUTSIDE
+UNKNOWN
+INVALID_LOCATION
+LOW_ACCURACY
+STALE_LOCATION
+```
+
+Do not reduce all failures to a generic error.
+
+This information will be important for audit and troubleshooting.
+
+---
+
+# 18. OUTSIDE GEOFENCE POLICY
+
+Organizations may want different behavior.
+
+Support configurable behavior such as:
+
+```text
+REJECT
+ALLOW_WITH_WARNING
+REQUIRE_APPROVAL
+RECORD_EXCEPTION
+```
+
+Example:
+
+```text
+Employee outside office
+       ↓
+Policy = REJECT
+       ↓
+Attendance rejected
+```
+
+Another tenant:
+
+```text
+Employee outside office
+       ↓
+Policy = ALLOW_WITH_WARNING
+       ↓
+Attendance accepted
+       ↓
+Audit exception recorded
+```
+
+---
+
+# 19. LOCATION ATTENDANCE EVENT
+
+Extend the attendance event model or create a related location record.
+
+Store appropriate metadata such as:
+
+```text
+latitude
+longitude
+accuracy
+captured_at
+distance_from_geofence
+geofence_id
+location_status
+location_source
+```
+
+Avoid duplicating information unnecessarily.
+
+---
+
+# 20. LOCATION PRIVACY
+
+Location data is sensitive.
+
+Implement strict access control.
+
+Employees should be able to see their own relevant attendance location information.
+
+Administrators/managers should only see location data according to permissions.
+
+Do not expose employee location history to every authenticated user.
+
+---
+
+# 21. LOCATION RETENTION
+
+Design the system so organizations can configure retention policies later.
+
+Do not assume location data must be stored forever.
+
+Separate:
+
+```text
+Attendance record
+```
+
+from:
+
+```text
+Detailed location metadata
+```
+
+where practical.
+
+This will make future retention policies easier.
+
+---
+
+# 22. LOCATION AUDIT
+
+Record important location decisions.
+
+Example:
+
+```text
+LOCATION_VALIDATED
+GEOFENCE_PASSED
+GEOFENCE_FAILED
+LOW_GPS_ACCURACY
+STALE_LOCATION
+LOCATION_REQUIRED
+LOCATION_REJECTED
+```
+
+Audit information should contain enough information for investigation without exposing unnecessary sensitive data.
+
+---
+
+# 23. DEVICE INFORMATION
+
+Prepare device metadata.
+
+Potential fields:
+
+```text
+device_id
+device_type
+platform
+platform_version
+app_version
+device_model
+```
+
+Do not collect unnecessary device information.
+
+---
+
+# 24. DEVICE REGISTRATION
+
+Prepare architecture for trusted device management.
+
+Future capability:
+
+```text
+Employee
+   ↓
+Registered Device
+   ↓
+Attendance
+```
+
+Possible fields:
+
+```text
+device_id
+employee_id
+tenant_id
+device_type
+status
+registered_at
+last_seen_at
+```
+
+Do not make device binding mandatory unless the product requirements explicitly require it.
+
+---
+
+# 25. DEVICE SECURITY
+
+Do not trust a client-provided:
+
+```text
+device_id
+```
+
+as a strong security credential.
+
+A device identifier is metadata, not authentication.
+
+Use the existing authentication mechanism as the primary identity.
+
+---
+
+# 26. SELFIE VERIFICATION FOUNDATION
+
+Implement the architecture for optional selfie verification.
+
+Do NOT build an insecure custom facial-recognition system.
+
+Create an abstraction:
+
+```text
+IdentityVerificationService
+```
+
+with future providers such as:
+
+```text
+FaceVerificationProvider
+ThirdPartyVerificationProvider
+InternalVerificationProvider
+```
+
+---
+
+# 27. SELFIE ATTENDANCE FLOW
+
+Future-compatible flow:
+
+```text
+Employee
+   |
+   ↓
+Check In
+   |
+   ↓
+Capture Selfie
+   |
+   ↓
+Upload Securely
+   |
+   ↓
+Verification Service
+   |
+   ↓
+Verification Result
+   |
+   ↓
+Attendance Engine
+```
+
+Phase 5 should establish the interfaces and secure metadata architecture.
+
+---
+
+# 28. SELFIE METADATA
+
+Do not unnecessarily store raw biometric information in PostgreSQL.
+
+Possible metadata:
+
+```text
+verification_id
+employee_id
+attendance_event_id
+provider
+status
+score
+reference
+verified_at
+```
+
+Avoid storing biometric templates unless there is a clear legal, security, and architectural requirement.
+
+---
+
+# 29. VERIFICATION STATUS
+
+Use controlled values:
+
+```text
+NOT_REQUIRED
+PENDING
+VERIFIED
+FAILED
+REJECTED
+EXPIRED
+ERROR
+```
+
+Attendance behavior must depend on configured policy.
+
+---
+
+# 30. VERIFICATION POLICY
+
+Support:
+
+```text
+verification_required
+verification_method
+minimum_score
+failure_action
+```
+
+Example:
+
+```text
+Selfie Required = YES
+Failure Action = REJECT
+```
+
+Another policy:
+
+```text
+Selfie Required = YES
+Failure Action = REQUIRE_REVIEW
+```
+
+---
+
+# 31. SELFIE STORAGE
+
+Do NOT store large images directly inside PostgreSQL unless there is a specific reason.
+
+Use object-storage architecture:
+
+```text
+PostgreSQL
+    |
+    └── storage_key/reference
+
+Object Storage
+    |
+    └── selfie file
+```
+
+Future storage:
+
+```text
+S3
+Azure Blob
+Google Cloud Storage
+```
+
+For local development, use an appropriate local storage abstraction.
+
+---
+
+# 32. SECURE FILE ACCESS
+
+Selfie/profile images must not be publicly accessible.
+
+Use:
+
+* authenticated access
+* signed URLs where appropriate
+* authorization checks
+* tenant isolation
+* expiration
+* access logging where necessary
+
+Never expose unrestricted storage URLs for sensitive employee images.
+
+---
+
+# 33. ANTI-SPOOFING FOUNDATION
+
+The system should be designed to reduce obvious spoofing risks.
+
+Consider:
+
+```text
+location freshness
+GPS accuracy
+device metadata
+server timestamps
+request authentication
+duplicate request detection
+selfie verification provider
+```
+
+Do not claim that GPS alone prevents spoofing.
+
+Do not implement a fake "100% spoof-proof" system.
+
+---
+
+# 34. MOCK VERIFICATION PROVIDER
+
+For development/testing, implement a mock verification provider.
+
+Example:
+
+```text
+MockFaceVerificationProvider
+```
+
+It should return deterministic test results.
+
+Example:
+
+```text
+VERIFIED
+FAILED
+ERROR
+```
+
+This allows automated tests without depending on an external biometric provider.
+
+---
+
+# 35. PROVIDER ABSTRACTION
+
+Use an interface similar to:
+
+```text
+VerificationProvider
+    |
+    +-- MockVerificationProvider
+    +-- FutureExternalProvider
+```
+
+The attendance engine should not know provider-specific implementation details.
+
+---
+
+# 36. ATTENDANCE VERIFICATION PIPELINE
+
+Design a reusable verification pipeline:
+
+```text
+Authentication
+      ↓
+Tenant Validation
+      ↓
+Employee Validation
+      ↓
+Shift Resolution
+      ↓
+Attendance Policy
+      ↓
+Location Validation
+      ↓
+Geofence Validation
+      ↓
+Identity Verification
+      ↓
+Attendance State Validation
+      ↓
+Attendance Event
+      ↓
+Attendance Summary
+      ↓
+Audit
+```
+
+Not every attendance event must use every verification stage.
+
+The pipeline should be policy-driven.
+
+---
+
+# 37. VERIFICATION DECISION ENGINE
+
+Create a clear decision model.
+
+Example:
+
+```text
+Location = INSIDE
+GPS Accuracy = GOOD
+Selfie = VERIFIED
+Shift = VALID
+Attendance State = VALID
+
+       ↓
+
+ATTENDANCE ACCEPTED
+```
+
+Failure:
+
+```text
+Location = OUTSIDE
+Policy = REJECT
+
+       ↓
+
+ATTENDANCE REJECTED
+```
+
+Another:
+
+```text
+Location = OUTSIDE
+Policy = ALLOW_WITH_WARNING
+
+       ↓
+
+ATTENDANCE ACCEPTED
++
+EXCEPTION RECORDED
+```
+
+---
+
+# 38. CHECK-IN API RESPONSE
+
+Return useful information.
+
+Example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "attendance_id": "...",
+    "event_id": "...",
+    "status": "PRESENT",
+    "check_in_time": "...",
+    "location_status": "INSIDE",
+    "verification_status": "VERIFIED"
+  }
+}
+```
+
+Do not expose internal implementation details.
+
+---
+
+# 39. FAILED LOCATION RESPONSE
+
+Example:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "OUTSIDE_GEOFENCE",
+    "message": "You are outside the allowed attendance location."
+  }
+}
+```
+
+Other useful errors:
+
+```text
+LOCATION_REQUIRED
+INVALID_COORDINATES
+LOW_LOCATION_ACCURACY
+STALE_LOCATION
+GEOFENCE_NOT_CONFIGURED
+VERIFICATION_REQUIRED
+VERIFICATION_FAILED
+```
+
+---
+
+# 40. EMPLOYEE UI
+
+Update the Phase 4 employee attendance screen.
+
+Before check-in:
+
+```text
+Today's Shift
+09:00 - 18:00
+
+Location
+Checking...
+
+Verification
+Ready
+
+[ CHECK IN ]
+```
+
+After location capture:
+
+```text
+Location
+✓ Office location detected
+
+Distance
+42 meters
+
+Accuracy
+11 meters
+```
+
+Then:
+
+```text
+[ CHECK IN ]
+```
+
+If selfie is required:
+
+```text
+Selfie Verification Required
+
+[ TAKE SELFIE ]
+```
+
+Do not fake location or verification status on the frontend.
+
+---
+
+# 41. LOCATION PERMISSION UX
+
+The frontend should clearly handle:
+
+```text
+Location permission granted
+Location permission denied
+Location unavailable
+GPS disabled
+Browser unsupported
+Timeout
+Low accuracy
+```
+
+Provide useful messages.
+
+Do not continuously request location unnecessarily.
+
+---
+
+# 42. SELFIE UX
+
+If selfie verification is enabled:
+
+```text
+Camera Permission
+       ↓
+Camera Preview
+       ↓
+Capture Selfie
+       ↓
+Upload
+       ↓
+Verification
+       ↓
+Result
+```
+
+Handle:
+
+* camera denied
+* camera unavailable
+* upload failure
+* verification failure
+* retry
+* timeout
+
+---
+
+# 43. ADMIN LOCATION MANAGEMENT
+
+Create:
+
+```text
+Settings
+  |
+  └── Attendance Locations
+```
+
+Features:
+
+```text
+List locations
+Create location
+Edit location
+Activate/deactivate
+Configure radius
+View map
+Assign branch
+```
+
+---
+
+# 44. MAP UI
+
+Provide a map-based location configuration if the project already has an appropriate map architecture.
+
+Administrator should be able to:
+
+```text
+Select location
+Drag marker
+Set radius
+Save
+```
+
+Example:
+
+```text
+         100m Radius
+       ______________
+      /              \
+     /      OFFICE    \
+    |        ●        |
+     \                /
+      \______________/
+```
+
+The backend remains authoritative.
+
+---
+
+# 45. LOCATION ASSIGNMENT UI
+
+Allow authorized users to assign:
+
+```text
+Location
+   ↓
+Branch
+   ↓
+Employee
+```
+
+Clearly display active assignment.
+
+---
+
+# 46. ATTENDANCE DETAIL UI
+
+Attendance detail should show, according to permissions:
+
+```text
+Employee
+Date
+Shift
+Check-in
+Check-out
+Worked Hours
+
+Location
+Location Status
+Distance
+Accuracy
+
+Verification
+Verification Status
+
+Source
+Device
+```
+
+Do not show sensitive information to users without permission.
+
+---
+
+# 47. ADMIN ATTENDANCE EXCEPTION DASHBOARD
+
+Create a foundation for:
+
+```text
+Location Exceptions
+Verification Failures
+Outside Geofence
+Low Accuracy
+Missing Location
+```
+
+Filters:
+
+```text
+Date
+Employee
+Branch
+Department
+Status
+Exception Type
+```
+
+---
+
+# 48. REPORTING FOUNDATION
+
+Prepare attendance data for future reports.
+
+Useful dimensions:
+
+```text
+employee
+branch
+department
+shift
+date
+location_status
+verification_status
+attendance_status
+```
+
+Do not build the full reporting engine yet.
+
+---
+
+# 49. RBAC
+
+Create/use permissions such as:
+
+```text
+attendance.location.view
+attendance.location.create
+attendance.location.update
+attendance.location.delete
+
+attendance.location_policy.view
+attendance.location_policy.update
+
+attendance.verification.view
+attendance.verification.manage
+
+attendance.exception.view
+attendance.exception.manage
+```
+
+Use Phase 2's existing RBAC system.
+
+Do not hard-code role names throughout the code.
+
+---
+
+# 50. TENANT ISOLATION
+
+Every location-related object must respect tenant boundaries.
+
+For example:
+
+```text
+Tenant A
+   |
+   +-- Branch A
+       |
+       +-- Location A
+```
+
+Tenant A must never be able to:
+
+```text
+read Location B
+update Location B
+assign Location B
+use Location B for attendance
+```
+
+even if the IDs are known.
+
+Test this explicitly.
+
+---
+
+# 51. CROSS-TENANT VALIDATION
+
+When assigning:
+
+```text
+Employee
++
+Branch
++
+Location
++
+Policy
+```
+
+verify all objects belong to the same tenant.
+
+Never rely solely on frontend filtering.
+
+---
+
+# 52. TRANSACTIONS
+
+Operations such as:
+
+```text
+Create location
+Assign location
+Check-in
+Create attendance event
+Create verification record
+```
+
+must use appropriate transaction boundaries.
+
+Avoid partially completed attendance operations.
+
+---
+
+# 53. IDEMPOTENCY
+
+Protect:
+
+```text
+GPS check-in
+GPS check-out
+Selfie upload
+Verification request
+```
+
+against duplicate network requests.
+
+Mobile networks frequently retry requests.
+
+The same logical attendance request must not create multiple attendance events.
+
+---
+
+# 54. TIME SECURITY
+
+Use server time as authoritative for attendance.
+
+The client-provided:
+
+```text
+captured_at
+```
+
+should be treated as metadata and validated for freshness.
+
+Do not allow users to manipulate attendance by changing their device clock.
+
+---
+
+# 55. LOCATION MOCKING TESTABILITY
+
+Do not make the test suite depend on real GPS hardware.
+
+Create test fixtures/mocks for:
+
+```text
+inside geofence
+outside geofence
+low accuracy
+stale location
+invalid coordinates
+GPS unavailable
+```
+
+---
+
+# 56. TEST DATA
+
+Create test locations such as:
+
+```text
+Office A
+Latitude: test value
+Longitude: test value
+Radius: 100m
+```
+
+Use deterministic test coordinates.
+
+Do not use real employee location data.
+
+---
+
+# 57. UNIT TESTS
+
+Test:
+
+```text
+coordinate validation
+distance calculation
+geofence calculation
+accuracy validation
+freshness validation
+policy evaluation
+verification decision
+```
+
+Examples:
+
+```text
+0 meters
+10 meters
+99 meters
+100 meters
+101 meters
+```
+
+Verify boundary behavior.
+
+---
+
+# 58. GEOFENCE EDGE TESTS
+
+Test:
+
+```text
+Exactly on boundary
+Just inside boundary
+Just outside boundary
+Invalid latitude
+Invalid longitude
+Zero/negative radius
+Very large radius
+Missing location
+```
+
+---
+
+# 59. ATTENDANCE TESTS
+
+Test:
+
+```text
+Normal GPS check-in
+GPS check-in inside geofence
+GPS check-in outside geofence
+GPS disabled
+Low accuracy
+Stale location
+Duplicate check-in
+GPS + selfie
+GPS without selfie
+Selfie failure
+Verification timeout
+```
+
+---
+
+# 60. SECURITY TESTS
+
+Test:
+
+```text
+Cross-tenant location access
+Cross-tenant attendance
+Unauthorized geofence modification
+Unauthorized verification access
+IDOR
+Mass assignment
+Fake employee_id
+Fake tenant_id
+Fake location_id
+```
+
+The backend must reject all unauthorized operations.
+
+---
+
+# 61. API TESTS
+
+Test all new endpoints.
+
+Potential APIs:
+
+```text
+GET    /api/v1/attendance/locations
+POST   /api/v1/attendance/locations
+GET    /api/v1/attendance/locations/{id}
+PUT    /api/v1/attendance/locations/{id}
+PATCH  /api/v1/attendance/locations/{id}
+DELETE /api/v1/attendance/locations/{id}
+
+POST   /api/v1/attendance/location/validate
+POST   /api/v1/attendance/check-in
+POST   /api/v1/attendance/check-out
+
+POST   /api/v1/attendance/verification
+GET    /api/v1/attendance/verification/{id}
+
+GET    /api/v1/attendance/exceptions
+```
+
+Follow existing API conventions.
+
+---
+
+# 62. DATABASE DESIGN
+
+Potential tables/entities:
+
+```text
+attendance_locations
+attendance_location_assignments
+attendance_location_policies
+attendance_location_events
+attendance_verifications
+attendance_devices
+attendance_exceptions
+```
+
+Do not create unnecessary tables.
+
+Extend existing attendance/event models where appropriate.
+
+---
+
+# 63. DATABASE CONSTRAINTS
+
+Enforce:
+
+```text
+tenant ownership
+foreign keys
+valid relationships
+unique location codes where applicable
+valid radius
+valid status
+```
+
+Use database constraints where appropriate.
+
+---
+
+# 64. DATABASE INDEXES
+
+Consider:
+
+```text
+tenant_id
+branch_id
+employee_id
+attendance_id
+geofence_id
+event_time
+verification_status
+location_status
+```
+
+Use composite indexes based on actual query patterns.
+
+Do not index every column.
+
+---
+
+# 65. POSTGRESQL GEO SUPPORT
+
+Evaluate whether PostgreSQL/PostGIS is appropriate.
+
+If the project is intended for substantial geographic functionality, consider:
+
+```text
+PostGIS
+```
+
+for:
+
+* geographic points
+* distance queries
+* spatial indexing
+* polygon geofencing
+
+If PostGIS is introduced:
+
+1. Add it through migration.
+2. Document installation.
+3. Ensure local development works.
+4. Ensure Docker works.
+5. Ensure test environment supports it.
+
+If PostGIS is unnecessary at the current scale, a carefully implemented distance calculation may be sufficient.
+
+Do not add infrastructure merely for complexity.
+
+---
+
+# 66. PERFORMANCE
+
+Location validation should be fast enough for interactive attendance.
+
+Avoid:
+
+```text
+loading all locations
+loading all employees
+Python-side filtering of large datasets
+```
+
+Use database filtering and indexed queries.
+
+For simple employee check-in, the server should resolve the applicable location efficiently.
+
+---
+
+# 67. CACHING
+
+If Redis already exists:
+
+Potentially cache:
+
+```text
+attendance policy
+employee location assignment
+branch location configuration
+```
+
+But:
+
+**Do not cache data in a way that allows stale security or attendance decisions.**
+
+Invalidate cache when configuration changes.
+
+Correctness is more important than caching.
+
+---
+
+# 68. ASYNCHRONOUS PROCESSING
+
+Do not make critical check-in success dependent on a slow asynchronous job.
+
+Core flow:
+
+```text
+Location validation
++
+Attendance validation
+=
+Immediate authoritative response
+```
+
+Use Celery for non-critical tasks such as:
+
+```text
+notifications
+analytics
+cleanup
+reports
+```
+
+where appropriate.
+
+---
+
+# 69. AUDIT LOGGING
+
+Audit:
+
+```text
+Location created
+Location updated
+Location deleted/archived
+Geofence changed
+Location assigned
+Location validation failed
+Outside geofence
+Verification failed
+Attendance accepted with exception
+Attendance rejected
+```
+
+Include:
+
+```text
+actor
+tenant
+employee
+timestamp
+action
+entity
+entity_id
+reason
+```
+
+Avoid logging raw selfies or unnecessary sensitive information.
+
+---
+
+# 70. PRIVACY & SECURITY
+
+Treat:
+
+```text
+GPS coordinates
+location history
+selfies
+verification results
+device information
+```
+
+as sensitive information.
+
+Apply:
+
+* least privilege
+* tenant isolation
+* RBAC
+* secure storage
+* controlled access
+* audit logging
+* retention strategy
+
+Do not expose this information through public APIs.
+
+---
+
+# 71. API RATE LIMITING
+
+Consider rate limits for:
+
+```text
+check-in
+check-out
+location validation
+verification
+selfie upload
+```
+
+Prevent abuse such as:
+
+```text
+1000 check-in requests per minute
+```
+
+Use existing rate-limiting infrastructure if available.
+
+---
+
+# 72. FILE UPLOAD SECURITY
+
+If selfie upload is implemented:
+
+Validate:
+
+```text
+MIME type
+file extension
+file size
+image format
+corrupted files
+```
+
+Do not trust client-provided MIME types.
+
+Do not execute uploaded files.
+
+Store outside the application executable directory where appropriate.
+
+---
+
+# 73. IMAGE PROCESSING
+
+If image processing is required:
+
+* limit image dimensions
+* limit file size
+* strip unnecessary metadata where appropriate
+* prevent decompression bombs
+* create controlled thumbnails if needed
+
+Do not retain multiple unnecessary copies.
+
+---
+
+# 74. SELFIE RETENTION
+
+Create configuration for future:
+
+```text
+selfie_retention_days
+```
+
+Do not assume selfies should be stored indefinitely.
+
+Implement cleanup architecture only if appropriate for this phase.
+
+---
+
+# 75. EMPLOYEE EXPERIENCE
+
+The employee should have a simple attendance flow:
+
+```text
+Open App
+    ↓
+View Shift
+    ↓
+Tap Check In
+    ↓
+Location Capture
+    ↓
+Geofence Validation
+    ↓
+Optional Selfie
+    ↓
+Verification
+    ↓
+Attendance Confirmed
+```
+
+Minimize unnecessary steps.
+
+---
+
+# 76. FAILURE EXPERIENCE
+
+If GPS fails:
+
+```text
+Unable to determine your location.
+Please enable location services and try again.
+```
+
+If outside:
+
+```text
+You are outside the allowed attendance area.
+```
+
+If accuracy is poor:
+
+```text
+Location accuracy is too low.
+Move to an area with a better GPS signal and retry.
+```
+
+If selfie verification fails:
+
+```text
+Identity verification failed.
+Please try again.
+```
+
+Messages should be understandable and actionable.
+
+---
+
+# 77. ADMIN CONFIGURATION
+
+Create attendance settings for:
+
+```text
+GPS Required
+Geofence Required
+Allowed Radius
+Minimum Accuracy
+Location Freshness
+Outside-Geofence Action
+Selfie Required
+Verification Failure Action
+```
+
+All settings should be tenant-specific.
+
+---
+
+# 78. DEFAULT CONFIGURATION
+
+Provide safe defaults for development.
+
+Example:
+
+```text
+GPS Required = false
+Geofence = false
+Selfie = false
+```
+
+This ensures existing Phase 4 attendance continues working unless an administrator explicitly enables verified attendance.
+
+Do NOT silently break existing attendance.
+
+---
+
+# 79. BACKWARD COMPATIBILITY
+
+Phase 4 attendance must continue to work.
+
+If location is disabled:
+
+```text
+Check-in
+   ↓
+Normal Phase 4 attendance
+```
+
+If GPS is enabled:
+
+```text
+Check-in
+   ↓
+Location validation
+   ↓
+Attendance
+```
+
+If selfie is enabled:
+
+```text
+Check-in
+   ↓
+Location
+   ↓
+Selfie
+   ↓
+Verification
+   ↓
+Attendance
+```
+
+---
+
+# 80. FEATURE FLAGS
+
+If the existing architecture supports feature flags, consider:
+
+```text
+GPS_ATTENDANCE
+GEOFENCING
+SELFIE_VERIFICATION
+DEVICE_VALIDATION
+```
+
+Feature flags must be tenant-aware if the SaaS architecture requires tenant-specific rollout.
+
+---
+
+# 81. DOCUMENTATION
+
+Create/update documentation for:
+
+```text
+GPS architecture
+Geofence architecture
+Location validation
+Attendance verification
+Selfie verification abstraction
+Storage architecture
+Privacy considerations
+API documentation
+Database relationships
+Configuration
+Testing
+```
+
+---
+
+# 82. ENVIRONMENT VARIABLES
+
+If external services are introduced, use environment variables.
+
+Example categories:
+
+```text
+STORAGE_PROVIDER
+STORAGE_BUCKET
+STORAGE_REGION
+VERIFICATION_PROVIDER
+VERIFICATION_API_URL
+VERIFICATION_API_KEY
+```
+
+Never hard-code:
+
+* API keys
+* secrets
+* access tokens
+* storage credentials
+
+Never commit `.env` secrets.
+
+---
+
+# 83. EXTERNAL VERIFICATION PROVIDERS
+
+Do not tightly couple AxonTimeHR to one biometric vendor.
+
+Use an abstraction:
+
+```text
+VerificationProvider
+```
+
+so future providers can be added without changing attendance business logic.
+
+---
+
+# 84. MOCK MODE
+
+Development environment should support:
+
+```text
+VERIFICATION_PROVIDER=mock
+```
+
+Production should use the configured secure provider if verification is enabled.
+
+Never use mock verification accidentally in production.
+
+---
+
+# 85. OBSERVABILITY
+
+Track metrics such as:
+
+```text
+location_validation_success
+location_validation_failure
+geofence_pass
+geofence_fail
+low_accuracy
+stale_location
+verification_success
+verification_failure
+attendance_rejected_location
+attendance_rejected_verification
+```
+
+Do not put raw GPS/selfie information into metrics.
+
+---
+
+# 86. ERROR CODES
+
+Create stable machine-readable codes.
+
+Examples:
+
+```text
+LOCATION_REQUIRED
+INVALID_COORDINATES
+LOW_LOCATION_ACCURACY
+STALE_LOCATION
+LOCATION_UNAVAILABLE
+GEOFENCE_NOT_CONFIGURED
+OUTSIDE_GEOFENCE
+VERIFICATION_REQUIRED
+VERIFICATION_FAILED
+VERIFICATION_TIMEOUT
+DEVICE_NOT_ALLOWED
+```
+
+Frontend should rely on error codes rather than parsing error messages.
+
+---
+
+# 87. TESTING WITH REAL DEVICES
+
+If possible, manually validate:
+
+### Browser
+
+```text
+Chrome
+Edge
+Safari where supported
+```
+
+### Mobile
+
+```text
+Android
+iOS
+```
+
+Test:
+
+```text
+Location permission
+GPS accuracy
+Camera permission
+Network failure
+Retry
+Duplicate taps
+Background/resume
+```
+
+Do not make automated CI tests dependent on physical devices.
+
+---
+
+# 88. MOBILE-READY DESIGN
+
+Design APIs for future mobile applications.
+
+The API should not assume:
+
+```text
+browser
+mouse
+desktop
+```
+
+It should work with:
+
+```text
+Android
+iOS
+Flutter
+React Native
+```
+
+---
+
+# 89. OFFLINE FOUNDATION
+
+Do not implement full offline attendance in Phase 5.
+
+However, ensure attendance events can eventually support:
+
+```text
+client_event_id
+client_created_at
+sync_status
+server_received_at
+```
+
+This will help future mobile synchronization.
+
+Do not accept offline events without server-side validation.
+
+---
+
+# 90. ANTI-TAMPERING
+
+Do not trust client values for:
+
+```text
+attendance status
+late minutes
+worked minutes
+distance
+geofence result
+verification status
+tenant
+employee
+```
+
+The server should calculate authoritative business values.
+
+---
+
+# 91. SERVER-AUTHORITATIVE ATTENDANCE
+
+The client can provide:
+
+```text
+latitude
+longitude
+accuracy
+capture timestamp
+selfie
+device metadata
+```
+
+But the server determines:
+
+```text
+tenant
+employee
+shift
+attendance date
+attendance status
+late
+early exit
+worked duration
+geofence result
+verification decision
+```
+
+---
+
+# 92. DATA FLOW
+
+Expected flow:
+
+```text
+Client
+  |
+  | GPS + optional selfie
+  ↓
+Authenticated API
+  |
+  ↓
+Tenant Resolver
+  |
+  ↓
+Employee Resolver
+  |
+  ↓
+Attendance Policy Resolver
+  |
+  ↓
+Shift Resolver
+  |
+  ↓
+Location Validator
+  |
+  ↓
+Geofence Validator
+  |
+  ↓
+Identity Verification
+  |
+  ↓
+Attendance State Machine
+  |
+  ↓
+Attendance Event
+  |
+  ↓
+Attendance Summary
+  |
+  ↓
+Audit Event
+```
+
+---
+
+# 93. DEFINITION OF DONE
+
+Phase 5 is complete only when:
+
+## LOCATION
+
+* Location management working
+* Branch/location relationship working
+* Geofence working
+* Radius configuration working
+* GPS validation working
+* Accuracy validation working
+* Freshness validation working
+* Outside-geofence rules working
+
+## ATTENDANCE
+
+* GPS check-in working
+* GPS check-out working
+* Existing Phase 4 attendance still working
+* Duplicate protection working
+* Server-side calculation working
+* Tenant isolation working
+
+## VERIFICATION
+
+* Verification abstraction working
+* Mock provider working
+* Verification status handling working
+* Optional selfie workflow working if implemented
+* Secure storage architecture working
+
+## ADMIN
+
+* Location management
+* Geofence configuration
+* Attendance policy configuration
+* Exception dashboard
+* Appropriate RBAC
+
+## SECURITY
+
+* Tenant isolation
+* RBAC
+* IDOR protection
+* Mass assignment protection
+* Secure file handling
+* Secure location access
+* Audit logging
+
+## TESTING
+
+* Unit tests
+* API tests
+* Integration tests
+* Geofence tests
+* Location tests
+* Verification tests
+* Security tests
+* Concurrency tests
+* Regression tests
+
+---
+
+# 94. REGRESSION REQUIREMENT
+
+Before declaring Phase 5 complete, verify:
+
+```text
+Phase 1 → PASS
+Phase 2 → PASS
+Phase 3 → PASS
+Phase 4 → PASS
+Phase 5 → PASS
+```
+
+Especially verify that disabling GPS/geofencing/selfie does not break normal Phase 4 attendance.
+
+---
+
+# 95. FINAL VALIDATION
+
+Run:
+
+```text
+1. Formatter
+2. Linter
+3. Type checking
+4. Database migrations
+5. Unit tests
+6. API tests
+7. Integration tests
+8. Security tests
+9. Tenant-isolation tests
+10. RBAC tests
+11. Geofence tests
+12. Timezone tests
+13. Concurrency tests
+14. File-upload security tests
+15. Frontend tests
+16. Build
+17. Docker build
+18. Docker startup
+19. OpenAPI validation
+20. Full regression suite
+```
+
+No critical test should remain failing.
+
+---
+
+# 96. FINAL DEVELOPMENT REPORT
+
+After implementation, provide:
+
+## Architecture
+
+Explain:
+
+```text
+GPS flow
+Geofence flow
+Verification flow
+Attendance integration
+```
+
+## Database
+
+List:
+
+```text
+New tables
+Modified tables
+Foreign keys
+Indexes
+Constraints
+Migrations
+```
+
+## APIs
+
+List all new/modified endpoints.
+
+## Frontend
+
+List:
+
+```text
+New screens
+Modified screens
+Components
+Forms
+Dashboards
+```
+
+## Security
+
+Explain:
+
+```text
+Tenant isolation
+RBAC
+Location privacy
+File security
+Verification security
+IDOR protection
+```
+
+## Testing
+
+Report:
+
+```text
+Total tests:
+Passed:
+Failed:
+Skipped:
+Coverage:
+```
+
+## Performance
+
+Report important query optimizations.
+
+## Known Issues
+
+Clearly list remaining limitations.
+
+## Future Work
+
+Recommend what should be implemented next.
+
+---
+
+# 97. IMPORTANT FUTURE PHASE BOUNDARIES
+
+Do NOT unnecessarily implement the following in Phase 5:
+
+```text
+Complete Leave Management
+Complete Payroll
+Complete Overtime Engine
+Complete Comp-Off
+Advanced Workforce Scheduling
+Complete Mobile Application
+AI Attendance Analytics
+Advanced Biometric Infrastructure
+Complete Notification Engine
+Subscription Billing
+```
+
+Those should be handled in later phases.
+
+---
+
+# 98. FINAL DEVELOPMENT PRINCIPLE
+
+The most important rule:
+
+**DO NOT TRUST THE CLIENT.**
+
+The frontend/mobile application is an untrusted source.
+
+The server must determine:
+
+```text
+Who
+Which tenant
+Which employee
+Which shift
+Which attendance date
+Which policy
+Whether location is valid
+Whether geofence is valid
+Whether verification is valid
+Whether attendance is allowed
+```
+
+The client only supplies evidence.
+
+---
+
+# FINAL INSTRUCTION TO THE AI CODING AGENT
+
+Inspect the existing AxonTimeHR repository before changing anything.
+
+Understand Phase 1–4 completely.
+
+Do not rewrite working functionality.
+
+Extend the existing attendance engine.
+
+Implement Phase 5 incrementally:
+
+```text
+1. Architecture analysis
+2. Database design
+3. Location management
+4. Geofence engine
+5. GPS validation
+6. Attendance integration
+7. Verification abstraction
+8. Secure file/storage architecture
+9. Frontend
+10. RBAC/security
+11. Audit
+12. Tests
+13. Performance
+14. Regression
+15. Documentation
+```
+
+After each major component:
+
+```text
+Implement
+   ↓
+Run tests
+   ↓
+Fix failures
+   ↓
+Check regression
+   ↓
+Continue
+```
+
+The final Phase 5 implementation must be:
+
+**secure, tenant-isolated, production-ready, scalable, auditable, mobile-ready, privacy-conscious, and extensible for future attendance verification technologies.**
+
+Do not build a fake GPS/selfie system merely to demonstrate functionality.
+
+Build the proper architecture so real GPS, geofencing, secure storage, and verified-attendance providers can be integrated safely.
+
+### Recommended overall roadmap
+
+With the phases you've built so far, I would structure the next few phases approximately like this:
+
+```text
+PHASE 1  → Foundation
+PHASE 2  → Authentication + Identity
+PHASE 3  → Organization + Employee Management
+PHASE 4  → Attendance + Shift Management
+PHASE 5  → GPS + Geofencing + Verified Attendance
+PHASE 6  → Leave + Holiday + Regularization + Approval Workflow
+PHASE 7  → Overtime + Comp-Off + Advanced Attendance Rules
+PHASE 8  → Payroll + Salary + Statutory Configuration
+PHASE 9  → Reports + Analytics + Dashboards
+PHASE 10 → Notifications + Email + WhatsApp/SMS + Webhooks
+PHASE 11 → Mobile App + Offline Attendance + Device Management
+PHASE 12 → SaaS Subscription + Billing + Plans + Entitlements
+PHASE 13 → Advanced Security + Compliance + Audit
+PHASE 14 → AI/Analytics + Workforce Intelligence
+PHASE 15 → Production Hardening + Scaling + Cloud Deployment
+```
+
+For **AxonTimeHR**, I would keep **GPS/geofencing/selfie verification separate from Leave and Payroll**. Attendance verification is complex enough that combining it with those modules would make the codebase unnecessarily difficult to maintain.
